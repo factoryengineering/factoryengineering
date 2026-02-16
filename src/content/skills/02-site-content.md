@@ -110,6 +110,8 @@ installUrl: "https://..."
 **Optional Fields**:
 - `featured` (boolean): Whether to feature on homepage (default: false)
 - `installUrl` (URL string): Installation or reference link
+  - **IMPORTANT**: Must be a valid URL (e.g., "https://example.com") or omitted entirely
+  - Empty strings (`""`) will cause schema validation errors
 
 **Naming Convention**: Use numeric prefixes for ordering
 - `01-doc-coauthoring.md`
@@ -398,6 +400,13 @@ Deploy to any static hosting:
 - Ensure dates are in correct format (YYYY-MM-DD)
 - Verify enum values match schema (difficulty, toolType)
 - Check for broken links or missing images
+- **Invalid URL errors**: Ensure optional URL fields (like `installUrl`, `githubUrl`) are either valid URLs or omitted entirely - empty strings cause validation errors
+
+### Sidebar Configuration Errors
+
+- **"Slug does not exist" errors**: Verify all slugs in `src/config/sidebar.json` reference actual content files
+- After updating sidebar config, clear cache: `rm -rf .astro` and restart dev server
+- Sidebar items should match actual content structure, not template placeholders
 
 ### Ordering Issues
 
