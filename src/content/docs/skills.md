@@ -11,6 +11,7 @@ Skills are reusable capabilities that extend your AI assistant with specialized 
 
 ### Documentation
 - [Document Co-Authoring](/skills/01-doc-coauthoring) - Structured workflow for collaborative document creation with AI assistance
+- [Site Content Management](/skills/02-site-content) - Comprehensive guide for maintaining content in the Factory Engineering website
 
 ## What Makes a Good Skill?
 
