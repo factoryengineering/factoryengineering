@@ -4,7 +4,6 @@ description: "Skill for maintaining and updating content in the Factory Engineer
 category: "Documentation"
 toolType: "skill"
 featured: true
-installUrl: ""
 ---
 
 # Site Content Management

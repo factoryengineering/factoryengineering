@@ -1,69 +1,31 @@
 {
   "main": [
     {
-      "label": "Getting Started",
-      "translations": {
-        "fr": "Commencer"
-      },
+      "label": "Articles",
       "items": [
         {
-          "label": "[seti:vite] Introduction",
-          "translations": {
-            "fr": "[seti:vite] Introduction"
-          },
-          "autogenerate": { "directory": "getting-started/introduction" }
-        },
-        {
-          "label": "[setting] Global Settings",
-          "translations": {
-            "fr": "[setting] Paramètres globaux"
-          },
-          "autogenerate": { "directory": "getting-started/global-settings" }
-        },
-        {
-          "label": "[seti:plan] Navigation",
-          "translations": {
-            "fr": "[seti:plan] Navigation"
-          },
-          "slug": "getting-started/navigation"
+          "label": "Browse Articles",
+          "slug": "articles"
         }
       ]
     },
     {
-      "label": "Content",
-      "translations": {
-        "fr": "Contenu"
-      },
+      "label": "Examples",
       "items": [
         {
-          "label": "[document] Components and Block",
-          "translations": {
-            "fr": "[document] Composants et blocs"
-          },
-          "autogenerate": { "directory": "contents/components" }
-        },
-        {
-          "label": "[pencil] Editing Content",
-          "translations": {
-            "fr": "[pencil] Édition du contenu"
-          },
-          "autogenerate": { "directory": "contents/editing" }
+          "label": "Browse Examples",
+          "slug": "examples"
         }
       ]
     },
     {
-      "label": "Reference",
-      "translations": {
-        "fr": "Référence"
-      },
-      "autogenerate": { "directory": "reference" }
-    },
-    {
-      "label": "Configurations",
-      "translations": {
-        "fr": "Configurations"
-      },
-      "autogenerate": { "directory": "configurations" }
+      "label": "Skills",
+      "items": [
+        {
+          "label": "Browse Skills",
+          "slug": "skills"
+        }
+      ]
     }
   ]
 }
