@@ -1,34 +1,34 @@
 ---
-title: Dockit Build Documentation with Modern UI
-description: Get started building your docs site with DocKit.
+title: Factory Engineering
+description: Build custom software factories from AI development tool components
 template: splash
 hero:
   title: |
-    Great <span data-icon-path='hero-icon.svg'></span> docs
-    <span class="light-text">developers love</span>
-  tagline: Discover tips, resources, and guidance to maximize experience with DocKit.
+    Build <span data-icon-path='hero-icon.svg'></span> software
+    <span class="light-text">factories</span>
+  tagline: Compose AI-powered tools, skills, and workflows into reproducible development environments.
 ---
 
 import Section from "~/components/Section.astro";
 import Card from "~/components/user-components/NewCard.astro";
 import Grid from "~/components/user-components/Grid.astro";
 
-<Section title="Powerful features
-<span class='light-text'>for documentations</span>" description="Explore the tools and design choices that make documentation efficient.">
+<Section title="Key components
+<span class='light-text'>of your factory</span>" description="Build custom development environments by combining powerful AI tools and workflows.">
 
 <Grid columns={4}>
-  <Card title="Well organized" icon="substack" iconColor="#FF8585">
-    The transparency of our data will help you make the informed decisions you need to.
+  <Card title="Skills" icon="seti:html" iconColor="#FF8585">
+    Reusable capabilities that extend your AI assistant with specialized workflows and knowledge.
   </Card>
-  <Card title="Lightning fast" icon="seti:vite" iconColor="#7BE1A4">
-  Our performance optimization ensures quick load times and a smooth user experience.
+  <Card title="Commands" icon="seti:vite" iconColor="#7BE1A4">
+    Single-purpose tools for specific development tasks, composable and easy to use.
   </Card>
 
-<Card title="Powerful search" icon="seti:code-search" iconColor="#FFD97B">
-  Our search functionality helps users find information quickly and easily.
+<Card title="Agents" icon="seti:config" iconColor="#FFD97B">
+  Autonomous components that handle complex workflows and decision-making processes.
 </Card>
-<Card title="Very customized" icon="seti:config" iconColor="#979BFF">
-  Tailor the documentation to fit your brand and project needs with ease.
+<Card title="Workflows" icon="substack" iconColor="#979BFF">
+  Multi-step processes that orchestrate multiple tools to accomplish sophisticated tasks.
 </Card>
 
 </Grid>
@@ -39,26 +39,26 @@ import HeroTabsItem from "~/components/HeroTabsItem.astro";
 
 <Section
   title="Get started quickly <span class='light-text'>in just 3 simple steps</span>"
-  description="A fast and frustration-free way to set up and start your documentation."
+  description="A fast way to build your first software factory and streamline your development workflow."
 >
   <HeroTabs>
     <HeroTabsItem
-      title="Install our template"
-      subtitle="Set up in seconds with our template ."
+      title="Choose your components"
+      subtitle="Select skills, commands, and agents for your workflow."
       number={1}
       image="/src/assets/step-1.png"
       imageAlt="Step 1 image"
     />
     <HeroTabsItem
-      title="Import what you need"
-      subtitle="Bring components or functions into projecs."
+      title="Configure your factory"
+      subtitle="Compose tools into a cohesive development environment."
       number={2}
       image="/src/assets/step-2.png"
       imageAlt="Step 2 image"
     />
     <HeroTabsItem
-      title="Start documentation"
-      subtitle="Start documenting your project immediately."
+      title="Build and iterate"
+      subtitle="Start developing with your custom factory setup."
       number={3}
       image="/src/assets/step-3.png"
       imageAlt="Step 3 image"
@@ -69,131 +69,75 @@ import HeroTabsItem from "~/components/HeroTabsItem.astro";
 import ListCard from "~/components/user-components/ListCard.astro";
 import LinkButton from "~/components/LinkButton.astro";
 
-<Section title="Feature topics for <span class='light-text'>our documentation</span>" description="Explore our featured topics and get an idea of our capabilities.">
+<Section title="Explore <span class='light-text'>factory engineering</span>" description="Learn concepts, see examples, and discover tools to build your custom development factory.">
 
 <Grid columns={3}>
-<ListCard title="UI Components" imageIcon="/src/assets/element.svg" number="15">
-- [Buttons & Links](/contents/components/using-components/)
-- [Navigation Menus](/contents/components/using-components/)
-- [Cards & Panels](/contents/components/using-components/)
-- [Tabs & Accordions](/contents/components/using-components/)
-- [Forms & Inputs](/contents/components/using-components/)
-- [Tables & Lists](/contents/components/using-components/)
-
-<LinkButton href="/contents/components/using-components/" variant="text" className="mt-6 mb-8 ml-4">View all components</LinkButton>
-</ListCard>
-
-<ListCard title="Content Writing" imageIcon="/src/assets/content.svg" number="18">
-- Markdown Basics
-- MDX Components
-- Code Examples
-- API Documentation
-- Tutorial Writing
+<ListCard title="Articles" imageIcon="/src/assets/content.svg" number="2">
+- Introduction to Factory Engineering
+- Building Your First Skill
+- Composing Workflows
 - Best Practices
+- Architecture Patterns
+- Tool Selection Guide
 
-<LinkButton href="/contents/editing/add-new-doc/" variant="text" className="mt-6 mb-8 ml-4">View writing guide</LinkButton>
+<LinkButton href="/articles" variant="text" className="mt-6 mb-8 ml-4">Read articles</LinkButton>
 </ListCard>
 
-<ListCard title="Page Layouts" imageIcon="/src/assets/layouts.svg" number="8">
-- Homepage Templates
-- Documentation Pages
-- API Reference Layout
-- Tutorial Structure
-- Landing Pages
-- Error Pages
+<ListCard title="Examples" imageIcon="/src/assets/layouts.svg" number="1">
+- Simple Documentation Factory
+- Code Review Factory
+- Testing Automation Factory
+- Content Generation Factory
+- API Development Factory
+- Full-Stack Factory
 
-<LinkButton href="/getting-started/introduction/overview/" variant="text" className="mt-6 mb-8 ml-4">View layouts</LinkButton>
+<LinkButton href="/examples" variant="text" className="mt-6 mb-8 ml-4">View examples</LinkButton>
+</ListCard>
+
+<ListCard title="Skills" imageIcon="/src/assets/element.svg" number="1">
+- Document Co-Authoring
+- PDF Generation
+- Code Analysis
+- Test Generation
+- API Design
+- Diagram Creation
+
+<LinkButton href="/skills" variant="text" className="mt-6 mb-8 ml-4">Browse skills</LinkButton>
 </ListCard>
 </Grid>
 
-<Grid columns={3}>
-
-<ListCard title="Code Syntax" imageIcon="/src/assets/code-block.svg" number="10" image="/src/assets/code-image.png">
-
-- Syntax Highlighting
-- Line Numbers
-- Copy Button
-- Language Labels
-- Diff Highlighting
-- File Names
-
-<LinkButton
-  href="/getting-started/introduction/overview/"
-  variant="text"
-  className="mt-6 mb-8 ml-4"
->
-  View code guide
-</LinkButton>
-
-</ListCard>
-
-<ListCard title="Version History" imageIcon="/src/assets/changelogs.svg" number="25">
-
-- Release Notes
-- Feature Updates
-- Bug Fixes
-- Breaking Changes
-- Migration Guides
-- Deprecated Features
-
-<LinkButton
-  href="/getting-started/introduction/overview/"
-  variant="text"
-  className="mt-6 mb-8 ml-4"
->
-  View changelog
-</LinkButton>
-
-</ListCard>
-
-</Grid>
- 
 </Section>
 
 
-
-import ThemeDemo from "~/components/ThemeDemo.astro";
-
-<Section
-  title="Switch easily from <span class='light-text'>dark/light mode</span>"
-  description="Dedicated toggle button to switch between dark and light mode."
->
-
-<ThemeDemo
-  darkImage="/src/assets/darkmode-demo.png"
-  lightImage="/src/assets/lightmode-demo.png"
-/>
-
-</Section>
 
 import AccordionContainer from "~/components/AccordionContainer.astro";
 import Accordion from "~/components/Accordion.astro";
 
 <Section
-  title="Have question? <span class='light-text'>We’re here to help</span>"
-  description="Get answers to the general questions people have asked."
+  title="Frequently asked <span class='light-text'>questions</span>"
+  description="Get answers to common questions about Factory Engineering."
 >
 
 <AccordionContainer tabList={
   [
     {
       type: 'basic',
-      title: 'Getting Started',
-      subtitle:'Some questions about how to start.',
+      title: 'Concepts',
+      subtitle:'Understanding factory engineering basics.',
       icon: "rocket"
 
     },
     {
       type: 'setting',
-      title: 'Settings & Configurations',
-      subtitle:'How to configure our documentation.',
+      title: 'Building Factories',
+      subtitle:'How to compose and configure factories.',
       icon: "settings"
 
     },
     {
       type: 'help',
-      title: 'Help & Support',
-      subtitle:'What type of support we provide.',
+      title: 'Tools & Skills',
+      subtitle:'Available components and how to use them.',
       icon: "support"
 
     }
@@ -202,60 +146,60 @@ import Accordion from "~/components/Accordion.astro";
 }>
 
 <Accordion
-  question="How do I get started with Dockit?"
-  answer="Simply install our template, import the components you need, and start documenting your project. The setup process takes just a few minutes."
+  question="What is Factory Engineering?"
+  answer="Factory Engineering is a methodology for building custom software development environments by composing AI-powered tools, skills, commands, agents, and workflows into reproducible configurations."
   type="basic"
 />
 <Accordion
-  question="What are the system requirements?"
-  answer="Dockit requires Node.js 18+ and works with any modern web browser. It's built on Astro and supports all major operating systems."
+  question="Why use Factory Engineering?"
+  answer="Traditional development environments require extensive manual configuration. Factory Engineering provides a composable, reproducible approach to building development environments tailored to your specific needs."
   type="basic"
 />
 <Accordion
-  question="Is Dockit free to use?"
-  answer="Yes, Dockit is completely free and open source. You can use it for personal and commercial projects without any limitations."
+  question="What's the difference between skills, commands, and agents?"
+  answer="Skills are reusable capabilities with specialized workflows. Commands are single-purpose tools for specific tasks. Agents are autonomous components that handle complex workflows and decision-making."
   type="basic"
 />
 <Accordion
-  question="Can I customize the design?"
-  answer="Absolutely! Dockit is highly customizable with Tailwind CSS. You can modify colors, layouts, components, and add your own branding."
+  question="Do I need programming experience?"
+  answer="Basic familiarity with development tools is helpful, but Factory Engineering focuses on composition rather than coding. Many factories can be built by configuring existing components."
   type="basic"
 />
 
 <Accordion
-  question="How do I change the theme colors?"
-  answer="You can customize theme colors by modifying the CSS custom properties in your theme configuration file or through the Tailwind config."
+  question="How do I create my first factory?"
+  answer="Start by identifying your workflow needs, choose relevant skills and tools from our examples, then compose them into a factory configuration. Check our 'Building Your First Skill' article for a detailed guide."
   type="setting"
 />
 <Accordion
-  question="Can I add custom components?"
-  answer="Yes, you can create and add custom Astro components. Simply place them in the components folder and import them where needed."
+  question="Can I share my factory configuration?"
+  answer="Yes! Factory configurations are designed to be portable and reproducible. You can share them with your team or publish them for others to use."
   type="setting"
 />
 <Accordion
-  question="How do I configure navigation?"
-  answer="Navigation is configured through the menu.json file in your config folder. You can add, remove, or reorder menu items as needed."
+  question="How do I customize existing factories?"
+  answer="Factories are composable by design. You can add, remove, or replace components to match your specific requirements. See our examples for common customization patterns."
   type="setting"
 />
 <Accordion
-  question="Can I use my own domain?"
-  answer="Yes, you can deploy Dockit to any hosting service and use your custom domain. We provide deployment guides for popular platforms."
+  question="Can I build factories for any type of development?"
+  answer="Yes! Factory Engineering is tool-agnostic. You can build factories for documentation, testing, code review, API development, or any workflow that benefits from AI assistance."
   type="setting"
 />
 
 <Accordion
-  question="Where can I get help?"
-  answer="You can get help through our GitHub discussions, documentation, or community Discord server. We also provide email support for complex issues."
+  question="What skills are available?"
+  answer="Browse our Skills section to see available tools. Popular skills include document co-authoring, PDF generation, code analysis, and test generation. New skills are added regularly."
   type="help"
 />
 <Accordion
-  question="How do I report bugs?"
-  answer="Please report bugs through our GitHub issues page with detailed information about the problem and steps to reproduce it."
+  question="How do I create custom skills?"
+  answer="Check our 'Building Your First Skill' article for a comprehensive guide. Skills are built using standard formats and can integrate with existing AI development tools."
   type="help"
 />
 <Accordion
-  question="Do you offer premium support?"
-  answer="While Dockit is free, we offer premium consulting services for custom implementations and enterprise deployments."
+  question="Where can I find example factories?"
+  answer="Visit our Examples section to see ready-to-use factory configurations for common scenarios like documentation, testing, and code review workflows."
   type="help"
 />
 

@@ -26,6 +26,41 @@ const ctaSection = defineCollection({
   }),
 });
 
+const articles = defineCollection({
+  type: 'content',
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    publishDate: z.coerce.date(),
+    author: z.string().optional(),
+    tags: z.array(z.string()).optional(),
+    draft: z.boolean().default(false),
+  }),
+});
+
+const examples = defineCollection({
+  type: 'content',
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    difficulty: z.enum(['beginner', 'intermediate', 'advanced']).optional(),
+    tags: z.array(z.string()).optional(),
+    githubUrl: z.string().url().optional(),
+  }),
+});
+
+const skills = defineCollection({
+  type: 'content',
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    category: z.string(),
+    toolType: z.enum(['skill', 'command', 'agent', 'workflow']),
+    featured: z.boolean().default(false),
+    installUrl: z.string().url().optional(),
+  }),
+});
+
 export const collections = {
   docs: defineCollection({
     loader: docsLoader(),
@@ -33,4 +68,7 @@ export const collections = {
   }),
   i18n: defineCollection({ loader: i18nLoader(), schema: i18nSchema() }),
   ctaSection,
+  articles,
+  examples,
+  skills,
 };
