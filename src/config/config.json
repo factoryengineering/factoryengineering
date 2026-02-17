@@ -1,11 +1,10 @@
 {
   "site": {
-    "title": "DocKit",
+    "title": "Factory Engineering",
     "logo": "/src/assets/logo-light.svg",
     "logo_darkmode": "/src/assets/logo-dark.svg",
     "logo_width": "127",
-    "logo_height": "32",
-    "logo_text": "DocKit"
+    "logo_height": "32"
   },
 
   "settings": {

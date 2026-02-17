@@ -1,8 +1,8 @@
 {
-  "name": "dockit-astro",
+  "name": "factoryengineering",
   "version": "0.0.2",
-  "description": "DocKit Astro is a simple, modern documentation theme built using Astro and Tailwind CSS",
-  "author": "Themefisher",
+  "description": "Factory Engineering website built using DocKit, Starlight, Astro, and Tailwind CSS",
+  "author": "Michael L Perry",
   "license": "MIT",
   "type": "module",
   "scripts": {
