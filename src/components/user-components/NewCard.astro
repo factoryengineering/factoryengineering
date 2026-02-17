@@ -25,7 +25,7 @@ const { icon, title, iconColor, size = "large" } = Astro.props;
     size === "sm" ? (
       ""
     ) : (
-      <div class="mt-15">
+      <div class="arrow-wrapper mt-auto pt-15">
         <span>
           <svg
             class="transition-transform duration-300 group-hover:-rotate-45"
@@ -93,6 +93,10 @@ const { icon, title, iconColor, size = "large" } = Astro.props;
     .card .body {
       margin: 0;
       font-size: clamp(var(--sl-text-body));
+    }
+
+    .card .arrow-wrapper {
+      margin-top: auto;
     }
   }
 </style>
