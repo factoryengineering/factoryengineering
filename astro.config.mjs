@@ -28,7 +28,7 @@ export default defineConfig({
       logo: {
         light: logo,
         dark: logo_darkmode,
-        alt: "DocKit Logo",
+        alt: title,
       },
       // @ts-ignore
       social: social.main || [],

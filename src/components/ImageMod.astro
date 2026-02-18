@@ -32,10 +32,13 @@ let {
 
 
 
-const images = import.meta.glob("src/assets/*.{jpeg,jpg,png,gif,svg,webp}");
+const images = import.meta.glob("/src/assets/*.{jpeg,jpg,png,gif,svg,webp}");
 
-// Check if the source path is valid
-const isValidPath = images[src] ? true : false;
+// Normalize path for lookup (glob keys may have leading slash or not)
+const normalizedSrc = src.replace(/^\//, "");
+const imageLoader =
+  images[src] ?? images[normalizedSrc] ?? images["/" + normalizedSrc];
+const isValidPath = Boolean(imageLoader);
 
 
 !isValidPath &&
@@ -49,7 +52,7 @@ const isValidPath = images[src] ? true : false;
 {
   isValidPath && (
     <Image
-      src={images[src]() as Promise<{ default: ImageMetadata }>}
+      src={(imageLoader as () => Promise<{ default: ImageMetadata }>)()}
       alt={alt}
       width={width}
       height={height}
