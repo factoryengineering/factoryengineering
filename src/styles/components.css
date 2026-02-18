@@ -10,7 +10,17 @@
   @apply mx-auto xl:max-w-[1740px]! ;
 }
 .hero-bg {
-  @apply absolute top-0 left-0 w-full -z-10 object-cover;
+  @apply absolute top-0 left-0 w-full -z-10;
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(0, 82, 204, 0.10) 0%, transparent 60%),
+    radial-gradient(ellipse at 78% 20%, rgba(0, 180, 216, 0.08) 0%, transparent 55%),
+    radial-gradient(ellipse at 50% 85%, rgba(0, 26, 77, 0.06) 0%, transparent 45%);
+}
+:global([data-theme="dark"]) .hero-bg {
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(0, 82, 204, 0.22) 0%, transparent 60%),
+    radial-gradient(ellipse at 78% 20%, rgba(0, 180, 216, 0.18) 0%, transparent 55%),
+    radial-gradient(ellipse at 50% 85%, rgba(0, 26, 77, 0.14) 0%, transparent 45%);
 }
 .doc-bg {
   @apply  h-screen bg-no-repeat absolute top-0 left-0 w-full -z-10 object-cover;

@@ -11,26 +11,7 @@ const { hasSidebar } = Astro.locals.starlightRoute;
 <div class="page sl-flex">
   {
     !hasSidebar ? (
-      <div class="hero-bg">
-        <ImageMod
-          src="/src/assets/hero-bg-light.png"
-          alt="Hero Background Light"
-          class="dark:hidden w-full h-full object-cover"
-          width={1920}
-          height={856}
-          loading="eager"
-          fetchpriority="high"
-        />
-        <ImageMod
-          src="/src/assets/hero-bg-dark.png"
-          alt="Hero Background Dark"
-          class="hidden dark:block w-full h-full object-cover"
-          width={1920}
-          height={820}
-          loading="eager"
-          fetchpriority="high"
-        />
-      </div>
+      <div class="hero-bg" aria-hidden="true"></div>
     ) : (
       <div class="doc-bg">
         <ImageMod
