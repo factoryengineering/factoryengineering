@@ -30,16 +30,20 @@ let {
   style,
 } = Astro.props;
 
-
+const isSvg = src.endsWith(".svg") || format === "svg";
 
 const images = import.meta.glob("/src/assets/*.{jpeg,jpg,png,gif,svg,webp}");
+const svgUrls = import.meta.glob("/src/assets/*.svg", { query: "?url", import: "default" });
 
 // Normalize path for lookup (glob keys may have leading slash or not)
 const normalizedSrc = src.replace(/^\//, "");
 const imageLoader =
   images[src] ?? images[normalizedSrc] ?? images["/" + normalizedSrc];
+const svgUrlLoader =
+  svgUrls[src] ?? svgUrls[normalizedSrc] ?? svgUrls["/" + normalizedSrc];
 const isValidPath = Boolean(imageLoader);
 
+const svgUrl = isSvg && svgUrlLoader ? (await svgUrlLoader()) as string : null;
 
 !isValidPath &&
   console.error(
@@ -51,17 +55,30 @@ const isValidPath = Boolean(imageLoader);
 
 {
   isValidPath && (
-    <Image
-      src={(imageLoader as () => Promise<{ default: ImageMetadata }>)()}
-      alt={alt}
-      width={width}
-      height={height}
-      loading={loading}
-      decoding={decoding}
-      fetchpriority={fetchpriority}
-      class={className}
-      format={format}
-      style={style}
-    />
+    isSvg && svgUrl ? (
+      <img
+        src={svgUrl}
+        alt={alt}
+        width={width}
+        height={height}
+        loading={loading ?? undefined}
+        decoding={decoding ?? undefined}
+        class={className}
+        style={style}
+      />
+    ) : (
+      <Image
+        src={(imageLoader as () => Promise<{ default: ImageMetadata }>)()}
+        alt={alt}
+        width={width}
+        height={height}
+        loading={loading}
+        decoding={decoding}
+        fetchpriority={fetchpriority}
+        class={className}
+        format={format}
+        style={style}
+      />
+    )
   )
 }
