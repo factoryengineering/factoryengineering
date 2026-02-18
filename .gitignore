@@ -22,3 +22,6 @@ pnpm-debug.log*
 
 # playwright logs
 .playwright-mcp/*.log
+
+# PowerPoint temp file
+docs/design/~$*.pptx
