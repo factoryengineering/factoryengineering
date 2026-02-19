@@ -2,15 +2,17 @@
 import { Icon } from "@astrojs/starlight/components";
 import Grid from "~/components/user-components/Grid.astro";
 
+type FactoryItem = { name: string; promptHtml?: string };
+
 interface Props {
   factory: {
     title: string;
     technologies: string[];
     applicationStyle: string;
-    skills: string[];
-    commands: string[];
-    agents: string[];
-    workflows: string[];
+    skills: FactoryItem[];
+    commands: FactoryItem[];
+    agents: FactoryItem[];
+    workflows: FactoryItem[];
   };
 }
 
@@ -41,7 +43,12 @@ const columns = [
           </h4>
           <ul class="section-list">
             {factory[key].map((item) => (
-              <li>{item}</li>
+              <li class="factory-item">
+                <span class="item-name">{item.name}</span>
+                {item.promptHtml && (
+                  <div class="item-prompt" set:html={item.promptHtml} />
+                )}
+              </li>
             ))}
           </ul>
         </div>
@@ -107,6 +114,51 @@ const columns = [
 
     .section-list li {
       padding: 0.15rem 0;
+    }
+
+    .factory-item {
+      position: relative;
+      padding: 0.15rem 0;
+    }
+
+    .item-name {
+      display: block;
+    }
+
+    .item-prompt {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      z-index: 1;
+      pointer-events: none;
+      min-width: 12rem;
+      max-width: 20rem;
+      padding: 0.5rem 0.6rem;
+      margin-top: 0.15rem;
+      font-size: 0.85em;
+      color: var(--sl-color-gray-1);
+      background: var(--sl-color-gray-6);
+      border-radius: 0.35rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+      opacity: 0;
+      transition: opacity 120ms ease-out;
+    }
+
+    .factory-item:hover .item-prompt {
+      opacity: 1;
+    }
+
+    .item-prompt :global(p:first-child) {
+      margin-top: 0;
+    }
+
+    .item-prompt :global(p:last-child) {
+      margin-bottom: 0;
+    }
+
+    .item-prompt :global(ul) {
+      margin: 0.25rem 0 0 0;
+      padding-left: 1rem;
     }
   }
 </style>

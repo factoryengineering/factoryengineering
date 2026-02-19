@@ -2,16 +2,43 @@
 import { getCollection } from "astro:content";
 import Section from "~/components/Section.astro";
 import ExampleFactorySection from "~/components/user-components/ExampleFactorySection.astro";
+import { markdownify } from "@/lib/utils/textConverter";
 
-const entries = await getCollection("exampleFactories");
-const sorted = entries.sort((a, b) => a.id.localeCompare(b.id));
+const factoryEntries = await getCollection("exampleFactories");
+const promptEntries = await getCollection("exampleFactoryPrompts");
+
+const promptHtmlByKey = new Map<string, string>();
+for (const entry of promptEntries) {
+  if (entry.body) {
+    promptHtmlByKey.set(entry.id, markdownify(entry.body, true));
+  }
+}
+
+function augmentItems<T extends { name: string }>(factoryId: string, items: T[]) {
+  return items.map((item) => ({
+    ...item,
+    promptHtml: promptHtmlByKey.get(`${factoryId}/${item.name}`),
+  }));
+}
+
+const sorted = factoryEntries.sort((a, b) => a.id.localeCompare(b.id));
+const augmented = sorted.map((entry) => {
+  const data = entry.data;
+  return {
+    ...data,
+    skills: augmentItems(entry.id, data.skills),
+    commands: augmentItems(entry.id, data.commands),
+    agents: augmentItems(entry.id, data.agents),
+    workflows: augmentItems(entry.id, data.workflows),
+  };
+});
 ---
 
 <Section
   title="Example <span class='light-text'>factories</span>"
   description="See how skills, commands, agents, and workflows compose for different application styles."
 >
-  {sorted.map((entry) => (
-    <ExampleFactorySection factory={entry.data} />
+  {augmented.map((factory) => (
+    <ExampleFactorySection factory={factory} />
   ))}
 </Section>
