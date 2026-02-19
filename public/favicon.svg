@@ -41,15 +41,14 @@
 <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_16_2283" result="shape"/>
 </filter>
 <linearGradient id="paint0_linear_16_2283" x1="7.5" y1="2" x2="35.3006" y2="16.5658" gradientUnits="userSpaceOnUse">
-<stop stop-color="#7F52FF"/>
-<stop offset="0.3125" stop-color="#3DBAAA"/>
-<stop offset="0.660263" stop-color="#DFA75E"/>
-<stop offset="1" stop-color="#FF856A"/>
+<stop stop-color="#1A0500"/>
+<stop offset="0.5" stop-color="#C23B00"/>
+<stop offset="1" stop-color="#FF9500"/>
 </linearGradient>
 <linearGradient id="paint1_linear_16_2283" x1="-2.12193e-07" y1="32" x2="36.5284" y2="23.8724" gradientUnits="userSpaceOnUse">
-<stop stop-color="#3A1C71"/>
-<stop offset="0.5" stop-color="#D76D77"/>
-<stop offset="1" stop-color="#FFCA7B"/>
+<stop stop-color="#1A0500"/>
+<stop offset="0.5" stop-color="#C23B00"/>
+<stop offset="1" stop-color="#FF9500"/>
 </linearGradient>
 </defs>
 </svg>

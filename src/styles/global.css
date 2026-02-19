@@ -113,9 +113,9 @@
 @theme {
   --color-primary-gradient: linear-gradient(
     35.65deg,
-    #001a4d -10.94%,
+    #1A0500 -10.94%,
     var(--color-primary) 61.04%,
-    #00b4d8 133.01%
+    #FF9500 133.01%
   );
 }
 
