@@ -8,6 +8,10 @@ license: Complete terms in LICENSE.txt
 
 This skill provides guidance for creating effective skills.
 
+## Required: Apply authoring best practices
+
+Every skill you create or revise must follow the authoring best practices. **Read [best-practices.md](best-practices.md)** when creating or verifying a skill; it contains the canonical rules (concise, degrees of freedom, progressive disclosure, workflows, content guidelines, anti-patterns) and the **Checklist for effective Skills**. Run through that checklist before finalizing.
+
 ## About Skills
 
 Skills are modular, self-contained packages that extend Claude's capabilities by providing
@@ -22,29 +26,11 @@ equipped with procedural knowledge that no model can fully possess.
 3. Domain expertise - Company-specific knowledge, schemas, business logic
 4. Bundled resources - Scripts, references, and assets for complex and repetitive tasks
 
-## Core Principles
+## Authoring rules (reference)
 
-### Concise is Key
+For **concise is key**, **degrees of freedom**, and the full **Checklist for effective Skills**, see [best-practices.md](best-practices.md). Read it when creating or verifying a skill; do not duplicate that content here.
 
-The context window is a public good. Skills share the context window with everything else Claude needs: system prompt, conversation history, other Skills' metadata, and the actual user request.
-
-**Default assumption: Claude is already very smart.** Only add context Claude doesn't already have. Challenge each piece of information: "Does Claude really need this explanation?" and "Does this paragraph justify its token cost?"
-
-Prefer concise examples over verbose explanations.
-
-### Set Appropriate Degrees of Freedom
-
-Match the level of specificity to the task's fragility and variability:
-
-**High freedom (text-based instructions)**: Use when multiple approaches are valid, decisions depend on context, or heuristics guide the approach.
-
-**Medium freedom (pseudocode or scripts with parameters)**: Use when a preferred pattern exists, some variation is acceptable, or configuration affects behavior.
-
-**Low freedom (specific scripts, few parameters)**: Use when operations are fragile and error-prone, consistency is critical, or a specific sequence must be followed.
-
-Think of Claude as exploring a path: a narrow bridge with cliffs needs specific guardrails (low freedom), while an open field allows many routes (high freedom).
-
-### Anatomy of a Skill
+## Anatomy of a Skill
 
 Every skill consists of a required SKILL.md file and optional bundled resources:
 
@@ -195,10 +181,7 @@ For simple edits, modify the XML directly.
 
 Claude reads REDLINING.md or OOXML.md only when the user needs those features.
 
-**Important guidelines:**
-
-- **Avoid deeply nested references** - Keep references one level deep from SKILL.md. All reference files should link directly from SKILL.md.
-- **Structure longer reference files** - For files longer than 100 lines, include a table of contents at the top so Claude can see the full scope when previewing.
+**Important guidelines:** Keep references one level deep from SKILL.md; add a table of contents for reference files over ~100 lines. For full progressive disclosure rules, see [best-practices.md](best-practices.md).
 
 ## Skill Creation Process
 
@@ -355,3 +338,16 @@ After testing the skill, users may request improvements. Often this happens righ
 2. Notice struggles or inefficiencies
 3. Identify how SKILL.md or bundled resources should be updated
 4. Implement changes and test again
+
+### Verification before finalizing
+
+Before considering a skill complete, run through the **Checklist for effective Skills** in [best-practices.md](best-practices.md). Then run `package_skill.py`; fix any validation errors and re-run until validation passes.
+
+## Summary checklist
+
+Before finalizing a skill:
+
+- [ ] **Run the full checklist** in [best-practices.md](best-practices.md) (Core quality, Structure, Scripts if applicable, Testing if applicable).
+- [ ] Description: third person, WHAT + WHEN, specific trigger terms; all "when to use" in description (not only in body).
+- [ ] No extraneous files (README, INSTALLATION_GUIDE, etc.); only files that support the skill.
+- [ ] Init and package: `init_skill.py` for new skills; `package_skill.py` passes before distribution.
