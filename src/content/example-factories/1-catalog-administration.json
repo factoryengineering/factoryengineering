@@ -1,9 +1,28 @@
 {
   "title": "Catalog administration",
-  "technologies": [".NET Razor Pages"],
+  "technologies": [
+    ".NET Razor Pages",
+    "EF Core"
+  ],
   "applicationStyle": "Forms over data",
-  "skills": ["linq-standards", "ef-migrations", "razor-pages"],
-  "commands": ["create-migration", "create-page", "review-pr", "write-story", "write-spec"],
-  "agents": ["fe-dev", "be-dev", "db-dev"],
-  "workflows": ["implement-feature"]
+  "skills": [
+    "linq-standards",
+    "ef-migrations",
+    "razor-pages"
+  ],
+  "commands": [
+    "create-migration",
+    "create-page",
+    "review-pr",
+    "write-story",
+    "write-spec"
+  ],
+  "agents": [
+    "fe-dev",
+    "be-dev",
+    "db-dev"
+  ],
+  "workflows": [
+    "implement-feature"
+  ]
 }

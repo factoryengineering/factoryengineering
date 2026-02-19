@@ -1,10 +1,14 @@
 {
   "title": "Data warehouse",
-  "technologies": ["PostgreSQL and .NET Core"],
+  "technologies": [
+    "PostgreSQL",
+    ".NET Core",
+    "FluentMigrator"
+  ],
   "applicationStyle": "Analytics and reporting",
   "skills": [
     "postgres-standards",
-    ".net-core-standards",
+    "fluentmigrator-standards",
     "analytics-reporting-standards"
   ],
   "commands": [

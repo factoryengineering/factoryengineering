@@ -1,6 +1,10 @@
 {
   "title": "Fulfillment engine",
-  "technologies": ["Java Spring Boot and Kafka"],
+  "technologies": [
+    "Java",
+    "Spring Boot",
+    "Kafka"
+  ],
   "applicationStyle": "Microservices and event-driven architecture",
   "skills": [
     "spring-boot-service-standards",
@@ -33,5 +37,8 @@
     "sre-dev",
     "release-manager"
   ],
-  "workflows": ["implement-feature", "incident-response-hotfix"]
+  "workflows": [
+    "implement-feature",
+    "incident-response-hotfix"
+  ]
 }

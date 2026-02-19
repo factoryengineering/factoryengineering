@@ -1,8 +1,15 @@
 {
   "title": "Sales portal",
-  "technologies": ["Next.js and React"],
+  "technologies": [
+    "Next.js",
+    "React"
+  ],
   "applicationStyle": "Customer facing",
-  "skills": ["app-router-standards", "react-custom-hooks", "atomic-design"],
+  "skills": [
+    "app-router-standards",
+    "react-custom-hooks",
+    "atomic-design"
+  ],
   "commands": [
     "create-component",
     "create-page",
@@ -13,6 +20,17 @@
     "write-story",
     "write-spec"
   ],
-  "agents": ["fe-dev", "be-dev", "db-dev", "tdd-plan", "tdd-test", "tdd-code", "tdd-refactor"],
-  "workflows": ["implement-feature", "tdd-cycle"]
+  "agents": [
+    "fe-dev",
+    "be-dev",
+    "db-dev",
+    "tdd-plan",
+    "tdd-test",
+    "tdd-code",
+    "tdd-refactor"
+  ],
+  "workflows": [
+    "implement-feature",
+    "tdd-cycle"
+  ]
 }
