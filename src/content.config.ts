@@ -61,6 +61,22 @@ const skills = defineCollection({
   }),
 });
 
+const exampleFactories = defineCollection({
+  loader: glob({
+    pattern: "**/*.json",
+    base: "src/content/example-factories",
+  }),
+  schema: z.object({
+    title: z.string(),
+    technologies: z.array(z.string()),
+    applicationStyle: z.string(),
+    skills: z.array(z.string()),
+    commands: z.array(z.string()),
+    agents: z.array(z.string()),
+    workflows: z.array(z.string()),
+  }),
+});
+
 export const collections = {
   docs: defineCollection({
     loader: docsLoader(),
@@ -71,4 +87,5 @@ export const collections = {
   articles,
   examples,
   skills,
+  exampleFactories,
 };

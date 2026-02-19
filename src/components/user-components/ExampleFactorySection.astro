@@ -1,0 +1,112 @@
+---
+import { Icon } from "@astrojs/starlight/components";
+import Grid from "~/components/user-components/Grid.astro";
+
+interface Props {
+  factory: {
+    title: string;
+    technologies: string[];
+    applicationStyle: string;
+    skills: string[];
+    commands: string[];
+    agents: string[];
+    workflows: string[];
+  };
+}
+
+const { factory } = Astro.props;
+
+const columns = [
+  { key: "skills" as const, label: "Skills", icon: "setting" as const, color: "#FF8585" },
+  { key: "commands" as const, label: "Commands", icon: "forward-slash" as const, color: "#7BE1A4" },
+  { key: "agents" as const, label: "Agents", icon: "puzzle" as const, color: "#FFD97B" },
+  { key: "workflows" as const, label: "Workflows", icon: "list-format" as const, color: "#979BFF" },
+];
+---
+
+<article class="example-factory">
+  <h3 class="factory-title">{factory.title}</h3>
+  <p class="factory-meta">
+    <span class="meta-technologies">{factory.technologies.join(", ")}</span>
+    <span class="meta-sep"> · </span>
+    <span class="meta-style">{factory.applicationStyle}</span>
+  </p>
+  <Grid columns={4}>
+    {
+      columns.map(({ key, label, icon, color }) => (
+        <div class="factory-section">
+          <h4 class="section-heading">
+            <Icon name={icon} class="section-icon" size="1.4rem" color={color} />
+            <span>{label}</span>
+          </h4>
+          <ul class="section-list">
+            {factory[key].map((item) => (
+              <li>{item}</li>
+            ))}
+          </ul>
+        </div>
+      ))
+    }
+  </Grid>
+</article>
+
+<style>
+  @layer starlight.components {
+    .example-factory {
+      margin-bottom: 2.5rem;
+    }
+
+    .example-factory:last-child {
+      margin-bottom: 0;
+    }
+
+    .factory-title {
+      font-size: var(--sl-text-h3);
+      color: var(--sl-color-white);
+      line-height: var(--sl-line-height-headings);
+      margin: 0 0 0.5rem 0;
+    }
+
+    .factory-meta {
+      font-size: var(--sl-text-body);
+      color: var(--sl-color-gray-2);
+      margin: 0 0 1.25rem 0;
+    }
+
+    .meta-sep {
+      margin: 0 0.35rem;
+    }
+
+    .factory-section {
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    .section-heading {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: var(--sl-text-h4);
+      color: var(--sl-color-white);
+      line-height: var(--sl-line-height-headings);
+      margin: 0 0 0.5rem 0;
+    }
+
+    .section-icon {
+      flex-shrink: 0;
+    }
+
+    .section-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      font-size: var(--sl-text-body);
+      color: var(--sl-color-gray-2);
+    }
+
+    .section-list li {
+      padding: 0.15rem 0;
+    }
+  }
+</style>
