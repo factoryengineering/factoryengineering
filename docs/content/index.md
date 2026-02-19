@@ -17,13 +17,105 @@ Build a custom factory specifically for each unique software project and team us
 
 ---
 
-## Get started quickly in just 3 simple steps
+## Example factories
 
-A fast way to build your first software factory and streamline your development workflow.
+### Catalog administration
 
-1. **Choose your components** — Select skills, commands, and agents for your workflow.
-2. **Configure your factory** — Compose tools into a cohesive development environment.
-3. **Build and iterate** — Start developing with your custom factory setup.
+- .NET Razor Pages
+- Forms over data
+
+Skills:
+- linq-standards
+- ef-migrations
+- razor-pages
+
+Commands:
+- create-migration
+- create-page
+- review-pr
+- write-story
+- write-spec
+
+Agents:
+- fe-dev
+- be-dev
+- db-dev
+
+Workflows:
+- implement-feature
+
+### Sales portal
+
+- Next.js and React
+- Customer facing
+
+Skills:
+- app-router-standards
+- react-custom-hooks
+- atomic-design
+
+Commands:
+- create-component
+- create-page
+- create-api-route
+- create-migration
+- create-state-store
+- review-pr
+- write-story
+- write-spec
+
+Agents:
+- fe-dev
+- be-dev
+- db-dev
+- tdd-plan
+- tdd-test
+- tdd-code
+- tdd-refactor
+
+Workflows:
+- implement-feature
+- tdd-cycle
+
+### Fulfillment engine
+
+- Java Spring Boot and Kafka
+- Microservices and event-driven architecture
+
+Skills:
+- spring-boot-service-standards
+- spring-data-jpa-standards
+- kafka-event-contracts
+- saga-orchestration-patterns
+- outbox-pattern
+- testcontainers-integration-testing
+- micrometer-observability
+
+Commands:
+- create-spring-service
+- create-rest-endpoint
+- create-domain-event
+- create-kafka-consumer
+- create-kafka-producer
+- create-saga-step
+- create-jpa-entity
+- create-flyway-migration
+- create-testcontainers-test
+- review-pr
+- write-story
+- write-spec
+
+Agents:
+- service-dev
+- integration-dev
+- data-dev
+- qa-dev
+- sre-dev
+- release-manager
+
+Workflows:
+- implement-feature
+- incident-response-hotfix
 
 ---
 
