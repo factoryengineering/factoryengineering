@@ -1,0 +1,17 @@
+---
+import { getCollection } from "astro:content";
+import Section from "~/components/Section.astro";
+import ExampleFactorySection from "~/components/user-components/ExampleFactorySection.astro";
+
+const entries = await getCollection("exampleFactories");
+const sorted = entries.sort((a, b) => a.id.localeCompare(b.id));
+---
+
+<Section
+  title="Example <span class='light-text'>factories</span>"
+  description="See how skills, commands, agents, and workflows compose for different application styles."
+>
+  {sorted.map((entry) => (
+    <ExampleFactorySection factory={entry.data} />
+  ))}
+</Section>

@@ -25,6 +25,7 @@ export default defineConfig({
   integrations: [
     starlight({
       title,
+      favicon: "/favicon.svg",
       logo: {
         light: logo,
         dark: logo_darkmode,

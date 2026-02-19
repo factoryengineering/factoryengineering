@@ -1,0 +1,37 @@
+{
+  "title": "Fulfillment engine",
+  "technologies": ["Java Spring Boot and Kafka"],
+  "applicationStyle": "Microservices and event-driven architecture",
+  "skills": [
+    "spring-boot-service-standards",
+    "spring-data-jpa-standards",
+    "kafka-event-contracts",
+    "saga-orchestration-patterns",
+    "outbox-pattern",
+    "testcontainers-integration-testing",
+    "micrometer-observability"
+  ],
+  "commands": [
+    "create-spring-service",
+    "create-rest-endpoint",
+    "create-domain-event",
+    "create-kafka-consumer",
+    "create-kafka-producer",
+    "create-saga-step",
+    "create-jpa-entity",
+    "create-flyway-migration",
+    "create-testcontainers-test",
+    "review-pr",
+    "write-story",
+    "write-spec"
+  ],
+  "agents": [
+    "service-dev",
+    "integration-dev",
+    "data-dev",
+    "qa-dev",
+    "sre-dev",
+    "release-manager"
+  ],
+  "workflows": ["implement-feature", "incident-response-hotfix"]
+}

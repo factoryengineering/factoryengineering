@@ -7,19 +7,21 @@ const { icon, title, iconColor, size = "large" } = Astro.props;
 <article
   class={`card bg-lightmode-dark dark:bg-dark group ${size === "sm" ? "p-6" : "py-12 px-10"}`}
 >
-  {
-    icon && (
-      <Icon
-        name={icon}
-        class="icon"
-        size={`${size === "sm" ? "1.4rem" : "2rem"}`}
-        color={iconColor}
-      />
-    )
-  }
-  <p class="title mt-11 mb-4">
-    <span set:html={title} />
-  </p>
+  <div class="card-header">
+    {
+      icon && (
+        <Icon
+          name={icon}
+          class="icon"
+          size={`${size === "sm" ? "1.4rem" : "2rem"}`}
+          color={iconColor}
+        />
+      )
+    }
+    <p class="title">
+      <span set:html={title} />
+    </p>
+  </div>
   <div class="body"><slot /></div>
   {
     size === "sm" ? (
@@ -82,12 +84,25 @@ const { icon, title, iconColor, size = "large" } = Astro.props;
       opacity: 1;
     }
 
-    .title {
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .card-header .icon {
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+      /* Pull icon up to align with title (icon sits low in its box) */
+      transform: translateY(-0.28em);
+    }
+
+    .card-header .title {
       font-size: var(--sl-text-h4);
       color: var(--sl-color-white);
-      line-height: var(--sl-line-height-headings);
-      gap: 1rem;
-      align-items: center;
+      line-height: 1.25;
+      margin: 0 0 1rem 0;
     }
 
     .card .body {
