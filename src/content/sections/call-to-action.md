@@ -1,11 +1,11 @@
 ---
 title: |
-  Ready to explore <span class='light-text'>Dockit experience? </span>
-description: Discover tips, resources, and guidance to maximize experience with our documentation.
+  Ready to build your first <span class='light-text'>software factory? </span>
+description: Discover tips, resources, and guidance to maximize experience with your software factory.
 enable: true
 fill_button:
   enable: true
-  label: Get Started
+  label: Build Your First Factory
   link: /getting-started/introduction/overview/
 outline_button:
   enable: true
