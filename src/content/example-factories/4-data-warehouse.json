@@ -1,0 +1,26 @@
+{
+  "title": "Data warehouse",
+  "technologies": ["PostgreSQL and .NET Core"],
+  "applicationStyle": "Analytics and reporting",
+  "skills": [
+    "postgres-standards",
+    ".net-core-standards",
+    "analytics-reporting-standards"
+  ],
+  "commands": [
+    "create-migration",
+    "create-script",
+    "review-pr",
+    "write-story",
+    "write-spec"
+  ],
+  "agents": [
+    "data-dev",
+    "analytics-dev",
+    "reporting-dev"
+  ],
+  "workflows": [
+    "implement-elt",
+    "implement-report"
+  ]
+}
