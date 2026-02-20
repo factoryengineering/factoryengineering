@@ -57,6 +57,22 @@ const columns = [
   </Grid>
 </article>
 
+<script>
+  function markTruncatedPrompts() {
+    document.querySelectorAll(".item-prompt").forEach((promptEl) => {
+      const pre = promptEl.querySelector("pre.raw-prompt");
+      if (pre && pre.scrollHeight > pre.clientHeight) {
+        promptEl.classList.add("is-truncated");
+      }
+    });
+  }
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", markTruncatedPrompts);
+  } else {
+    markTruncatedPrompts();
+  }
+</script>
+
 <style>
   @layer starlight.components {
     .example-factory {
@@ -131,11 +147,11 @@ const columns = [
       left: 0;
       z-index: 1;
       pointer-events: none;
-      min-width: 12rem;
-      max-width: 20rem;
+      min-width: 24rem;
+      max-width: min(40rem, calc(100vw - 2rem));
       padding: 0.5rem 0.6rem;
       margin-top: 0.15rem;
-      font-size: 0.85em;
+      font-size: 0.75em;
       color: var(--sl-color-gray-1);
       background: var(--sl-color-gray-6);
       border-radius: 0.35rem;
@@ -144,8 +160,27 @@ const columns = [
       transition: opacity 120ms ease-out;
     }
 
+    .item-prompt::after {
+      content: "… (more in file)";
+      display: none;
+      margin-top: 0.25rem;
+      font-size: 0.9em;
+      font-style: italic;
+      color: var(--sl-color-gray-3);
+    }
+
+    .item-prompt.is-truncated::after {
+      display: block;
+    }
+
     .factory-item:hover .item-prompt {
       opacity: 1;
+    }
+
+    /* Right-align tooltip in the last column so it doesn’t bleed off the right edge */
+    .factory-section:nth-child(4) .item-prompt {
+      left: auto;
+      right: 0;
     }
 
     .item-prompt :global(p:first-child) {
@@ -162,10 +197,15 @@ const columns = [
     }
 
     .item-prompt :global(pre.raw-prompt) {
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 12;
+      overflow: hidden;
       white-space: pre-wrap;
       word-wrap: break-word;
       margin: 0;
       padding: 0;
+      line-height: 1.35;
       font-family: inherit;
       font-size: inherit;
       border: none;
