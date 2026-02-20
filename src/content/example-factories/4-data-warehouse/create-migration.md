@@ -1,3 +1,5 @@
-**Purpose:** Add a new FluentMigrator migration.
+Add a new FluentMigrator migration.
 
-**Steps:** Create migration class; implement Up/Down; test.
+1. Create the migration class.
+2. Implement Up and Down.
+3. Test.

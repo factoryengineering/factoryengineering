@@ -1,3 +1,5 @@
-**Purpose:** Add an integration test using Testcontainers.
+Add an integration test using Testcontainers.
 
-**Steps:** Define containers; @DynamicPropertySource or config; run test.
+1. Define the containers.
+2. Use @DynamicPropertySource or config to wire them.
+3. Run the test.

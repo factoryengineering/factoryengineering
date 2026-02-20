@@ -1,3 +1,6 @@
-**Purpose:** Define and publish a domain event.
+Define and publish a domain event.
 
-**Steps:** Event class; producer; schema/topic; document contract.
+1. Define the event class.
+2. Add the producer.
+3. Define schema and topic.
+4. Document the contract.

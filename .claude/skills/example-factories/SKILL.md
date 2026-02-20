@@ -51,7 +51,7 @@ Keep each prompt **concise** so the hover tooltip stays readable.
 |-----------|-----------|----------------|
 | **Skills** | Frontmatter with `description`. `## Section` headings expressing opinions. Code examples with ✅/❌ patterns where appropriate. | Opinionated; show preferred and discouraged patterns |
 | **Agents** | **Purpose**, **What you do**, **When to use**, **Process** | Second person (“You …”); minimal bullets |
-| **Commands** | **Purpose:** one line. **Steps:** short list or phases | Structure only |
+| **Commands** | One-line intent; numbered list of instructions (imperative) | Structure only |
 | **Workflows** | **Purpose:** one line. **Phases:** high-level steps | Structure only |
 
 **Skill prompt format:**
@@ -86,6 +86,9 @@ var customers = await context.Customer
 ```
 ````
 
+**Command prompt format:**
+- One line stating intent, then a numbered list of instructions (imperative). No **Purpose** or **Steps** labels.
+
 **Example — Agent (fe-dev.md):**
 ```markdown
 **Purpose:** You implement and maintain front-end behavior and UI.
@@ -99,9 +102,11 @@ var customers = await context.Customer
 
 **Example — Command (create-migration.md):**
 ```markdown
-**Purpose:** Add a new EF Core migration.
+Add a new EF Core migration.
 
-**Steps:** Define schema change in code → run migration command → verify Up/Down.
+1. Define the schema change in code.
+2. Run the migration command.
+3. Verify Up and Down.
 ```
 
 **Example — Workflow (implement-feature.md):**

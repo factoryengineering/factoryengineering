@@ -1,3 +1,5 @@
-**Purpose:** Review pull request for correctness and standards.
+Review pull request for correctness and standards.
 
-**Steps:** Check diff, run locally, approve or request changes.
+1. Check the diff.
+2. Run locally.
+3. Approve or request changes.

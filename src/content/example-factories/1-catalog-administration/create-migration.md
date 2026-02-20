@@ -1,3 +1,5 @@
-**Purpose:** Add a new EF Core migration.
+Add a new EF Core migration.
 
-**Steps:** Define schema change in code → run migration command → verify Up/Down.
+1. Define the schema change in code.
+2. Run the migration command.
+3. Verify Up and Down.

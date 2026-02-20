@@ -1,3 +1,5 @@
-**Purpose:** Add a step to a saga (orchestration or choreography).
+Add a step to a saga (orchestration or choreography).
 
-**Steps:** Define step; compensation; update saga state; idempotency.
+1. Define the step and compensation.
+2. Update saga state.
+3. Ensure idempotency.

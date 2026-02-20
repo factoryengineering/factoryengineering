@@ -1,3 +1,4 @@
-**Purpose:** Write a user story for a feature or fix.
+Write a user story for a feature or fix.
 
-**Steps:** As a / I want / So that; acceptance criteria.
+1. Use the As a / I want / So that format.
+2. Add acceptance criteria.

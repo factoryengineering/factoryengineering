@@ -1,3 +1,4 @@
-**Purpose:** Add a SQL script for ETL or one-off use.
+Add a SQL script for ETL or one-off use.
 
-**Steps:** Idempotent where possible; document inputs/outputs.
+1. Make it idempotent where possible.
+2. Document inputs and outputs.

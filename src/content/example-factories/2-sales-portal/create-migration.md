@@ -1,3 +1,5 @@
-**Purpose:** Add a new DB migration.
+Add a new DB migration.
 
-**Steps:** Define change; run migration; verify Up/Down.
+1. Define the change.
+2. Run the migration.
+3. Verify Up and Down.

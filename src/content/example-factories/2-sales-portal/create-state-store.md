@@ -1,3 +1,4 @@
-**Purpose:** Add a client or server state store.
+Add a client or server state store.
 
-**Steps:** Define slice/store; wire to components or server actions.
+1. Define the slice or store.
+2. Wire it to components or server actions.

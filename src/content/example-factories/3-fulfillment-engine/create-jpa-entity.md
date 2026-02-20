@@ -1,3 +1,5 @@
-**Purpose:** Add a JPA entity and repository.
+Add a JPA entity and repository.
 
-**Steps:** Entity; mapping; repository interface; migration if needed.
+1. Define the entity and mapping.
+2. Add the repository interface.
+3. Add a migration if needed.

@@ -1,3 +1,4 @@
-**Purpose:** Scaffold a new Razor Page.
+Scaffold a new Razor Page.
 
-**Steps:** Add PageModel and view; wire routing and handlers.
+1. Add the PageModel and view.
+2. Wire routing and handlers.

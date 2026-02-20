@@ -1,3 +1,5 @@
-**Purpose:** Add a Kafka producer for a topic.
+Add a Kafka producer for a topic.
 
-**Steps:** Producer config; send with key; schema; error/retry handling.
+1. Configure the producer.
+2. Send with key and schema.
+3. Add error and retry handling.

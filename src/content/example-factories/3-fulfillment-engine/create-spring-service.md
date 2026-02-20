@@ -1,3 +1,4 @@
-**Purpose:** Bootstrap a new Spring Boot service.
+Bootstrap a new Spring Boot service.
 
-**Steps:** Create module; add dependencies; main class and config.
+1. Create the module and add dependencies.
+2. Add the main class and config.

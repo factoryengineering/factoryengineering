@@ -1,3 +1,4 @@
-**Purpose:** Add a new React component.
+Add a new React component.
 
-**Steps:** Create file, define props, export; add to storybook if used.
+1. Create the file, define props, and export.
+2. Add to Storybook if used.

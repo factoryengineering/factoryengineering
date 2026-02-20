@@ -1,3 +1,5 @@
-**Purpose:** Add a Flyway migration.
+Add a Flyway migration.
 
-**Steps:** Create V{n}__description.sql; Up only or pair with down; test.
+1. Create V{n}__description.sql.
+2. Implement Up only or pair with a down script.
+3. Test.
