@@ -1,18 +1,1 @@
-{
-  "title": "Sales portal",
-  "technologies": ["Next.js and React"],
-  "applicationStyle": "Customer facing",
-  "skills": ["app-router-standards", "react-custom-hooks", "atomic-design"],
-  "commands": [
-    "create-component",
-    "create-page",
-    "create-api-route",
-    "create-migration",
-    "create-state-store",
-    "review-pr",
-    "write-story",
-    "write-spec"
-  ],
-  "agents": ["fe-dev", "be-dev", "db-dev", "tdd-plan", "tdd-test", "tdd-code", "tdd-refactor"],
-  "workflows": ["implement-feature", "tdd-cycle"]
-}
+{"title":"Sales portal","technologies":["Next.js","React"],"applicationStyle":"Customer facing","skills":[{"name":"app-router-standards"},{"name":"react-custom-hooks"},{"name":"atomic-design"}],"commands":[{"name":"create-component"},{"name":"create-page"},{"name":"create-api-route"},{"name":"create-migration"},{"name":"create-state-store"},{"name":"review-pr"},{"name":"write-story"},{"name":"write-spec"}],"agents":[{"name":"fe-dev"},{"name":"be-dev"},{"name":"db-dev"},{"name":"tdd-plan"},{"name":"tdd-test"},{"name":"tdd-code"},{"name":"tdd-refactor"}],"workflows":[{"name":"implement-feature"},{"name":"tdd-cycle"}]}

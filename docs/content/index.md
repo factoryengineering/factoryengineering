@@ -117,6 +117,32 @@ Workflows:
 - implement-feature
 - incident-response-hotfix
 
+### Data warehouse
+
+- PostgreSQL and .NET Core
+- Analytics and reporting
+
+Skills:
+- postgres-standards
+- .net-core-standards
+- analytics-reporting-standards
+
+Commands:
+- create-migration
+- create-script
+- review-pr
+- write-story
+- write-spec
+
+Agents:
+- data-dev
+- analytics-dev
+- reporting-dev
+
+Workflows:
+- implement-elt
+- implement-report
+
 ---
 
 ## Explore factory engineering

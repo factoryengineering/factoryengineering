@@ -61,6 +61,10 @@ const skills = defineCollection({
   }),
 });
 
+const factoryItemSchema = z.object({
+  name: z.string(),
+});
+
 const exampleFactories = defineCollection({
   loader: glob({
     pattern: "**/*.json",
@@ -70,10 +74,21 @@ const exampleFactories = defineCollection({
     title: z.string(),
     technologies: z.array(z.string()),
     applicationStyle: z.string(),
-    skills: z.array(z.string()),
-    commands: z.array(z.string()),
-    agents: z.array(z.string()),
-    workflows: z.array(z.string()),
+    skills: z.array(factoryItemSchema),
+    commands: z.array(factoryItemSchema),
+    agents: z.array(factoryItemSchema),
+    workflows: z.array(factoryItemSchema),
+  }),
+});
+
+const exampleFactoryPrompts = defineCollection({
+  loader: glob({
+    pattern: "**/*.md",
+    base: "src/content/example-factories",
+    generateId: ({ entry }) => entry.replace(/\.md$/, ""),
+  }),
+  schema: z.object({
+    description: z.string().optional(),
   }),
 });
 
@@ -88,4 +103,5 @@ export const collections = {
   examples,
   skills,
   exampleFactories,
+  exampleFactoryPrompts,
 };
