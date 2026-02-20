@@ -2,15 +2,45 @@
 import { getCollection } from "astro:content";
 import Section from "~/components/Section.astro";
 import ExampleFactorySection from "~/components/user-components/ExampleFactorySection.astro";
-import { markdownify } from "@/lib/utils/textConverter";
+
+function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+const rawPromptFiles = import.meta.glob<string>(
+  "/src/content/example-factories/**/*.md",
+  { query: "?raw", import: "default", eager: true }
+);
 
 const factoryEntries = await getCollection("exampleFactories");
 const promptEntries = await getCollection("exampleFactoryPrompts");
 
+function getRawContent(entryId: string): string | undefined {
+  const pathVariants = [
+    `/src/content/example-factories/${entryId}.md`,
+    `src/content/example-factories/${entryId}.md`,
+  ];
+  for (const pathKey of pathVariants) {
+    const value = rawPromptFiles[pathKey];
+    if (typeof value === "string") return value;
+    if (value && typeof (value as { default?: string }).default === "string") {
+      return (value as { default: string }).default;
+    }
+  }
+  return undefined;
+}
+
 const promptHtmlByKey = new Map<string, string>();
 for (const entry of promptEntries) {
-  if (entry.body) {
-    promptHtmlByKey.set(entry.id, markdownify(entry.body, true));
+  const raw = getRawContent(entry.id);
+  if (raw !== undefined) {
+    const safe = escapeHtml(raw);
+    promptHtmlByKey.set(entry.id, `<pre class="raw-prompt">${safe}</pre>`);
   }
 }
 
