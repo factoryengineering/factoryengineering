@@ -87,7 +87,9 @@ const exampleFactoryPrompts = defineCollection({
     base: "src/content/example-factories",
     generateId: ({ entry }) => entry.replace(/\.md$/, ""),
   }),
-  schema: z.object({}),
+  schema: z.object({
+    description: z.string().optional(),
+  }),
 });
 
 export const collections = {

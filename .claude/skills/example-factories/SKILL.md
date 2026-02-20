@@ -49,20 +49,42 @@ Keep each prompt **concise** so the hover tooltip stays readable.
 
 | Type       | Structure | Voice / style |
 |-----------|-----------|----------------|
-| **Skills** | **Core Principles** (1–2 bullets), **Examples** (1–2 bullets) | Minimal detail; no long prose |
+| **Skills** | Frontmatter with `description`. `## Section` headings expressing opinions. Code examples with ✅/❌ patterns where appropriate. | Opinionated; show preferred and discouraged patterns |
 | **Agents** | **Purpose**, **What you do**, **When to use**, **Process** | Second person (“You …”); minimal bullets |
 | **Commands** | **Purpose:** one line. **Steps:** short list or phases | Structure only |
 | **Workflows** | **Purpose:** one line. **Phases:** high-level steps | Structure only |
 
-**Example — Skill (linq-standards.md):**
-```markdown
-**Core Principles**
-- Prefer declarative LINQ; avoid N+1.
-- Use async when querying (ToListAsync, etc.).
+**Skill prompt format:**
+- **Frontmatter:** YAML `description` field that explains when to use the skill (e.g., "Use when writing LINQ queries").
+- **Sections:** Use `## Heading` for each opinion or guideline.
+- **Code examples:** Where appropriate, show `// ✅ Preferred` and `// ❌ Avoid` patterns in fenced code blocks.
+- **Voice:** Express opinions directly — "Always use…", "Never rely on…", "Prefer X over Y".
 
-**Examples**
-- Project only needed columns; filter in DB.
+**Example — Skill (linq-standards.md):**
+````markdown
+---
+description: Guidelines for writing LINQ queries using Entity Framework Core. Use when writing LINQ queries.
+---
+
+## Separate specification from execution
+
+Always use query syntax (`from...select`) and separate IQueryable definition from async execution:
+
+```csharp
+// ✅ Preferred
+var customersSpec =
+    from customer in context.Customer
+    where customer.CustomerGUID == customerGuid
+    select new { customer.CustomerID, customer.Name };
+var customers = await customersSpec.ToListAsync();
+
+// ❌ Avoid: Method chaining with immediate execution
+var customers = await context.Customer
+    .Where(customer => customer.CustomerGUID == customerGuid)
+    .Select(customer => new { customer.CustomerID, customer.Name })
+    .ToListAsync();
 ```
+````
 
 **Example — Agent (fe-dev.md):**
 ```markdown
