@@ -1,31 +1,21 @@
 {
   "main": [
     {
-      "label": "Articles",
+      "label": "Factory components",
       "items": [
-        {
-          "label": "Browse Articles",
-          "slug": "articles"
-        }
+        {"label": "Skills", "slug": "skills"},
+        {"label": "Commands", "slug": "commands"},
+        {"label": "Agents", "slug": "agents"},
+        {"label": "Workflows", "slug": "workflows"}
       ]
+    },
+    {
+      "label": "Articles",
+      "items": [{"label": "Browse Articles", "slug": "articles"}]
     },
     {
       "label": "Examples",
-      "items": [
-        {
-          "label": "Browse Examples",
-          "slug": "examples"
-        }
-      ]
-    },
-    {
-      "label": "Skills",
-      "items": [
-        {
-          "label": "Browse Skills",
-          "slug": "skills"
-        }
-      ]
+      "items": [{"label": "Browse Examples", "slug": "examples"}]
     }
   ]
 }
