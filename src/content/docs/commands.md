@@ -7,11 +7,13 @@ description: Reusable task instructions—lightweight markdown files that encode
 
 Commands are lightweight markdown files that encode repeatable instructions for specific tasks. Unlike skills, which are standardized across platforms, commands are simple prompt templates that you invoke with a slash (or at symbol in any IDE) to execute a predefined sequence of steps against an artifact.
 
-In factory engineering, artifacts—such as user stories, specifications, product requirements documents, and user journeys—move through the software factory. Commands define how to process those artifacts. The power move is combining a command with an artifact: slash write spec at submit sales order executes the write spec command against that specific user story. The command provides the instructions, the artifact provides the target, and the agent does the work.
+In factory engineering, artifacts—such as user stories, specifications, product requirements documents, and user journeys—move through the software factory. Commands define how to process those artifacts. The power move is **slash-command at-artifact**: e.g. `/write-spec @submit-sales-order` runs the write-spec command against that artifact. The command provides the instructions, the artifact provides the target, and the agent does the work.
 
 ## Why Project-Scoped Commands Matter for Factory Engineering
 
 Like skills, commands must live in your project repository and evolve with your codebase. When commands are stored at the project level, they are versioned with your code, reviewed in pull requests, and automatically available to every team member on clone.
+
+**Invocation rule:** The slash name is the **filename without `.md`** (e.g. `write-spec.md` → `/write-spec`). Always use **slash-command at-artifact** to run a command against a specific artifact.
 
 ## Command Folder Locations by IDE
 
@@ -23,12 +25,12 @@ Commands are not standardized. Each IDE looks in a different folder:
 | Cursor | `.cursor/commands/` | `/command-name` |
 | Windsurf | `.windsurf/workflows/` | `/workflow-name` |
 | KiloCode | `.kilocode/workflows/` | `/workflow-name` |
+| Antigravity | `.agent/workflows/` | `/workflow-name` |
 | GitHub Copilot | Not supported natively | Use at symbol as fallback |
-| Antigravity | Not supported natively | Use at symbol as fallback |
 
-## The Symlink Approach for Commands
+## The Symlink Approach
 
-Since commands live in different folders across IDEs, use symlinks to maintain a single canonical location. We recommend `.claude/commands/` as the source of truth.
+Both **commands** and **workflows** are stored in `.claude/commands/`. Each IDE looks in a different folder, so use symlinks so that one canonical location works everywhere.
 
 **Create symlinks for each IDE:**
 
@@ -36,16 +38,18 @@ Since commands live in different folders across IDEs, use symlinks to maintain a
 # Cursor
 ln -s ../.claude/commands .cursor/commands
 
-# Windsurf (stores commands as Windsurf workflows)
+# Windsurf
 ln -s ../.claude/commands .windsurf/workflows
 
-# KiloCode (stores commands as KiloCode workflows)
+# KiloCode
 ln -s ../.claude/commands .kilocode/workflows
 
-# GitHub Copilot and Antigravity: use @ symbol as fallback to bring command into context
+# Antigravity
+mkdir -p .agent
+ln -s ../.claude/commands .agent/workflows
 ```
 
-Commit the symlinks to your repository so every team member gets the correct structure on clone.
+Commit the symlinks so every team member gets the correct structure on clone. GitHub Copilot has no project-level slash-command folder; use the at symbol to bring a command file into context.
 
 ## IDE-by-IDE Reference
 
@@ -53,9 +57,9 @@ Commit the symlinks to your repository so every team member gets the correct str
 
 **Folder location:** `.claude/commands/` (project) or `~/.claude/commands/` (global)
 
-**Invocation:** `/command-name` or `@command-name`
+**Invocation:** `/command-name` — the filename without `.md` is the slash command (e.g. `write-spec.md` → `/write-spec`). Use `@command-name` only if your IDE supports it. The `@` symbol in **slash-command at-artifact** refers to the *artifact*, not the command.
 
-Claude Code stores commands as simple markdown files. Each file becomes a command. You can use the `$ARGUMENTS` placeholder to accept parameters.
+Claude Code stores commands as markdown files; each file becomes a slash command. Use the `$ARGUMENTS` placeholder to receive the artifact (or other parameters) when the user types `/write-spec @path/to/artifact`.
 
 **Example command file (`.claude/commands/write-spec.md`):**
 
@@ -94,9 +98,7 @@ Or using the at symbol:
 
 **Folder location:** `.cursor/commands/` (project) or `~/.cursor/commands/` (global)
 
-**Invocation:** `/command-name` or `@command-name`
-
-Cursor stores commands as markdown files in `.cursor/commands/`. The filename becomes the command name. Like Claude Code, you can use `$ARGUMENTS` for parameterization.
+**Invocation:** `/command-name` — filename without `.md` becomes the slash command. Use **slash-command at-artifact** (e.g. `/write-spec @submit-sales-order`). `$ARGUMENTS` receives the artifact or other parameters when provided.
 
 **Example command file (`.cursor/commands/write-spec.md`):**
 
@@ -225,13 +227,19 @@ Or using the at symbol:
 @write-spec @submit-sales-order
 ```
 
-Create a symlink to use your canonical location:
-
-```bash
-ln -s ../.claude/commands .kilocode/workflows
-```
+Use the symlink from the setup above so `.kilocode/workflows` points to `.claude/commands`.
 
 📖 [KiloCode Workflows Documentation](https://kilo.ai/docs/features/slash-commands/workflows)
+
+---
+
+### Antigravity
+
+**Folder location:** `.agent/workflows/` (project) or `~/.gemini/antigravity/skills/` (global skills; workflows are in `.agent/workflows/`)
+
+**Invocation:** `/workflow-name` — Antigravity treats files in `.agent/workflows/` as workflows. With the symlink, your `.claude/commands/` files appear there. Use **slash-command at-artifact** (e.g. `/write-spec @submit-sales-order`).
+
+Create the symlink from the setup above: `mkdir -p .agent` then `ln -s ../.claude/commands .agent/workflows`. If you don't use the symlink, you can still use the at symbol to bring a command file and artifact into context.
 
 ---
 
@@ -250,24 +258,6 @@ GitHub Copilot does not provide a built-in mechanism for project-level custom co
 This brings both the write-spec command and the submit-sales-order artifact into the conversation context, allowing Copilot to execute the sequence of steps defined in the command.
 
 For more structured command-like functionality, consider using custom agents in VS Code through the "Configure Custom Agents" menu in Copilot Chat.
-
----
-
-### Antigravity
-
-**Status:** Does not support custom commands natively.
-
-Google Antigravity uses skills for reusable, parameterized capabilities. However, you can use the at symbol as a fallback:
-
-**Fallback usage:**
-
-```
-@write-spec @submit-sales-order
-```
-
-This brings both the command instructions and the artifact into Antigravity's context, allowing the agent to execute the sequence of steps.
-
-For more robust command-like behavior, encode your instructions as skills instead and invoke them explicitly.
 
 ---
 
@@ -304,23 +294,25 @@ EOF
 # Cursor
 ln -s ../.claude/commands .cursor/commands
 
-# Windsurf (stores commands as Windsurf workflows)
+# Windsurf
 ln -s ../.claude/commands .windsurf/workflows
 
-# KiloCode (stores commands as KiloCode workflows)
+# KiloCode
 ln -s ../.claude/commands .kilocode/workflows
 
-# GitHub Copilot and Antigravity: use @ symbol as fallback
+# Antigravity
+mkdir -p .agent
+ln -s ../.claude/commands .agent/workflows
 ```
 
 **4. Commit everything:**
 
 ```bash
-git add .claude/commands .cursor .windsurf .kilocode
-git commit -m "Initialize factory engineering commands"
+git add .claude/commands .cursor .windsurf .kilocode .agent
+git commit -m "Initialize factory engineering commands and workflows"
 ```
 
-From this point forward, every team member has commands available in their preferred IDE immediately after cloning.
+From this point forward, every team member has commands and workflows in their preferred IDE. Both live in `.claude/commands/`. Use **slash-command at-artifact** (e.g. `/write-spec @docs/stories/submit-sales-order.md`) and **slash-workflow at-artifact** (e.g. `/feature-development @docs/specs/submit-sales-order.md`). See the Workflows page for orchestration workflow content.
 
 ---
 

@@ -15,6 +15,8 @@ Before diving in, a critical terminology note: several IDEs use the word "workfl
 
 This page covers what factory engineering means by the word—orchestration of named agents—and assesses how close each IDE can come to that capability.
 
+**Software factory invocation:** To run a workflow with an artifact, use **slash-workflow at-artifact**, e.g. `/feature-development @docs/specs/submit-sales-order.md`. The workflow name is the filename without `.md`. Workflows are stored in `.claude/commands/`, alongside commands. Symlinks from `.cursor/commands/`, `.windsurf/workflows/`, `.kilocode/workflows/`, and `.agent/workflows/` point to `.claude/commands/` so every IDE sees the same files (see the Commands page).
+
 ---
 
 ## IDE Support for Workflow Orchestration
@@ -42,33 +44,29 @@ Subagents cannot spawn other subagents—only the main orchestrator can delegate
 
 Workflows for Claude Code are markdown documents written as orchestration instructions. They describe how the orchestrator should assess a situation and which subagents to delegate to. They are not step-by-step scripts—they are decision-making guidance for the orchestrator.
 
-**Store your workflow:** `.claude/workflows/`
+**Where workflows live:** Workflows are markdown files in `.claude/commands/`, the same folder as commands. One file per workflow (e.g. `feature-development.md`). The orchestrator reads that file when you invoke `/feature-development @artifact`.
 
 **Example workflow: Feature Development (`feature-development.md`)**
+
+This workflow assumes the user story and specification are already done. The user provides a specification (which contains a link to the user story). The workflow starts at implementation planning.
 
 ````markdown
 # Feature Development Workflow
 
 You are the orchestrator for this project's feature development process.
-When given a user story, execute the following process:
+The user will provide a technical specification. The specification should 
+contain a link to the user story. User story and specification steps are 
+already complete—begin at implementation planning.
 
-## Assessment
-First, read the user story carefully.
-- Does it have clear acceptance criteria? If not, delegate to @spec-writer 
-  to fill in missing criteria before proceeding.
-- Is there an existing specification? If yes, read it. If no, proceed to 
-  spec writing.
-
-## Specification
-Delegate to @spec-writer:
-- Input: the user story
-- Expected output: a complete technical specification saved to 
-  docs/specs/{story-slug}.md
-- If the spec-writer flags ambiguities it cannot resolve, surface them 
-  to the user before continuing
+## Input Check
+- If the user has **not** provided a specification: do **not** continue.
+  Ask the user to provide a specification before proceeding. Do not 
+  attempt to write a specification or infer one from a user story.
+- If a specification is provided: read it (and the user story it links to, 
+  if needed for context). Then proceed to Implementation Planning.
 
 ## Implementation Planning
-Once a specification exists, delegate to @implementation-planner:
+Delegate to @implementation-planner:
 - Input: the specification
 - Expected output: a task breakdown saved to docs/plans/{story-slug}.md
 - Review the plan for completeness. If any tasks are missing, loop back 
@@ -103,10 +101,10 @@ When all tasks pass review:
 **Invoke the workflow:**
 
 ```
-Read .claude/workflows/feature-development.md and then execute it for: @submit-sales-order
+/feature-development @docs/specs/submit-sales-order.md
 ```
 
-The orchestrator reads the workflow document, loads the user story, and begins delegating—calling on the spec-writer, implementation-planner, developers, and reviewer in sequence, looping where the workflow instructs it to loop, and surfacing decisions that require human judgment.
+Execution is **slash-workflow then at-artifact**: the workflow name (filename without `.md`) followed by `@` and the specification path. The file `.claude/commands/feature-development.md` contains the orchestration instructions. The user supplies the specification; the orchestrator reads the workflow, checks that a specification was provided, and begins at implementation planning—delegating to the implementation-planner, developers, and reviewer in sequence, looping where the workflow instructs, and surfacing decisions that require human judgment. If no specification is provided, the orchestrator asks for one and does not continue.
 
 ### Restricting Which Subagents an Orchestrator Can Spawn
 
@@ -115,14 +113,15 @@ You can define an orchestrator subagent that has explicit control over which oth
 ````markdown
 ---
 name: feature-orchestrator
-description: Use to orchestrate full feature development from user story through implementation and review
-tools: Task(spec-writer, implementation-planner, front-end-developer, back-end-developer, code-reviewer, test-runner), Read
+description: Use to orchestrate feature development from specification through implementation and review. Expects the user to provide a specification (with a link to the user story); does not write specs.
+tools: Task(implementation-planner, front-end-developer, back-end-developer, code-reviewer, test-runner), Read
 ---
 
 You are the feature development orchestrator for this project.
 
-Read your orchestration instructions from .claude/workflows/feature-development.md
-before beginning any feature development task.
+Read your orchestration instructions from .claude/commands/feature-development.md
+before beginning any feature development task. If the user has not provided a
+specification, ask for one and do not proceed.
 ````
 
 This makes the orchestrator itself a reusable, named agent that the team can invoke by name.
@@ -155,23 +154,24 @@ Orchestration instructions for KiloCode are written as custom rules or instructi
 
 Place in `.kilo/rules-orchestrator/feature-development.md`:
 
+User story and specification are assumed done. The user provides a specification (which contains a link to the user story). Start at implementation planning.
+
 ````markdown
 # Feature Development Orchestration
 
-When given a user story artifact to develop, follow this process:
+The user will provide a technical specification (with a link to the user 
+story). User story and specification steps are already complete—begin at 
+implementation planning.
 
-## Assess the Story
-Read the user story. Check if it has complete acceptance criteria and a 
-technical specification.
+## Input Check
+If the user has **not** provided a specification: do **not** continue. Ask 
+the user to provide a specification before proceeding. Do not attempt to 
+write a specification or infer one from a user story.
 
-## Specification (if missing)
-If no specification exists:
-- Delegate to spec-writer mode
-- Input: the user story
-- Wait for completion before proceeding
+If a specification is provided, read it (and the user story it links to if 
+needed), then proceed to Implementation Planning.
 
 ## Implementation Planning
-After the specification is confirmed:
 - Delegate to architect mode for implementation planning
 - Input: the specification document
 - Review the plan before proceeding
@@ -194,13 +194,13 @@ When implementation is complete:
 
 **Invoke the orchestrator:**
 
-Switch to Orchestrator mode in KiloCode, then give it the user story:
+Switch to Orchestrator mode in KiloCode, then give it the specification (slash-workflow then at-artifact):
 
 ```
-Follow our feature development orchestration process for: @submit-sales-order
+/feature-development @docs/specs/submit-sales-order.md
 ```
 
-The Orchestrator reads its instructions, assesses the artifact, and begins delegating to named modes in sequence—looping and branching based on what it discovers.
+KiloCode may expose this as a slash command if the orchestration is wired to a workflow; otherwise use the same pattern in your prompt (workflow name + @ artifact). The Orchestrator reads its instructions, verifies a specification was provided, and begins at implementation planning—delegating to named modes in sequence and looping or branching as needed. If no specification is provided, it asks for one and does not continue.
 
 📖 [KiloCode Custom Modes Documentation](https://kilo.ai/docs/customize/custom-modes)
 
@@ -324,41 +324,49 @@ When a workflow produces poor orchestration—the orchestrator makes a wrong rou
 
 ## Setting Up Workflows: Step-by-Step
 
-**1. Create your workflows directory:**
+**1. Create your commands directory (if you don't have it yet):**
 
 ```bash
-mkdir -p .claude/workflows
+mkdir -p .claude/commands
 ```
 
-**2. Create your first workflow:**
+**2. Add your first workflow:**
+
+Create `.claude/commands/feature-development.md` and paste the Feature Development Workflow markdown from the example above. Workflows live in the same folder as commands.
+
+**3. Create symlinks for other IDEs (see the Commands page):**
 
 ```bash
-touch .claude/workflows/feature-development.md
+ln -s ../.claude/commands .cursor/commands
+ln -s ../.claude/commands .windsurf/workflows
+ln -s ../.claude/commands .kilocode/workflows
+mkdir -p .agent && ln -s ../.claude/commands .agent/workflows
 ```
 
-**3. Define the orchestrator agent (Claude Code):**
+**4. Define the orchestrator agent (Claude Code):**
 
 ```bash
 cat > .claude/agents/orchestrator.md << 'EOF'
 ---
 name: orchestrator
-description: Orchestrates complete feature development from user story through implementation and review. Use when starting work on a new user story or feature.
-tools: Task(spec-writer, implementation-planner, front-end-developer, back-end-developer, code-reviewer, test-runner), Read
+description: Orchestrates feature development from specification through implementation and review. Use when the user provides a specification; ask for a specification if none is provided.
+tools: Task(implementation-planner, front-end-developer, back-end-developer, code-reviewer, test-runner), Read
 ---
 
 You are the feature development orchestrator for this project.
 
 Before beginning any task, read the appropriate workflow document from
-.claude/workflows/ to understand how to coordinate the specialist agents.
+.claude/commands/ to understand how to coordinate the specialist agents.
 
 Your role is to break down work, delegate to specialists, evaluate their
-output, and coordinate the sequence until the work is complete.
+output, and coordinate the sequence until the work is complete. Do not
+proceed without a specification from the user.
 EOF
 ```
 
-**4. Commit everything:**
+**5. Commit everything:**
 
 ```bash
-git add .claude/workflows/ .claude/agents/orchestrator.md
+git add .claude/commands/ .claude/agents/orchestrator.md .cursor .windsurf .kilocode .agent
 git commit -m "Initialize factory engineering workflows and orchestrator"
 ```
