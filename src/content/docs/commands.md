@@ -51,7 +51,7 @@ ln -s ../.claude/commands .agent/workflows
 
 Commit the symlinks so every team member gets the correct structure on clone.
 
-**GitHub Copilot (VS Code)** uses prompt files (`.prompt.md`) with different naming and optional frontmatter, so commands cannot be shared via symlinks. Use a **sync** step instead: when you add or change commands, run a script or skill that reads `.claude/commands/*.md`, adds minimal Copilot frontmatter, and writes `.github/prompts/*.prompt.md`. Commit the generated files so the team gets slash commands in VS Code. See the [GitHub Copilot (VS Code)](#github-copilot-vs-code) section below.
+**GitHub Copilot (VS Code)** uses prompt files (`.prompt.md`) with different naming and optional frontmatter, so commands cannot be shared via symlinks. Use a **sync** step instead; install the **sync-copilot-prompts** skill to assist (see [GitHub Copilot (VS Code)](#github-copilot-vs-code) below).
 
 ## IDE-by-IDE Reference
 
@@ -253,13 +253,20 @@ Create the symlink from the setup above: `mkdir -p .agent` then `ln -s ../.claud
 
 **Format:** Prompt files use the `.prompt.md` extension (not plain `.md`). They support optional YAML frontmatter (`description`, `agent`, `tools`, etc.). See [Use prompt files in VS Code](https://code.visualstudio.com/docs/copilot/customization/prompt-files) (VS Code 1.100+, April 2025).
 
-**Syncing commands for Copilot:** Copilot expects `.prompt.md` files and optional frontmatter, so the same `.claude/commands/*.md` files cannot be used directly. Keep canonical commands in `.claude/commands/*.md` and **sync** them into `.github/prompts/` when you add or change commands:
+**Syncing commands for Copilot:** Copilot expects `.prompt.md` files and optional frontmatter, so the same `.claude/commands/*.md` files cannot be used directly. Keep canonical commands in `.claude/commands/*.md` and **sync** them into `.github/prompts/` when you add or change commands.
 
-1. **Run a sync script or skill** that reads each `.claude/commands/*.md`, wraps the body with minimal Copilot frontmatter (e.g. `description`, `agent: 'agent'`), and writes `.github/prompts/<name>.prompt.md`.
-2. **When to run:** After adding or editing any file in `.claude/commands/`, or on demand (e.g. “sync commands to Copilot”).
-3. **Commit** the generated `.github/prompts/*.prompt.md` files so everyone on the team gets slash commands in VS Code.
+**Install the sync-copilot-prompts skill** so your IDE can assist with the sync (workflow, frontmatter rules, and optional batch script):
 
-You can implement the sync as a small script in your repo. This repository includes an example: **`scripts/sync_copilot_prompts.py`** (Python). Run it from the repo root after adding or changing commands; it reads `.claude/commands/*.md`, adds minimal frontmatter, and writes `.github/prompts/*.prompt.md`. Alternatively, use a skill that packages this workflow and an optional bundled script. Avoid maintaining `.github/prompts/` by hand so the canonical source stays `.claude/commands/`.
+```bash
+npx openskills install michaellperry/factoryengineering
+```
+
+Then:
+
+1. **When you add or change commands**, ask your agent to sync commands to Copilot, or run the skill’s bundled script from repo root (the skill documents the exact command).
+2. **Commit** the generated `.github/prompts/*.prompt.md` files so everyone on the team gets slash commands in VS Code.
+
+Avoid maintaining `.github/prompts/` by hand so the canonical source stays `.claude/commands/`.
 
 ---
 
@@ -307,7 +314,7 @@ mkdir -p .agent
 ln -s ../.claude/commands .agent/workflows
 ```
 
-**4. Sync commands for GitHub Copilot (if your team uses VS Code):** Run your sync script or skill to generate `.github/prompts/*.prompt.md` from `.claude/commands/*.md`. Then add and commit those files (see [GitHub Copilot (VS Code)](#github-copilot-vs-code)).
+**4. Sync commands for GitHub Copilot (if your team uses VS Code):** Install the sync-copilot-prompts skill (`npx openskills install michaellperry/factoryengineering`), then run the sync (ask your agent or run the skill’s script) to generate `.github/prompts/*.prompt.md` from `.claude/commands/*.md`. Add and commit those files (see [GitHub Copilot (VS Code)](#github-copilot-vs-code)).
 
 **5. Commit everything:**
 
