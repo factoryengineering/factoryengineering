@@ -108,3 +108,13 @@
 .list-body li:hover::before {
   background-color: var(--sl-color-white);
 }
+
+/* Card as link: no underline, fill grid cell, inherit appearance */
+.card-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+.card-link article {
+  height: 100%;
+}
