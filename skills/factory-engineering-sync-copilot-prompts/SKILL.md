@@ -1,5 +1,5 @@
 ---
-name: sync-copilot-prompts
+name: factory-engineering-sync-copilot-prompts
 description: Converts project commands (.claude/commands/*.md) into GitHub Copilot prompt files (.github/prompts/*.prompt.md) for VS Code. Use when syncing commands for Copilot, defining frontmatter from a source command, or batch-generating .prompt.md files so slash commands work in VS Code Chat.
 ---
 
@@ -12,7 +12,7 @@ Convert canonical commands into VS Code prompt files so Copilot Chat can run the
 ## Workflow
 
 1. **Single command:** Read the source command (`.claude/commands/<name>.md`). Derive frontmatter from it (see below). Write `.github/prompts/<name>.prompt.md` with that frontmatter and the command body.
-2. **Batch sync:** Run the bundled script from repo root: `python .claude/skills/sync-copilot-prompts/scripts/sync_copilot_prompts.py [REPO_ROOT]`. It reads all `.claude/commands/*.md`, adds minimal frontmatter, and writes `.github/prompts/*.prompt.md`. Commit the generated files.
+2. **Batch sync:** Run the bundled script from repo root: `python .claude/skills/factory-engineering-sync-copilot-prompts/scripts/sync_copilot_prompts.py [REPO_ROOT]`. It reads all `.claude/commands/*.md`, adds minimal frontmatter, and writes `.github/prompts/*.prompt.md`. Commit the generated files.
 
 ---
 
@@ -66,9 +66,9 @@ If the source command already uses these or similar placeholders, keep them. If 
 For deterministic batch sync, run the bundled script from the repository root:
 
 ```bash
-python .claude/skills/sync-copilot-prompts/scripts/sync_copilot_prompts.py
+python .claude/skills/factory-engineering-sync-copilot-prompts/scripts/sync_copilot_prompts.py
 # Or with explicit repo root:
-python .claude/skills/sync-copilot-prompts/scripts/sync_copilot_prompts.py /path/to/repo
+python .claude/skills/factory-engineering-sync-copilot-prompts/scripts/sync_copilot_prompts.py /path/to/repo
 ```
 
 The script creates `.github/prompts/` if missing, reads every `.claude/commands/*.md`, derives minimal frontmatter (description from first line or slug, `agent: 'agent'`), and writes each `.prompt.md`. Commit the generated files so the team gets slash commands in VS Code.

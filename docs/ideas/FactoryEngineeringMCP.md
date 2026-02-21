@@ -9,7 +9,7 @@ Ideas for pre-packaging a set of skills or an MCP server so people have immediat
 **Idea:** Ship a single bundle (repo or archive) that contains a fixed set of skills and optional scripts:
 
 - **skill-creator** — already present; create/update skills.
-- **sync-copilot-prompts** — (to add) sync `.claude/commands/*.md` → `.github/prompts/*.prompt.md`.
+- **factory-engineering-sync-copilot-prompts** — (to add) sync `.claude/commands/*.md` → `.github/prompts/*.prompt.md`.
 - **example-factories** — already present; format and conventions for example factories.
 - **factory-bootstrap** (new) — one skill that knows how to scaffold a factory: create `.claude/commands/`, stub commands (`write-spec`, `write-story`, `review-pr`), symlink setup, and when to run the Copilot sync.
 
@@ -43,7 +43,7 @@ Ideas for pre-packaging a set of skills or an MCP server so people have immediat
 
 **Idea:** A repo like `factoryengineering/starter` or `factoryengineering/template` that is a ready-to-use factory:
 
-- Pre-populated `.claude/skills/` (skill-creator, sync-copilot-prompts, example-factories, bootstrap).
+- Pre-populated `.claude/skills/` (skill-creator, factory-engineering-sync-copilot-prompts, example-factories, bootstrap).
 - `.claude/commands/` with a few stub commands.
 - Symlinks (or a script that creates them) for Cursor, Windsurf, KiloCode, Antigravity.
 - Script (or skill) to generate `.github/prompts/`.
@@ -92,7 +92,7 @@ Ideas for pre-packaging a set of skills or an MCP server so people have immediat
 
 ## Suggested order
 
-1. **Short term:** Add the **sync-copilot-prompts** skill (with script) and a **factory-bootstrap** skill (with script) to this repo, and document “copy these skills into your project” as the first packaging story.
+1. **Short term:** Add the **factory-engineering-sync-copilot-prompts** skill (with script) and a **factory-bootstrap** skill (with script) to this repo, and document “copy these skills into your project” as the first packaging story.
 2. **Next:** Add a **starter template repo** that contains those skills + stub commands + symlink script so “clone template” is the one-step path.
 3. **Then:** Implement an **MCP server** with `scaffold_factory`, `sync_copilot_prompts`, and `validate_skill` so any IDE can use the same tooling; optionally ship the skill bundle alongside the server (idea 6).
 

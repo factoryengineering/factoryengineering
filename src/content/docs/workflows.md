@@ -334,7 +334,7 @@ mkdir -p .claude/commands
 
 Create `.claude/commands/feature-development.md` and paste the Feature Development Workflow markdown from the example above. Workflows live in the same folder as commands.
 
-**3. Create symlinks for other IDEs (see the Commands page):**
+**3. Create symlinks for other IDEs (see the Commands page).** You can use the **factory-engineering-symlinks** skill (`npx openskills install michaellperry/factoryengineering`) and ask your agent to set up symlinks for your IDEs.
 
 ```bash
 ln -s ../.claude/commands .cursor/commands

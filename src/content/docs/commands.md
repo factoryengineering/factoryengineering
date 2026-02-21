@@ -32,7 +32,9 @@ Commands are not standardized. Each IDE looks in a different folder:
 
 Both **commands** and **workflows** are stored in `.claude/commands/`. Each IDE looks in a different folder, so use symlinks so that one canonical location works everywhere.
 
-**Create symlinks for each IDE:**
+**Option A — Use the factory-engineering-symlinks skill:** Install with `npx openskills install michaellperry/factoryengineering`, then ask your agent to create symlinks for your selected IDEs. The skill can auto-detect IDEs from your directory structure and will prompt to copy existing command files into `.claude/commands` if a target folder already exists.
+
+**Option B — Create symlinks manually for each IDE:**
 
 ```bash
 # Cursor
@@ -51,7 +53,7 @@ ln -s ../.claude/commands .agent/workflows
 
 Commit the symlinks so every team member gets the correct structure on clone.
 
-**GitHub Copilot (VS Code)** uses prompt files (`.prompt.md`) with different naming and optional frontmatter, so commands cannot be shared via symlinks. Use a **sync** step instead; install the **sync-copilot-prompts** skill to assist (see [GitHub Copilot (VS Code)](#github-copilot-vs-code) below).
+**GitHub Copilot (VS Code)** uses prompt files (`.prompt.md`) with different naming and optional frontmatter, so commands cannot be shared via symlinks. Use a **sync** step instead; install the **factory-engineering-sync-copilot-prompts** skill to assist (see [GitHub Copilot (VS Code)](#github-copilot-vs-code) below).
 
 ## IDE-by-IDE Reference
 
@@ -255,7 +257,7 @@ Create the symlink from the setup above: `mkdir -p .agent` then `ln -s ../.claud
 
 **Syncing commands for Copilot:** Copilot expects `.prompt.md` files and optional frontmatter, so the same `.claude/commands/*.md` files cannot be used directly. Keep canonical commands in `.claude/commands/*.md` and **sync** them into `.github/prompts/` when you add or change commands.
 
-**Install the sync-copilot-prompts skill** so your IDE can assist with the sync (workflow, frontmatter rules, and optional batch script):
+**Install the factory-engineering-sync-copilot-prompts skill** so your IDE can assist with the sync (workflow, frontmatter rules, and optional batch script):
 
 ```bash
 npx openskills install michaellperry/factoryengineering
@@ -314,7 +316,7 @@ mkdir -p .agent
 ln -s ../.claude/commands .agent/workflows
 ```
 
-**4. Sync commands for GitHub Copilot (if your team uses VS Code):** Install the sync-copilot-prompts skill (`npx openskills install michaellperry/factoryengineering`), then run the sync (ask your agent or run the skill’s script) to generate `.github/prompts/*.prompt.md` from `.claude/commands/*.md`. Add and commit those files (see [GitHub Copilot (VS Code)](#github-copilot-vs-code)).
+**4. Sync commands for GitHub Copilot (if your team uses VS Code):** Install the factory-engineering-sync-copilot-prompts skill (`npx openskills install michaellperry/factoryengineering`), then run the sync (ask your agent or run the skill’s script) to generate `.github/prompts/*.prompt.md` from `.claude/commands/*.md`. Add and commit those files (see [GitHub Copilot (VS Code)](#github-copilot-vs-code)).
 
 **5. Commit everything:**
 
