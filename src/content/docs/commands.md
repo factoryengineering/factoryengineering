@@ -26,7 +26,7 @@ Commands are not standardized. Each IDE looks in a different folder:
 | Windsurf | `.windsurf/workflows/` | `/workflow-name` |
 | KiloCode | `.kilocode/workflows/` | `/workflow-name` |
 | Antigravity | `.agent/workflows/` | `/workflow-name` |
-| GitHub Copilot | Not supported natively | Use at symbol as fallback |
+| GitHub Copilot (VS Code) | `.github/prompts/` (default) or `chat.promptFilesLocations` | `/prompt-name` (type `/` in chat; files must use the `.prompt.md` extension) |
 
 ## The Symlink Approach
 
@@ -49,7 +49,9 @@ mkdir -p .agent
 ln -s ../.claude/commands .agent/workflows
 ```
 
-Commit the symlinks so every team member gets the correct structure on clone. GitHub Copilot has no project-level slash-command folder; use the at symbol to bring a command file into context.
+Commit the symlinks so every team member gets the correct structure on clone.
+
+**GitHub Copilot (VS Code)** uses prompt files (`.prompt.md`) with different naming and optional frontmatter, so commands cannot be shared via symlinks. Use a **sync** step instead: when you add or change commands, run a script or skill that reads `.claude/commands/*.md`, adds minimal Copilot frontmatter, and writes `.github/prompts/*.prompt.md`. Commit the generated files so the team gets slash commands in VS Code. See the [GitHub Copilot (VS Code)](#github-copilot-vs-code) section below.
 
 ## IDE-by-IDE Reference
 
@@ -243,21 +245,21 @@ Create the symlink from the setup above: `mkdir -p .agent` then `ln -s ../.claud
 
 ---
 
-### GitHub Copilot
+### GitHub Copilot (VS Code)
 
-**Status:** Does not support custom slash commands or project-level commands natively.
+**Folder location:** `.github/prompts/` (default workspace location). Additional folders can be listed in the `chat.promptFilesLocations` setting.
 
-GitHub Copilot does not provide a built-in mechanism for project-level custom commands like Claude Code or Cursor. However, you can use the at symbol to bring a command file into context alongside an artifact:
+**Invocation:** Type `/` in the Chat view, then the prompt name (filename without `.prompt.md`). For example, `write-spec.prompt.md` → `/write-spec`. You can then add an artifact with `@artifact-name` (e.g. `/write-spec @submit-sales-order`).
 
-**Fallback usage:**
+**Format:** Prompt files use the `.prompt.md` extension (not plain `.md`). They support optional YAML frontmatter (`description`, `agent`, `tools`, etc.). See [Use prompt files in VS Code](https://code.visualstudio.com/docs/copilot/customization/prompt-files) (VS Code 1.100+, April 2025).
 
-```
-@write-spec @submit-sales-order
-```
+**Syncing commands for Copilot:** Copilot expects `.prompt.md` files and optional frontmatter, so the same `.claude/commands/*.md` files cannot be used directly. Keep canonical commands in `.claude/commands/*.md` and **sync** them into `.github/prompts/` when you add or change commands:
 
-This brings both the write-spec command and the submit-sales-order artifact into the conversation context, allowing Copilot to execute the sequence of steps defined in the command.
+1. **Run a sync script or skill** that reads each `.claude/commands/*.md`, wraps the body with minimal Copilot frontmatter (e.g. `description`, `agent: 'agent'`), and writes `.github/prompts/<name>.prompt.md`.
+2. **When to run:** After adding or editing any file in `.claude/commands/`, or on demand (e.g. “sync commands to Copilot”).
+3. **Commit** the generated `.github/prompts/*.prompt.md` files so everyone on the team gets slash commands in VS Code.
 
-For more structured command-like functionality, consider using custom agents in VS Code through the "Configure Custom Agents" menu in Copilot Chat.
+You can implement the sync as a small script in your repo. This repository includes an example: **`scripts/sync_copilot_prompts.py`** (Python). Run it from the repo root after adding or changing commands; it reads `.claude/commands/*.md`, adds minimal frontmatter, and writes `.github/prompts/*.prompt.md`. Alternatively, use a skill that packages this workflow and an optional bundled script. Avoid maintaining `.github/prompts/` by hand so the canonical source stays `.claude/commands/`.
 
 ---
 
@@ -288,7 +290,7 @@ Reference our specification standards in docs/spec-standards.md
 EOF
 ```
 
-**3. Create symlinks for each IDE your team uses:**
+**3. Create symlinks for each IDE your team uses (except GitHub Copilot):**
 
 ```bash
 # Cursor
@@ -305,10 +307,14 @@ mkdir -p .agent
 ln -s ../.claude/commands .agent/workflows
 ```
 
-**4. Commit everything:**
+**4. Sync commands for GitHub Copilot (if your team uses VS Code):** Run your sync script or skill to generate `.github/prompts/*.prompt.md` from `.claude/commands/*.md`. Then add and commit those files (see [GitHub Copilot (VS Code)](#github-copilot-vs-code)).
+
+**5. Commit everything:**
 
 ```bash
 git add .claude/commands .cursor .windsurf .kilocode .agent
+# If you synced for Copilot:
+git add .github/prompts
 git commit -m "Initialize factory engineering commands and workflows"
 ```
 
