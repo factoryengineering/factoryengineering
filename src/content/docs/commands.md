@@ -15,18 +15,40 @@ Like skills, commands must live in your project repository and evolve with your 
 
 **Invocation rule:** The slash name is the **filename without `.md`** (e.g. `write-spec.md` → `/write-spec`). Always use **slash-command at-artifact** to run a command against a specific artifact.
 
-## Command Folder Locations by IDE
+## Example command file
 
-Commands are not standardized. Each IDE looks in a different folder:
+Commands are markdown files. The slash name is the filename without `.md` (e.g. `write-design.md` → `/write-design`). This is a convention shared across IDEs; folder locations vary (see table below). Because commands are shared via symlinks, keep them **IDE-agnostic**: do not rely on `$ARGUMENTS` or other placeholders, since not all IDEs support them. Instead, write the command so it **states what the user will supply** (e.g. a user story or design document, by link or by name) and **instructs the LLM to stop and prompt the user** if that input is missing. That pattern works consistently in every IDE. Below is an example showing this pattern plus location, purpose, structure, and a short checklist.
 
-| IDE | Folder | Invocation |
-|-----|--------|-----------|
-| Claude Code | `.claude/commands/` | `/command-name` |
-| Cursor | `.cursor/commands/` | `/command-name` |
-| Windsurf | `.windsurf/workflows/` | `/workflow-name` |
-| KiloCode | `.kilocode/workflows/` | `/workflow-name` |
-| Antigravity | `.agent/workflows/` | `/workflow-name` |
-| GitHub Copilot (VS Code) | `.github/prompts/` (default) or `chat.promptFilesLocations` | `/prompt-name` (type `/` in chat; files must use the `.prompt.md` extension) |
+**Example (`.claude/commands/write-design.md`):**
+
+```markdown
+# Write Design Document
+
+The user will supply a user story or design document, either by link or by name. If no user story or design document is supplied, then stop and prompt the user. Create a new design document or update the existing one using the following instructions.
+
+## Location
+
+- **Path:** `docs/designs/`
+- **Filename:** Descriptive kebab-case ending in `-design.md`.
+
+## Purpose
+
+Design documents capture: user story and scope, domain definitions, technical approach and data sources, gaps and recommendations, test cases, acceptance criteria. They are planning artifacts; reference user stories and scenarios, not implementation.
+
+## Contents
+
+Include:
+1. Title and user story
+2. Data model and validation rules
+3. Data model diagrams
+4. Test cases driven by acceptance criteria
+5. OpenAPI endpoint specifications
+6. References
+
+## Structure
+
+Use the recommended template in the [documentation-spec](../../skills/documentation-spec/SKILL.md) skill.
+```
 
 ## The Symlink Approach
 
@@ -58,6 +80,8 @@ Commit the symlinks so every team member gets the correct structure on clone.
 
 **GitHub Copilot (VS Code)** uses prompt files (`.prompt.md`) with different naming and optional frontmatter, so commands cannot be shared via symlinks. Use a **sync** step instead; the **factory-engineering** skill includes sync instructions and a batch script (see [GitHub Copilot (VS Code)](#github-copilot-vs-code) below).
 
+Stored in `.claude/commands/`, this file is available as `/write-design` in Claude Code and Cursor; with symlinks, the same file is used by Windsurf, KiloCode, and Antigravity. Invoke with **slash-command at-artifact** (e.g. `/write-design @docs/user-stories/billing-email.md`).
+
 ## IDE-by-IDE Reference
 
 ### Claude Code
@@ -66,24 +90,7 @@ Commit the symlinks so every team member gets the correct structure on clone.
 
 **Invocation:** `/command-name` — the filename without `.md` is the slash command (e.g. `write-spec.md` → `/write-spec`). Use `@command-name` only if your IDE supports it. The `@` symbol in **slash-command at-artifact** refers to the *artifact*, not the command.
 
-Claude Code stores commands as markdown files; each file becomes a slash command. Use the `$ARGUMENTS` placeholder to receive the artifact (or other parameters) when the user types `/write-spec @path/to/artifact`.
-
-**Example command file (`.claude/commands/write-spec.md`):**
-
-```markdown
-Write a detailed technical specification for this user story.
-
-Include:
-- Feature description
-- User flows and interactions
-- Data requirements and schema
-- API endpoints (if applicable)
-- Error handling and edge cases
-- Performance requirements
-- Acceptance criteria
-
-Reference our specification standards in docs/spec-standards.md
-```
+Claude Code stores commands as markdown files; each file becomes a slash command. For cross-IDE consistency, use the [recommended pattern](#example-command-file): state in the command what the user will supply and instruct the LLM to stop and prompt if it’s missing. Claude Code also supports `$ARGUMENTS` if you need it. See [Example command file](#example-command-file) above for structure.
 
 **Usage in Claude Code:**
 
@@ -105,24 +112,7 @@ Or using the `@` symbol:
 
 **Folder location:** `.cursor/commands/` (project) or `~/.cursor/commands/` (global)
 
-**Invocation:** `/command-name` — filename without `.md` becomes the slash command. Use **slash-command at-artifact** (e.g. `/write-spec @submit-sales-order`). `$ARGUMENTS` receives the artifact or other parameters when provided.
-
-**Example command file (`.cursor/commands/write-spec.md`):**
-
-```markdown
-Write a detailed technical specification for this user story.
-
-Include:
-- Feature description
-- User flows and interactions
-- Data requirements and schema
-- API endpoints (if applicable)
-- Error handling and edge cases
-- Performance requirements
-- Acceptance criteria
-
-Reference our specification standards in docs/spec-standards.md
-```
+**Invocation:** `/command-name` — filename without `.md` becomes the slash command. Use **slash-command at-artifact** (e.g. `/write-spec @submit-sales-order`). Follow the [recommended pattern](#example-command-file) (state what the user supplies; stop and prompt if missing) so the same command works in all IDEs; Cursor also supports `$ARGUMENTS` when provided. See [Example command file](#example-command-file) above for structure.
 
 **Usage in Cursor:**
 
@@ -152,26 +142,7 @@ ln -s ../.claude/commands .cursor/commands
 
 **Invocation:** `/workflow-name` or `@workflow-name`
 
-Windsurf calls them workflows—note that this is different from workflows in the factory engineering sense. In Windsurf, these are simply the storage mechanism for reusable command instructions. Windsurf workflows are markdown files that define a sequence of steps for Cascade to follow.
-
-**Example Windsurf workflow file (`.windsurf/workflows/write-spec.md`):**
-
-```markdown
-# Write Technical Specification
-
-Write a detailed technical specification for this user story.
-
-## Include:
-- Feature description and goals
-- User flows and interactions
-- Data requirements and schema
-- API endpoints (if applicable)
-- Error handling and edge cases
-- Performance requirements
-- Acceptance criteria
-
-Reference our specification standards in docs/spec-standards.md
-```
+Windsurf calls them workflows—note that this is different from workflows in the factory engineering sense. In Windsurf, these are simply the storage mechanism for reusable command instructions. Windsurf workflows are markdown files that define a sequence of steps for Cascade to follow. With the symlink, the same file as in [Example command file](#example-command-file) is used.
 
 **Usage in Windsurf:**
 
@@ -201,26 +172,7 @@ ln -s ../.claude/commands .windsurf/workflows
 
 **Invocation:** `/workflow-name` or `@workflow-name`
 
-KiloCode calls them workflows—again, this is KiloCode's storage mechanism for commands, not factory engineering workflows. KiloCode workflows are markdown files that define a sequence of steps.
-
-**Example KiloCode workflow file (`.kilocode/workflows/write-spec.md`):**
-
-```markdown
-# Write Technical Specification
-
-Write a detailed technical specification for this user story.
-
-Include:
-- Feature description and goals
-- User flows and interactions
-- Data requirements and schema
-- API endpoints (if applicable)
-- Error handling and edge cases
-- Performance requirements
-- Acceptance criteria
-
-Reference our specification standards in docs/spec-standards.md
-```
+KiloCode calls them workflows—again, this is KiloCode's storage mechanism for commands, not factory engineering workflows. KiloCode workflows are markdown files that define a sequence of steps. With the symlink, the same file as in [Example command file](#example-command-file) is used.
 
 **Usage in KiloCode:**
 
