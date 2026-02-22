@@ -50,6 +50,24 @@ Include:
 Use the recommended template in the [documentation-spec](../../skills/documentation-spec/SKILL.md) skill.
 ```
 
+---
+
+## Creating Commands Iteratively
+
+**1. Do the task once with the agent.** Pick a concrete artifact (e.g. a user story) and tell the agent what you want (e.g. "Write a technical spec for this story"). Work through the result—fix gaps, adjust structure, clarify wording—until the output is what you want. Do not compromise on quality.
+
+**2. Capture the process as a command.** Ask the agent to create a command file in `.claude/commands/` that encodes the instructions you just followed. The command should state what the user supplies (e.g. a user story or design doc) and tell the LLM to stop and prompt if that input is missing. Use the [recommended pattern](#example-command-file): location, purpose, contents, structure. Instruct the LLM to save the file (e.g. `write-spec.md` → `/write-spec`).
+
+**3. Run the command against an artifact.** Invoke **slash-command at-artifact** (e.g. `/write-spec @docs/user-stories/submit-sales-order.md`). Do not hand-hold; let the command stand on its own. Note where the output is wrong, vague, or inconsistent with how you refined it in step 1.
+
+**4. Refine the command.** For each shortcoming, ask: *Which part of the command allowed this?* Update the command text—add constraints, examples, or explicit structure (e.g. "Include…", "Do not…", "Use the template in…"). Commit the change.
+
+**5. Repeat steps 3 and 4.** Re-run the command on the same or a different artifact. Keep tightening instructions until the command produces the desired result without extra guidance. When it does, that command is ready for the team.
+
+**6. Add more commands the same way.** For each new repeatable task (e.g. implementation plan, code review), do the task once, capture it as a command, then iterate by running and refining until the command is reliable.
+
+From here, every team member uses **slash-command at-artifact** (e.g. `/write-spec @docs/stories/submit-sales-order.md`). For multi-step orchestration, see the Workflows page.
+
 ## The Symlink Approach
 
 Both **commands** and **workflows** are stored in `.claude/commands/`. Each IDE looks in a different folder. Use symlinks so that one canonical location works everywhere.
@@ -200,121 +218,3 @@ Then:
 2. **Commit** the generated `.github/prompts/*.prompt.md` files so everyone on the team gets slash commands in VS Code.
 
 Avoid maintaining `.github/prompts/` by hand so the canonical source stays `.claude/commands/`.
-
----
-
-## Complete Setup: Step-by-Step
-
-**1. Create your canonical commands directory:**
-
-```bash
-mkdir -p .claude/commands
-```
-
-**2. Create your first command:**
-
-```bash
-cat > .claude/commands/write-spec.md << 'EOF'
-Write a detailed technical specification for this user story.
-
-Include:
-- Feature description and goals
-- User flows and interactions
-- Data requirements and schema
-- API endpoints (if applicable)
-- Error handling and edge cases
-- Performance requirements
-- Acceptance criteria
-
-Reference our specification standards in docs/spec-standards.md
-EOF
-```
-
-**3. Create symlinks for each IDE your team uses (except GitHub Copilot):** Use the **factory-engineering** skill (Option A above) and ask your agent to set up symlinks—it will create both command and skill symlinks by default. Or create them manually from the repository root:
-
-```bash
-# Cursor
-mkdir -p .cursor
-ln -s ../.claude/commands .cursor/commands
-
-# Windsurf
-mkdir -p .windsurf
-ln -s ../.claude/commands .windsurf/workflows
-
-# KiloCode
-mkdir -p .kilocode
-ln -s ../.claude/commands .kilocode/workflows
-
-# Antigravity
-mkdir -p .agent
-ln -s ../.claude/commands .agent/workflows
-```
-
-**4. Sync commands for GitHub Copilot (if your team uses VS Code):** Use the factory-engineering skill (same install as above); ask your agent to sync or run the skill’s script to generate `.github/prompts/*.prompt.md` from `.claude/commands/*.md`. Add and commit those files (see [GitHub Copilot (VS Code)](#github-copilot-vs-code)).
-
-**5. Commit everything:**
-
-```bash
-git add .claude/commands .cursor .windsurf .kilocode .agent
-# If you synced for Copilot:
-git add .github/prompts
-git commit -m "Initialize factory engineering commands and workflows"
-```
-
-From this point forward, every team member has commands and workflows in their preferred IDE. Both live in `.claude/commands/`. Use **slash-command at-artifact** (e.g. `/write-spec @docs/stories/submit-sales-order.md`) and **slash-workflow at-artifact** (e.g. `/feature-development @docs/specs/submit-sales-order.md`). See the Workflows page for orchestration workflow content.
-
----
-
-## Writing Effective Commands
-
-A command is a template for processing an artifact. Keep it focused on a single repeatable task. Be explicit about what you expect in the output.
-
-**Example: Write Specification Command**
-
-```markdown
-Write a detailed technical specification for this user story.
-
-Include:
-- Feature description and acceptance criteria
-- User flows and interaction patterns
-- Data model and schema requirements
-- API endpoints and request/response formats
-- Error handling and edge cases
-- Performance and security considerations
-
-Structure it as a single coherent document. Reference our specification standards in docs/spec-standards.md
-```
-
-**Example: Implementation Plan Command**
-
-```markdown
-Create a detailed implementation plan for this user story.
-
-Include:
-- High-level approach and architecture decisions
-- Step-by-step implementation steps
-- Files that need to be created or modified
-- Database migrations (if applicable)
-- Testing strategy and test coverage
-- Deployment considerations
-
-Break down the work into discrete, reviewable chunks.
-```
-
-**Example: Code Review Command**
-
-```markdown
-Review the implementation of this user story against its specification.
-
-Check:
-- Does the implementation match the specification?
-- Are acceptance criteria met?
-- Code quality and adherence to standards
-- Test coverage and test quality
-- Performance and security implications
-- Edge cases and error handling
-
-Provide specific, actionable feedback.
-```
-
-When a command produces suboptimal output, don't just edit the output. Ask: which part of the command instructions allowed this? Update the command. Commit it. This is how your factory improves.
