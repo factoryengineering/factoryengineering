@@ -98,12 +98,6 @@ Claude Code stores commands as markdown files; each file becomes a slash command
 /write-spec @submit-sales-order
 ```
 
-Or using the `@` symbol:
-
-```
-@write-spec @submit-sales-order
-```
-
 📖 [Claude Code Slash Commands Documentation](https://code.claude.com/docs/en/slash-commands)
 
 ---
@@ -118,12 +112,6 @@ Or using the `@` symbol:
 
 ```
 /write-spec @submit-sales-order
-```
-
-Or using the `@` symbol:
-
-```
-@write-spec @submit-sales-order
 ```
 
 Since Cursor uses `.cursor/commands/` and we're storing our canonical commands in `.claude/commands/`, create a symlink:
@@ -150,12 +138,6 @@ Windsurf calls them workflows—note that this is different from workflows in th
 /write-spec @submit-sales-order
 ```
 
-Or using the `@` symbol:
-
-```
-@write-spec @submit-sales-order
-```
-
 Create a symlink to use your canonical commands folder:
 
 ```bash
@@ -178,12 +160,6 @@ KiloCode calls them workflows—again, this is KiloCode's storage mechanism for 
 
 ```
 /write-spec @submit-sales-order
-```
-
-Or using the `@` symbol:
-
-```
-@write-spec @submit-sales-order
 ```
 
 Use the symlink from the setup above so `.kilocode/workflows` points to `.claude/commands`.
