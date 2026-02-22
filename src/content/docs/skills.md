@@ -123,11 +123,7 @@ Claude Code automatically detects skills in `.claude/skills/` and loads them int
 
 Claude Code extends the base standard with additional features including invocation controls and dynamic context injection. The `anthropics/skills` repository on GitHub provides a growing collection of community and official skills ready to use.
 
-**Getting started:**
-```bash
-mkdir -p .claude/skills/my-skill
-touch .claude/skills/my-skill/SKILL.md
-```
+**Getting started:** Use the **skill-creator** skill to create new skills (see [Installing skill-creator and skill-optimizer](#installing-skill-creator-and-skill-optimizer)). It guides you through the workflow and produces a proper skill directory and SKILL.md.
 
 📖 [Claude Code Skills Documentation](https://docs.claude.ai/code/skills)
 
@@ -155,15 +151,17 @@ Agent Skills work across the Copilot coding agent, Copilot CLI, and VS Code. Ena
 
 ### Cursor
 
-**Supports Agent Skills standard:** ✅ Yes, via `.claude/skills/`
+**Supports Agent Skills standard:** ✅ Yes — primary `.cursor/skills/`, compatibility `.claude/skills/`
 
 **Folder locations:**
 | Scope | Path |
 |-------|------|
-| Project | `.claude/skills/` |
-| Global | `~/.claude/skills/` |
+| Project (primary) | `.cursor/skills/` |
+| Project (compatibility) | `.claude/skills/` |
+| Global (primary) | `~/.cursor/skills/` |
+| Global (compatibility) | `~/.claude/skills/` |
 
-Cursor loads skills from `.claude/skills/` at the project level. No symlink is required—use the canonical location and Cursor will automatically detect and load skills when they match your request, based on the `description` field in each `SKILL.md` frontmatter.
+Cursor looks for skills in `.cursor/skills/` first, then in `.claude/skills/` for compatibility—similar to GitHub Copilot. If you use `.claude/skills/` as your canonical location, **no symlink is needed**; Cursor will find your skills automatically. Skills are loaded when they match your request, based on the `description` field in each `SKILL.md` frontmatter.
 
 📖 [Cursor Documentation](https://docs.cursor.com)
 
@@ -249,29 +247,7 @@ Here is the full setup for a team using multiple IDEs with one canonical skills 
 mkdir -p .claude/skills
 ```
 
-**2. Create your first skill:**
-
-```bash
-mkdir -p .claude/skills/your-skill-name
-cat > .claude/skills/your-skill-name/SKILL.md << 'EOF'
----
-name: your-skill-name
-description: Use when [describe the specific situation that should trigger this skill].
----
-
-# Your Skill Title
-
-## When to use this skill
-- [Situation 1]
-- [Situation 2]
-
-## Instructions
-[Your detailed instructions here]
-
-## Standards
-[Your team's standards and invariants]
-EOF
-```
+**2. Create your first skill:** Use the **skill-creator** skill (see [Installing skill-creator and skill-optimizer](#installing-skill-creator-and-skill-optimizer)). Ask your agent to create a new skill in `.claude/skills`; it will guide you through the workflow and produce a proper SKILL.md and directory structure.
 
 **3. Create symlinks for each IDE your team uses:** Use the **factory-engineering** skill (Option A above) and ask your agent to set up symlinks—it will create command symlinks and skill symlinks for IDEs that need them (Windsurf, KiloCode, Antigravity). Or create them manually:
 

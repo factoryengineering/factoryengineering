@@ -1,13 +1,13 @@
 ---
 title: Commands
-description: Reusable task instructions—lightweight markdown files that encode repeatable steps for specific tasks, invoked with a slash or at symbol in your IDE.
+description: Reusable task instructions—lightweight markdown files that encode repeatable steps for specific tasks, invoked with a slash or `@` symbol in your IDE.
 ---
 
 # Commands: Reusable Task Instructions
 
-Commands are lightweight markdown files that encode repeatable instructions for specific tasks. Unlike skills, which are standardized across platforms, commands are simple prompt templates that you invoke with a slash (or at symbol in any IDE) to execute a predefined sequence of steps against an artifact.
+Commands are lightweight markdown files that encode repeatable instructions for specific tasks. Unlike skills, which are standardized across platforms, commands are simple prompt templates that you invoke with a `/` (or `@` symbol for some IDEs) to execute a predefined sequence of steps against an artifact.
 
-In factory engineering, artifacts—such as user stories, specifications, product requirements documents, and user journeys—move through the software factory. Commands define how to process those artifacts. The power move is **slash-command at-artifact**: e.g. `/write-spec @submit-sales-order` runs the write-spec command against that artifact. The command provides the instructions, the artifact provides the target, and the agent does the work.
+In factory engineering, artifacts—such as user stories, specifications, product requirements documents, and user journeys—move through the software factory. Commands define how to process those artifacts. The power move is **slash-command at-artifact**: e.g. `/write-spec @docs/user-stories/submit-sales-order` runs the write-spec command against that user story. The command provides the instructions, the artifact provides the target, and the agent does the work.
 
 ## Why Project-Scoped Commands Matter for Factory Engineering
 
@@ -34,16 +34,19 @@ Both **commands** and **workflows** are stored in `.claude/commands/`. Each IDE 
 
 **Option A — Use the factory-engineering skill:** Install with `npx openskills install michaellperry/factoryengineering`, then ask your agent to create symlinks for your selected IDEs. The skill sets up symlinks for **commands/workflows** (`.claude/commands/`) and **skills** (`.claude/skills/`) in one go (or use `--type commands` to do only commands). The agent can **detect** which IDEs you have (e.g. run the script with `--detect`), confirm with you, then create symlinks. If a target folder already exists (e.g. `.cursor/commands`), the skill will **offer to copy** its contents into the canonical folder and then replace it with a symlink (`--copy-existing`). On **Windows**, use the skill’s PowerShell script (`Setup-Symlinks.ps1`); the agent will use it when appropriate.
 
-**Option B — Create symlinks manually for each IDE:**
+**Option B — Create symlinks manually for each IDE:** Run these from your **repository root**. The symlink target `../.claude/commands` is resolved relative to the link’s directory (e.g. `.cursor/`), so it correctly points at the repo’s `.claude/commands/`.
 
 ```bash
 # Cursor
+mkdir -p .cursor
 ln -s ../.claude/commands .cursor/commands
 
 # Windsurf
+mkdir -p .windsurf
 ln -s ../.claude/commands .windsurf/workflows
 
 # KiloCode
+mkdir -p .kilocode
 ln -s ../.claude/commands .kilocode/workflows
 
 # Antigravity
@@ -88,7 +91,7 @@ Reference our specification standards in docs/spec-standards.md
 /write-spec @submit-sales-order
 ```
 
-Or using the at symbol:
+Or using the `@` symbol:
 
 ```
 @write-spec @submit-sales-order
@@ -127,7 +130,7 @@ Reference our specification standards in docs/spec-standards.md
 /write-spec @submit-sales-order
 ```
 
-Or using the at symbol:
+Or using the `@` symbol:
 
 ```
 @write-spec @submit-sales-order
@@ -176,7 +179,7 @@ Reference our specification standards in docs/spec-standards.md
 /write-spec @submit-sales-order
 ```
 
-Or using the at symbol:
+Or using the `@` symbol:
 
 ```
 @write-spec @submit-sales-order
@@ -225,7 +228,7 @@ Reference our specification standards in docs/spec-standards.md
 /write-spec @submit-sales-order
 ```
 
-Or using the at symbol:
+Or using the `@` symbol:
 
 ```
 @write-spec @submit-sales-order
@@ -243,7 +246,7 @@ Use the symlink from the setup above so `.kilocode/workflows` points to `.claude
 
 **Invocation:** `/workflow-name` — Antigravity treats files in `.agent/workflows/` as workflows. With the symlink, your `.claude/commands/` files appear there. Use **slash-command at-artifact** (e.g. `/write-spec @submit-sales-order`).
 
-Create the symlink from the setup above: `mkdir -p .agent` then `ln -s ../.claude/commands .agent/workflows`. If you don't use the symlink, you can still use the at symbol to bring a command file and artifact into context.
+Create the symlink from the setup above: `mkdir -p .agent` then `ln -s ../.claude/commands .agent/workflows`. If you don't use the symlink, you can still use the `@` symbol to bring a command file and artifact into context.
 
 ---
 
@@ -299,16 +302,19 @@ Reference our specification standards in docs/spec-standards.md
 EOF
 ```
 
-**3. Create symlinks for each IDE your team uses (except GitHub Copilot):** Use the **factory-engineering** skill (Option A above) and ask your agent to set up symlinks—it will create both command and skill symlinks by default. Or create them manually:
+**3. Create symlinks for each IDE your team uses (except GitHub Copilot):** Use the **factory-engineering** skill (Option A above) and ask your agent to set up symlinks—it will create both command and skill symlinks by default. Or create them manually from the repository root:
 
 ```bash
 # Cursor
+mkdir -p .cursor
 ln -s ../.claude/commands .cursor/commands
 
 # Windsurf
+mkdir -p .windsurf
 ln -s ../.claude/commands .windsurf/workflows
 
 # KiloCode
+mkdir -p .kilocode
 ln -s ../.claude/commands .kilocode/workflows
 
 # Antigravity
