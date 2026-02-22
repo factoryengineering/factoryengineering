@@ -67,7 +67,7 @@ The agent loads only the skills relevant to the current task, keeping context le
 
 Different IDEs look for skills in different folders. Managing multiple copies of the same skill across multiple folders is not viable for a team—it creates drift, duplication, and maintenance burden.
 
-The recommended approach is to establish one canonical skills location in your repository and use symlinks to point each IDE's expected folder to that location.
+Establish one canonical skills location in your repository and use symlinks to point each IDE's expected folder to that location.
 
 **Canonical location (recommended):**
 
@@ -77,7 +77,7 @@ The recommended approach is to establish one canonical skills location in your r
 
 This folder is the most widely recognized across the ecosystem. Use it as your source of truth.
 
-**Option A — Use the factory-engineering skill:** Install with `npx openskills install michaellperry/factoryengineering`, then ask your agent to create symlinks. The skill sets up symlinks for **commands/workflows** (`.claude/commands/`) and, for IDEs that need them, **skills** (`.claude/skills/` → Windsurf, KiloCode, Antigravity; Cursor and Copilot read `.claude/skills/` directly). Use `--type all` (default) for both, or `--type commands` / `--type skills`. The agent can detect which IDEs you have, confirm with you, and offer to copy existing contents into the canonical folder if a target already exists. On Windows, the skill uses a PowerShell script. See the [Commands](/commands) page for the full symlink approach and the skill’s SKILL.md (and symlinks.md) for script options.
+**Option A — Use the factory-engineering skill:** Install with `npx openskills install michaellperry/factoryengineering`, then ask your agent to create symlinks. The skill sets up symlinks for **commands/workflows** (`.claude/commands/`) and, for IDEs that need them, **skills** (`.claude/skills/` → Windsurf, KiloCode, Antigravity; Cursor and Copilot read `.claude/skills/` directly). Use `--type all` (default) for both, or `--type commands` / `--type skills`. The agent can detect which IDEs you have, confirm with you, and offer to copy existing contents into the canonical folder if a target already exists. On Windows, use the skill's PowerShell script. See the [Commands](/commands) page for the full symlink approach and the skill’s SKILL.md (and symlinks.md) for script options.
 
 **Option B — Create symlinks manually for each IDE:**
 
@@ -103,7 +103,7 @@ Commit the symlinks to your repository. Every team member gets the correct folde
 To support authoring and optimizing skills, install these published skills:
 
 - **skill-creator** — Install with `npx openskills install anthropics/skills`. Use when creating or updating a skill; it provides authoring guidance, best practices, and the full skill-creation workflow.
-- **skill-optimizer** — Install with `npx openskills install michaellperry/factory-engineering`. Use when you want to apply authoring best practices to an existing skill or to verify a skill after creation. If the target skill does not exist yet, use skill-creator first, then skill-optimizer.
+- **skill-optimizer** — Install with `npx openskills install michaellperry/factory-engineering`. Use to apply authoring best practices to an existing skill or to verify a skill after creation. If the target skill does not exist yet, use skill-creator first, then skill-optimizer.
 
 ---
 
@@ -183,7 +183,7 @@ Windsurf's Cascade agent looks for skills in `.windsurf/skills/`. A symlink to y
 ln -s ../.claude/skills .windsurf/skills
 ```
 
-Cascade automatically invokes skills when your request matches a skill's description. You can also explicitly invoke a skill by typing `@skill-name` in the Cascade input.
+Cascade automatically invokes skills when your request matches a skill's description. To invoke a skill explicitly, type `@skill-name` in the Cascade input.
 
 📖 [Windsurf Cascade Skills Documentation](https://docs.windsurf.com/windsurf/cascade/skills)
 

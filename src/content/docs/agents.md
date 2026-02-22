@@ -126,7 +126,7 @@ GitHub Copilot has custom agents, but they do not natively provide the persisten
 
 GitHub Copilot Pro and Pro+ users can enable Copilot Memory, which allows Copilot to store details about a repository. However, this is not the same as an individual agent reading from and writing to its own memory file at the start and end of each session.
 
-For factory engineering purposes, GitHub Copilot's custom agents are limited. You can work around this by using `AGENTS.md` (which is just a text file of instructions, not a true agent) or by creating your own memory file at the project level and explicitly referencing it in your custom agent instructions.
+For factory engineering purposes, GitHub Copilot's custom agents are limited. Work around this by using `AGENTS.md` (which is just a text file of instructions, not a true agent) or by creating your own memory file at the project level and explicitly referencing it in your custom agent instructions.
 
 **Workaround approach:**
 
@@ -163,7 +163,7 @@ KiloCode uses "modes" which allow you to define different roles and tool sets. H
 
 KiloCode does have a "Memory Bank" feature (stored in `.kilocode/rules/memory-bank/`) which persists project context, but this is project-level memory, not agent-specific memory that an individual mode reads from and writes to independently.
 
-If you need true agent support in KiloCode, you would need to create workarounds similar to the GitHub Copilot approach: manually managing memory files and explicitly referencing them in your mode instructions.
+For true agent support in KiloCode, create workarounds similar to the GitHub Copilot approach: manually manage memory files and explicitly reference them in your mode instructions.
 
 📖 [KiloCode Custom Modes Documentation](https://kilo.ai/docs/agent-behavior/custom-modes)
 
@@ -175,7 +175,7 @@ If you need true agent support in KiloCode, you would need to create workarounds
 
 Cursor previously had custom agent modes (called "custom agents"), but this feature was removed in recent versions. The functionality was consolidated into commands and other features, which do not provide the persistent agent memory capability you defined.
 
-If you need agent-like behavior in Cursor, you would need to manage memory files manually using commands or other workarounds.
+For agent-like behavior in Cursor, manage memory files manually using commands or other workarounds.
 
 ---
 
