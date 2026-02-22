@@ -63,6 +63,33 @@ The agent loads only the skills relevant to the current task, keeping context le
 
 ---
 
+## Installing skill-creator and skill-optimizer
+
+To support authoring and optimizing skills, install these published skills:
+
+- **skill-creator** — Install with `npx openskills install anthropics/skills`. Use when creating or updating a skill; it provides authoring guidance, best practices, and the full skill-creation workflow.
+- **skill-optimizer** — Install with `npx openskills install michaellperry/factory-engineering`. Use to apply authoring best practices to an existing skill or to verify a skill after creation. If the target skill does not exist yet, use skill-creator first, then skill-optimizer.
+
+---
+
+## Creating Skills Iteratively
+
+**1. Do the task once with the agent.** Pick a concrete task (e.g. "Draft a technical spec from this user story" or "Review this PR for security issues") and tell the agent what you want. Work through the result—fix gaps, adjust structure, clarify wording—until the output is what you want. Do not compromise on quality.
+
+**2. Capture the process as a skill.** Ask the agent to use the **skill-creator** skill to create a skill that captures your standards and opinions. Give it the name of the skill. Then instruct the agent to use **skill-optimizer** to align it with best practices and refine the content.
+
+**3. Run the skill against a task.** In a new session, give the agent a new instance of the same kind of task (e.g. another user story or PR). Carefully observe whether the LLM uses the skill you created. Do not hand-hold; let the skill stand on its own. Note where the output is wrong, vague, or inconsistent with how you refined it in step 1.
+
+**4. Refine the skill.** If the skill was not applied, ask: *How can the description be improved?* For each shortcoming, ask: *Which part of the skill allowed this?* Update the skill—add triggers, tighten the description, add constraints or examples, or clarify steps. Use **skill-optimizer** to re-check best practices, or edit the SKILL.md and skill files directly. Commit the change.
+
+**5. Repeat steps 3 and 4.** Re-run the skill on the same or a different task. Keep tightening instructions until the skill produces the desired result without extra guidance. When it does, that skill is ready for the team.
+
+**6. Add more skills the same way.** For each new repeatable task (e.g. writing release notes, generating test cases), do the task once, capture it with skill-creator, optimize it with skill-optimizer, then iterate by running and refining until the skill is reliable.
+
+From here, every team member can invoke the skill by describing the task or by naming the skill in their prompt; the agent loads skills when relevant.
+
+---
+
 ## Managing Skills Across IDEs: The Symlink Approach
 
 Different IDEs look for skills in different folders. Managing multiple copies of the same skill across multiple folders is not viable for a team—it creates drift, duplication, and maintenance burden.
@@ -95,15 +122,6 @@ ln -s ../.claude/skills .agent/skills
 ```
 
 Commit the symlinks to your repository. Every team member gets the correct folder structure automatically on clone, regardless of which IDE they use.
-
----
-
-## Installing skill-creator and skill-optimizer
-
-To support authoring and optimizing skills, install these published skills:
-
-- **skill-creator** — Install with `npx openskills install anthropics/skills`. Use when creating or updating a skill; it provides authoring guidance, best practices, and the full skill-creation workflow.
-- **skill-optimizer** — Install with `npx openskills install michaellperry/factory-engineering`. Use to apply authoring best practices to an existing skill or to verify a skill after creation. If the target skill does not exist yet, use skill-creator first, then skill-optimizer.
 
 ---
 
