@@ -24,8 +24,7 @@ kilocode_commands=".kilocode/workflows"
 antigravity_commands=".agent/workflows"
 canonical_commands=".claude/commands"
 
-# Skills: canonical .claude/skills -> IDE-specific paths
-cursor_skills=".cursor/skills"
+# Skills: canonical .claude/skills -> IDE-specific paths (Cursor reads .claude/skills directly; no symlink)
 windsurf_skills=".windsurf/skills"
 kilocode_skills=".kilocode/skills"
 antigravity_skills=".agent/skills"
@@ -169,7 +168,7 @@ run_for_ide() {
   fi
   if [[ "$TYPE" == "skills" || "$TYPE" == "all" ]]; then
     case "$ide" in
-      cursor)     create_symlink "$cursor_skills"     "$canonical_skills" || ec=$? ;;
+      cursor)     ;;  # Cursor reads .claude/skills directly; no symlink
       windsurf)   create_symlink "$windsurf_skills"   "$canonical_skills" || ec=$? ;;
       kilocode)   create_symlink "$kilocode_skills"   "$canonical_skills" || ec=$? ;;
       antigravity) create_symlink "$antigravity_skills" "$canonical_skills" || ec=$? ;;

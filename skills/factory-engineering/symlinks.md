@@ -2,7 +2,7 @@
 
 Canonical **commands and workflows** live in **`.claude/commands/`**. Canonical **skills** live in **`.claude/skills/`**. Each IDE looks in different folders. The scripts create symlinks so one folder of each type works everywhere.
 
-**Supported IDEs:** Cursor, Windsurf, KiloCode, Antigravity. GitHub Copilot: for commands use sync (see [sync-copilot-prompts.md](sync-copilot-prompts.md)); for skills Copilot reads `.claude/skills/` directly—no symlink.
+**Supported IDEs:** Cursor, Windsurf, KiloCode, Antigravity. Cursor and GitHub Copilot read `.claude/skills/` directly—no skills symlink. For Copilot commands use sync (see [sync-copilot-prompts.md](sync-copilot-prompts.md)).
 
 ---
 
@@ -17,7 +17,7 @@ Canonical **commands and workflows** live in **`.claude/commands/`**. Canonical 
 
 3. **Check for existing target folders.** For each selected IDE:
    - **Commands/workflows:** `.cursor/commands`, `.windsurf/workflows`, `.kilocode/workflows`, `.agent/workflows` → `.claude/commands`
-   - **Skills:** `.cursor/skills`, `.windsurf/skills`, `.kilocode/skills`, `.agent/skills` → `.claude/skills`
+   - **Skills:** `.windsurf/skills`, `.kilocode/skills`, `.agent/skills` → `.claude/skills` (Cursor and Copilot read `.claude/skills/` directly; no skills symlink.)
    If a target exists and is **not** already a symlink to the canonical folder: inform the user and **offer** to copy existing contents into the canonical folder and then replace with a symlink. If they agree, run with `--copy-existing` / `-CopyExisting`.
 
 4. **Create symlinks.** From repo root: Bash `scripts/setup-symlinks.sh` or PowerShell `scripts/Setup-Symlinks.ps1`. Pass IDEs (e.g. `--ide cursor,windsurf` or `-Ide cursor,windsurf`). Use `--type all` (default) for both commands and skills; `--type commands` or `--type skills` for one. If the script reports an existing target, return to step 3.
@@ -63,11 +63,10 @@ Default `--type all` creates both command and skill symlinks. If a target is an 
 | KiloCode | `.kilocode/workflows` | `../.claude/commands` |
 | Antigravity | `.agent/workflows` | `../.claude/commands` |
 
-**Skills** (canonical: `.claude/skills/`):
+**Skills** (canonical: `.claude/skills/`). Cursor and GitHub Copilot read this path directly—no symlink.
 
 | IDE | Target (symlink) | Points to |
 |-----|------------------|-----------|
-| Cursor | `.cursor/skills` | `../.claude/skills` |
 | Windsurf | `.windsurf/skills` | `../.claude/skills` |
 | KiloCode | `.kilocode/skills` | `../.claude/skills` |
 | Antigravity | `.agent/skills` | `../.claude/skills` |

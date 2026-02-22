@@ -32,8 +32,8 @@ $targetsCommands = @{
     kilocode   = '.kilocode/workflows'
     antigravity = '.agent/workflows'
 }
+# Cursor reads .claude/skills directly; no skills symlink for cursor
 $targetsSkills = @{
-    cursor     = '.cursor/skills'
     windsurf   = '.windsurf/skills'
     kilocode   = '.kilocode/skills'
     antigravity = '.agent/skills'
@@ -133,7 +133,10 @@ foreach ($ide in $ideList) {
             New-SymlinkForTarget -root $repoFull -targetRelativePath $targetsCommands[$ide] -canonicalDir $canonicalCommands -copyExisting $CopyExisting.IsPresent
         }
         if ($Type -eq 'skills' -or $Type -eq 'all') {
-            New-SymlinkForTarget -root $repoFull -targetRelativePath $targetsSkills[$ide] -canonicalDir $canonicalSkills -copyExisting $CopyExisting.IsPresent
+            $skillsTarget = $targetsSkills[$ide]
+            if ($skillsTarget) {
+                New-SymlinkForTarget -root $repoFull -targetRelativePath $skillsTarget -canonicalDir $canonicalSkills -copyExisting $CopyExisting.IsPresent
+            }
         }
     } catch {
         Write-Host $_.Exception.Message

@@ -48,11 +48,15 @@ description: Use when designing or reviewing REST APIs, defining endpoints, requ
 
 # API Design Standards
 
-## When to use this skill
-...
-
 ## Standards
 ...
+
+## Resources
+- **OpenAPI reference**: See [references/openapi-patterns.md](references/openapi-patterns.md) for request/response patterns and examples.
+- **Templates**: Use [assets/endpoint-template.yaml](assets/endpoint-template.yaml) when adding new endpoints.
+
+## Scripts
+- **Validate spec**: Run `scripts/validate-openapi.sh` to check the OpenAPI file before commit.
 ```
 
 The agent loads only the skills relevant to the current task, keeping context lean and responses accurate. This is called **progressive disclosure**—skills sit dormant until needed.
@@ -73,7 +77,7 @@ The recommended approach is to establish one canonical skills location in your r
 
 This folder is the most widely recognized across the ecosystem. Use it as your source of truth.
 
-**Option A — Use the factory-engineering skill:** Install with `npx openskills install michaellperry/factoryengineering`, then ask your agent to create symlinks. The skill sets up symlinks for **skills** (`.claude/skills/`) and **commands/workflows** (`.claude/commands/`) in one go by default, or use `--type skills` to set up only skills. The agent can detect which IDEs you have, confirm with you, and offer to copy existing contents into the canonical folder if a target already exists. On Windows, the skill uses a PowerShell script. See the [Commands](/commands) page for the full symlink approach and the skill’s SKILL.md (and symlinks.md) for script options.
+**Option A — Use the factory-engineering skill:** Install with `npx openskills install michaellperry/factoryengineering`, then ask your agent to create symlinks. The skill sets up symlinks for **commands/workflows** (`.claude/commands/`) and, for IDEs that need them, **skills** (`.claude/skills/` → Windsurf, KiloCode, Antigravity; Cursor and Copilot read `.claude/skills/` directly). Use `--type all` (default) for both, or `--type commands` / `--type skills`. The agent can detect which IDEs you have, confirm with you, and offer to copy existing contents into the canonical folder if a target already exists. On Windows, the skill uses a PowerShell script. See the [Commands](/commands) page for the full symlink approach and the skill’s SKILL.md (and symlinks.md) for script options.
 
 **Option B — Create symlinks manually for each IDE:**
 
@@ -81,16 +85,13 @@ This folder is the most widely recognized across the ecosystem. Use it as your s
 # Windsurf
 ln -s ../.claude/skills .windsurf/skills
 
-# Cursor
-ln -s ../.claude/skills .cursor/skills
-
 # KiloCode
 ln -s ../.claude/skills .kilocode/skills
 
-# GitHub Copilot (already reads .claude/skills — no symlink needed)
-
 # Antigravity (uses .agent/skills at project level)
 ln -s ../.claude/skills .agent/skills
+
+# Cursor and GitHub Copilot read .claude/skills directly — no symlink needed
 ```
 
 Commit the symlinks to your repository. Every team member gets the correct folder structure automatically on clone, regardless of which IDE they use.
@@ -154,21 +155,15 @@ Agent Skills work across the Copilot coding agent, Copilot CLI, and VS Code. Ena
 
 ### Cursor
 
-**Supports Agent Skills standard:** ✅ Yes, via `.cursor/skills/`
+**Supports Agent Skills standard:** ✅ Yes, via `.claude/skills/`
 
 **Folder locations:**
 | Scope | Path |
 |-------|------|
-| Project | `.cursor/skills/` |
-| Global | `~/.cursor/skills/` |
+| Project | `.claude/skills/` |
+| Global | `~/.claude/skills/` |
 
-Cursor looks for skills in `.cursor/skills/`. Since this differs from the canonical `.claude/skills/` location, a symlink is required:
-
-```bash
-ln -s ../.claude/skills .cursor/skills
-```
-
-Once the symlink is in place, Cursor will automatically detect and load skills when they match your request, based on the `description` field in each `SKILL.md` frontmatter.
+Cursor loads skills from `.claude/skills/` at the project level. No symlink is required—use the canonical location and Cursor will automatically detect and load skills when they match your request, based on the `description` field in each `SKILL.md` frontmatter.
 
 📖 [Cursor Documentation](https://docs.cursor.com)
 
@@ -278,12 +273,9 @@ description: Use when [describe the specific situation that should trigger this 
 EOF
 ```
 
-**3. Create symlinks for each IDE your team uses:** Use the **factory-engineering** skill (Option A above) and ask your agent to set up symlinks—it will create both skill and command symlinks by default. Or create them manually:
+**3. Create symlinks for each IDE your team uses:** Use the **factory-engineering** skill (Option A above) and ask your agent to set up symlinks—it will create command symlinks and skill symlinks for IDEs that need them (Windsurf, KiloCode, Antigravity). Or create them manually:
 
 ```bash
-# Cursor
-ln -s ../.claude/skills .cursor/skills
-
 # Windsurf
 ln -s ../.claude/skills .windsurf/skills
 
@@ -293,7 +285,7 @@ ln -s ../.claude/skills .kilocode/skills
 # Antigravity
 ln -s ../.claude/skills .agent/skills
 
-# GitHub Copilot reads .claude/skills directly — no symlink needed
+# Cursor and GitHub Copilot read .claude/skills directly — no symlink needed
 ```
 
 **4. Commit everything:**
