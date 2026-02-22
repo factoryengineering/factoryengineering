@@ -52,9 +52,9 @@ Use the recommended template in the [documentation-spec](../../skills/documentat
 
 ## The Symlink Approach
 
-Both **commands** and **workflows** are stored in `.claude/commands/`. Each IDE looks in a different folder, so use symlinks so that one canonical location works everywhere.
+Both **commands** and **workflows** are stored in `.claude/commands/`. Each IDE looks in a different folder. Use symlinks so that one canonical location works everywhere.
 
-**Option A — Use the factory-engineering skill:** Install with `npx openskills install michaellperry/factoryengineering`, then ask your agent to create symlinks for your selected IDEs. The skill sets up symlinks for **commands/workflows** (`.claude/commands/`) and **skills** (`.claude/skills/`) in one go (or use `--type commands` to do only commands). The agent can **detect** which IDEs you have (e.g. run the script with `--detect`), confirm with you, then create symlinks. If a target folder already exists (e.g. `.cursor/commands`), the skill will **offer to copy** its contents into the canonical folder and then replace it with a symlink (`--copy-existing`). On **Windows**, use the skill’s PowerShell script (`Setup-Symlinks.ps1`); the agent will use it when appropriate.
+**Option A — Use the factory-engineering skill:** Install with `npx openskills install michaellperry/factoryengineering`, then ask your agent to create symlinks for your selected IDEs. The skill sets up symlinks for **commands/workflows** (`.claude/commands/`) and **skills** (`.claude/skills/`) in one go (or use `--type commands` to do only commands). The agent can **detect** which IDEs you have (e.g. run the script with `--detect`), confirm with you, then create symlinks. If a target folder already exists (e.g. `.cursor/commands`), the skill will **offer to copy** its contents into the canonical folder and then replace it with a symlink (`--copy-existing`). On **Windows**, use the skill’s PowerShell script (`Setup-Symlinks.ps1`).
 
 **Option B — Create symlinks manually for each IDE:** Run these from your **repository root**. The symlink target `../.claude/commands` is resolved relative to the link’s directory (e.g. `.cursor/`), so it correctly points at the repo’s `.claude/commands/`.
 
@@ -88,9 +88,9 @@ Stored in `.claude/commands/`, this file is available as `/write-design` in Clau
 
 **Folder location:** `.claude/commands/` (project) or `~/.claude/commands/` (global)
 
-**Invocation:** `/command-name` — the filename without `.md` is the slash command (e.g. `write-spec.md` → `/write-spec`). Use `@command-name` only if your IDE supports it. The `@` symbol in **slash-command at-artifact** refers to the *artifact*, not the command.
+**Invocation:** `/command-name` — the filename without `.md` is the slash command (e.g. `write-spec.md` → `/write-spec`). Prefer `/command-name` for the command; the `@` symbol in **slash-command at-artifact** refers to the *artifact*, not the command.
 
-Claude Code stores commands as markdown files; each file becomes a slash command. For cross-IDE consistency, use the [recommended pattern](#example-command-file): state in the command what the user will supply and instruct the LLM to stop and prompt if it’s missing. Claude Code also supports `$ARGUMENTS` if you need it. See [Example command file](#example-command-file) above for structure.
+Claude Code stores commands as markdown files; each file becomes a slash command. **Use the [recommended pattern](#example-command-file):** state in the command what the user will supply and instruct the LLM to stop and prompt if it’s missing. Do not rely on `$ARGUMENTS`—commands are shared via symlinks and not all IDEs support it. See [Example command file](#example-command-file) above for structure.
 
 **Usage in Claude Code:**
 
@@ -112,7 +112,7 @@ Or using the `@` symbol:
 
 **Folder location:** `.cursor/commands/` (project) or `~/.cursor/commands/` (global)
 
-**Invocation:** `/command-name` — filename without `.md` becomes the slash command. Use **slash-command at-artifact** (e.g. `/write-spec @submit-sales-order`). Follow the [recommended pattern](#example-command-file) (state what the user supplies; stop and prompt if missing) so the same command works in all IDEs; Cursor also supports `$ARGUMENTS` when provided. See [Example command file](#example-command-file) above for structure.
+**Invocation:** `/command-name` — filename without `.md` becomes the slash command. Use **slash-command at-artifact** (e.g. `/write-spec @submit-sales-order`). Follow the [recommended pattern](#example-command-file) (state what the user supplies; stop and prompt if missing). Do not rely on `$ARGUMENTS`—commands are shared via symlinks and not all IDEs support it. See [Example command file](#example-command-file) above for structure.
 
 **Usage in Cursor:**
 
@@ -198,7 +198,7 @@ Use the symlink from the setup above so `.kilocode/workflows` points to `.claude
 
 **Invocation:** `/workflow-name` — Antigravity treats files in `.agent/workflows/` as workflows. With the symlink, your `.claude/commands/` files appear there. Use **slash-command at-artifact** (e.g. `/write-spec @submit-sales-order`).
 
-Create the symlink from the setup above: `mkdir -p .agent` then `ln -s ../.claude/commands .agent/workflows`. If you don't use the symlink, you can still use the `@` symbol to bring a command file and artifact into context.
+Create the symlink from the setup above: `mkdir -p .agent` then `ln -s ../.claude/commands .agent/workflows`. Without the symlink, you would have to maintain a separate copy of commands in `.agent/workflows/`.
 
 ---
 
