@@ -97,6 +97,15 @@ Commit the symlinks to your repository. Every team member gets the correct folde
 
 ---
 
+## Installing skill-creator and skill-optimizer
+
+To support authoring and optimizing skills, install these published skills:
+
+- **skill-creator** — Install with `npx openskills install anthropics/skills`. Use when creating or updating a skill; it provides authoring guidance, best practices, and the full skill-creation workflow.
+- **skill-optimizer** — Install with `npx openskills install michaellperry/factory-engineering`. Use when you want to apply authoring best practices to an existing skill or to verify a skill after creation. If the target skill does not exist yet, use skill-creator first, then skill-optimizer.
+
+---
+
 ## IDE-by-IDE Reference
 
 ### Claude Code
