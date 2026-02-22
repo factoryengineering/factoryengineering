@@ -74,7 +74,7 @@ To support authoring and optimizing skills, install these published skills:
 
 ## Creating Skills Iteratively
 
-**1. Do the task once with the agent.** Pick a concrete task (e.g. "Draft a technical spec from this user story" or "Review this PR for security issues") and tell the agent what you want. Work through the result—fix gaps, adjust structure, clarify wording—until the output is what you want. Do not compromise on quality.
+**1. Do the task once with the agent.** Pick a concrete task (e.g. "Write a LINQ query to fetch this data" or "Refactor this unit test"). Work through the result. Fix gaps, adjust structure, clarify wording until the output is what you want. Do not compromise on quality.
 
 **2. Capture the process as a skill.** Ask the agent to use the **skill-creator** skill to create a skill that captures your standards and opinions. Give it the name of the skill. Then instruct the agent to use **skill-optimizer** to align it with best practices and refine the content.
 
