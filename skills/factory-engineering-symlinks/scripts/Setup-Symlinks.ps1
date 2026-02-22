@@ -1,15 +1,19 @@
-# Set up symlinks so .claude/commands is available as commands/workflows in each IDE.
+# Set up symlinks so .claude/commands and .claude/skills are available in each IDE.
 # Run from repository root. See SKILL.md for full workflow.
 #
 # Usage:
 #   .\Setup-Symlinks.ps1 -Detect
 #   .\Setup-Symlinks.ps1 -Ide cursor,windsurf,kilocode,antigravity
+#   .\Setup-Symlinks.ps1 -Type all -Ide cursor
 #   .\Setup-Symlinks.ps1 -Ide cursor -CopyExisting
 #   .\Setup-Symlinks.ps1 -RepoRoot C:\path\to\repo -Ide cursor
 
 param(
     [Parameter(Mandatory = $false)]
     [string]$RepoRoot = (Get-Location).Path,
+    [Parameter(Mandatory = $false)]
+    [ValidateSet('commands', 'skills', 'all')]
+    [string]$Type = 'all',
     [Parameter(Mandatory = $false)]
     [switch]$Detect,
     [Parameter(Mandatory = $false)]
@@ -20,12 +24,19 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
-$canonicalDir = '.claude/commands'
-$targets = @{
+$canonicalCommands = '.claude/commands'
+$canonicalSkills = '.claude/skills'
+$targetsCommands = @{
     cursor     = '.cursor/commands'
     windsurf   = '.windsurf/workflows'
     kilocode   = '.kilocode/workflows'
     antigravity = '.agent/workflows'
+}
+$targetsSkills = @{
+    cursor     = '.cursor/skills'
+    windsurf   = '.windsurf/skills'
+    kilocode   = '.kilocode/skills'
+    antigravity = '.agent/skills'
 }
 
 function Get-DetectedIdes {
@@ -38,13 +49,14 @@ function Get-DetectedIdes {
     return $detected
 }
 
-function New-SymlinkForIde {
+function New-SymlinkForTarget {
     param(
         [string]$root,
-        [string]$ide,
+        [string]$targetRelativePath,
+        [string]$canonicalDir,
         [bool]$copyExisting
     )
-    $targetPath = Join-Path $root $targets[$ide]
+    $targetPath = Join-Path $root $targetRelativePath
     $parentDir = Split-Path -Parent $targetPath
     $existingMsg = "Target $targetPath already exists. Use -CopyExisting to copy its contents to $canonicalDir and then create the symlink."
 
@@ -52,7 +64,7 @@ function New-SymlinkForIde {
         $item = Get-Item -LiteralPath $targetPath -Force
         if ($item.Attributes -band [System.IO.FileAttributes]::ReparsePoint) {
             $linkTarget = $item.Target
-            if ($linkTarget -and ($linkTarget -match '\.claude[\\/]commands$')) {
+            if ($linkTarget -and ($linkTarget -match "\.claude[\\/](commands|skills)$")) {
                 Write-Host "Already a symlink: $targetPath"
                 return 0
             }
@@ -62,6 +74,9 @@ function New-SymlinkForIde {
             if ($copyExisting) {
                 Write-Host "Copying existing $targetPath into $canonicalDir ..."
                 $canonicalFull = Join-Path $root $canonicalDir
+                if (-not (Test-Path -LiteralPath $canonicalFull)) {
+                    New-Item -ItemType Directory -Path $canonicalFull -Force | Out-Null
+                }
                 Get-ChildItem -LiteralPath $targetPath -Force | Copy-Item -Destination $canonicalFull -Recurse -Force
                 Remove-Item -LiteralPath $targetPath -Recurse -Force
             } else {
@@ -79,7 +94,6 @@ function New-SymlinkForIde {
         New-Item -ItemType Directory -Path $parentDir -Force | Out-Null
     }
 
-    # Relative target from link parent (e.g. .cursor) so repo is portable: ../.claude/commands
     $relativeTarget = '..' + [IO.Path]::DirectorySeparatorChar + $canonicalDir -replace '/', [IO.Path]::DirectorySeparatorChar
 
     New-Item -ItemType SymbolicLink -Path $targetPath -Target $relativeTarget -Force | Out-Null
@@ -112,15 +126,15 @@ foreach ($ide in $ideList) {
     }
 }
 
-$canonicalFull = Join-Path $repoFull $canonicalDir
-if (-not (Test-Path -LiteralPath $canonicalFull)) {
-    New-Item -ItemType Directory -Path $canonicalFull -Force | Out-Null
-}
-
 $exitCode = 0
 foreach ($ide in $ideList) {
     try {
-        New-SymlinkForIde -root $repoFull -ide $ide -copyExisting $CopyExisting.IsPresent
+        if ($Type -eq 'commands' -or $Type -eq 'all') {
+            New-SymlinkForTarget -root $repoFull -targetRelativePath $targetsCommands[$ide] -canonicalDir $canonicalCommands -copyExisting $CopyExisting.IsPresent
+        }
+        if ($Type -eq 'skills' -or $Type -eq 'all') {
+            New-SymlinkForTarget -root $repoFull -targetRelativePath $targetsSkills[$ide] -canonicalDir $canonicalSkills -copyExisting $CopyExisting.IsPresent
+        }
     } catch {
         Write-Host $_.Exception.Message
         $exitCode = 2

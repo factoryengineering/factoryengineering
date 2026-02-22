@@ -32,7 +32,7 @@ Commands are not standardized. Each IDE looks in a different folder:
 
 Both **commands** and **workflows** are stored in `.claude/commands/`. Each IDE looks in a different folder, so use symlinks so that one canonical location works everywhere.
 
-**Option A — Use the factory-engineering-symlinks skill:** Install with `npx openskills install michaellperry/factoryengineering`, then ask your agent to create symlinks for your selected IDEs. The skill can auto-detect IDEs from your directory structure and will prompt to copy existing command files into `.claude/commands` if a target folder already exists.
+**Option A — Use the factory-engineering-symlinks skill:** Install with `npx openskills install michaellperry/factoryengineering`, then ask your agent to create symlinks for your selected IDEs. The skill sets up symlinks for **commands/workflows** (`.claude/commands/`) and **skills** (`.claude/skills/`) in one go (or use `--type commands` to do only commands). The agent can **detect** which IDEs you have (e.g. run the script with `--detect`), confirm with you, then create symlinks. If a target folder already exists (e.g. `.cursor/commands`), the skill will **offer to copy** its contents into the canonical folder and then replace it with a symlink (`--copy-existing`). On **Windows**, use the skill’s PowerShell script (`Setup-Symlinks.ps1`); the agent will use it when appropriate.
 
 **Option B — Create symlinks manually for each IDE:**
 
@@ -299,7 +299,7 @@ Reference our specification standards in docs/spec-standards.md
 EOF
 ```
 
-**3. Create symlinks for each IDE your team uses (except GitHub Copilot):**
+**3. Create symlinks for each IDE your team uses (except GitHub Copilot):** Use the **factory-engineering-symlinks** skill (Option A above) and ask your agent to set up symlinks—it will create both command and skill symlinks by default. Or create them manually:
 
 ```bash
 # Cursor
