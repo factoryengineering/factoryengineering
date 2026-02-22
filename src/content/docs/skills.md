@@ -73,7 +73,7 @@ The recommended approach is to establish one canonical skills location in your r
 
 This folder is the most widely recognized across the ecosystem. Use it as your source of truth.
 
-**Option A — Use the factory-engineering-symlinks skill:** Install with `npx openskills install michaellperry/factoryengineering`, then ask your agent to create symlinks. The skill sets up symlinks for **skills** (`.claude/skills/`) and **commands/workflows** (`.claude/commands/`) in one go by default, or use `--type skills` to set up only skills. The agent can detect which IDEs you have, confirm with you, and offer to copy existing contents into the canonical folder if a target already exists. On Windows, the skill uses a PowerShell script. See the [Commands](/commands) page for the full symlink approach and the skill’s SKILL.md for script options.
+**Option A — Use the factory-engineering skill:** Install with `npx openskills install michaellperry/factoryengineering`, then ask your agent to create symlinks. The skill sets up symlinks for **skills** (`.claude/skills/`) and **commands/workflows** (`.claude/commands/`) in one go by default, or use `--type skills` to set up only skills. The agent can detect which IDEs you have, confirm with you, and offer to copy existing contents into the canonical folder if a target already exists. On Windows, the skill uses a PowerShell script. See the [Commands](/commands) page for the full symlink approach and the skill’s SKILL.md (and symlinks.md) for script options.
 
 **Option B — Create symlinks manually for each IDE:**
 
@@ -269,7 +269,7 @@ description: Use when [describe the specific situation that should trigger this 
 EOF
 ```
 
-**3. Create symlinks for each IDE your team uses:** Use the **factory-engineering-symlinks** skill (Option A above) and ask your agent to set up symlinks—it will create both skill and command symlinks by default. Or create them manually:
+**3. Create symlinks for each IDE your team uses:** Use the **factory-engineering** skill (Option A above) and ask your agent to set up symlinks—it will create both skill and command symlinks by default. Or create them manually:
 
 ```bash
 # Cursor

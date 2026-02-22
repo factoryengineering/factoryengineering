@@ -10,7 +10,7 @@ Usage:
 Run from repo root, or pass REPO_ROOT. Default: current working directory.
 
 Example:
-    python .claude/skills/factory-engineering-sync-copilot-prompts/scripts/sync_copilot_prompts.py
+    python .claude/skills/factory-engineering/scripts/sync_copilot_prompts.py
     python scripts/sync_copilot_prompts.py /path/to/my-project
 """
 

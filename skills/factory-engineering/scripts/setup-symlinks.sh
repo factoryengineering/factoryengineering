@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Set up symlinks so .claude/commands and .claude/skills are available in each IDE.
-# Run from repository root. See SKILL.md for full workflow.
+# Run from repository root. See SKILL.md (factory-engineering skill) for full workflow.
 #
 # Usage:
 #   setup-symlinks.sh --detect
