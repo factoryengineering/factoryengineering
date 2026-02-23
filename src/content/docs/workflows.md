@@ -11,7 +11,7 @@ This is the highest layer of the software factory. Skills encode knowledge. Comm
 
 ## The Word "Workflow" Is Used Differently by Different IDEs
 
-Before diving in, a critical terminology note: several IDEs use the word "workflow" for something entirely different. Windsurf calls its command mechanism "Workflows." KiloCode also has a feature it calls "Workflows." Neither of these are workflows in the factory engineering sense—they are commands, task instructions that a single agent follows in sequence.
+Before diving in, a critical terminology note: several IDEs use the word "workflow" for something entirely different. Windsurf calls its command mechanism "Workflows." Kilo Code also has a feature it calls "Workflows." Neither of these are workflows in the factory engineering sense—they are commands, task instructions that a single agent follows in sequence.
 
 This page covers what factory engineering means by the word—orchestration of named agents—and assesses how close each IDE can come to that capability.
 
@@ -24,7 +24,7 @@ This page covers what factory engineering means by the word—orchestration of n
 | IDE | Orchestration Support | Feature Name | Notes |
 |-----|----------------------|--------------|-------|
 | Claude Code | ✅ Yes | CLAUDE.md + subagent orchestration | Main agent reads workflow, delegates via Task tool |
-| KiloCode | ✅ Yes | Orchestrator Mode | Built-in orchestrator delegates to named modes |
+| Kilo Code | ✅ Yes | Orchestrator Mode | Built-in orchestrator delegates to named modes |
 | GitHub Copilot | ⚠️ Partial | Agent HQ | Cross-agent task assignment, not in-session orchestration |
 | Cursor | ❌ No | — | No orchestration layer |
 | Windsurf | ❌ No (terminology collision) | "Workflows" = commands | Cascade has no orchestration capability |
@@ -132,23 +132,23 @@ This makes the orchestrator itself a reusable, named agent that the team can inv
 
 ---
 
-## KiloCode: Orchestrator Mode
+## Kilo Code: Orchestrator Mode
 
 **Orchestration support:** ✅ Yes
 
-**How it works:** KiloCode has a built-in Orchestrator mode whose explicit purpose is to break down complex tasks and delegate to other modes. The Orchestrator reads the task, formulates a plan, and uses the `new_task()` tool to spawn work in other modes. Each delegated task runs in its own context. The Orchestrator monitors results and coordinates the sequence.
+**How it works:** Kilo Code has a built-in Orchestrator mode whose explicit purpose is to break down complex tasks and delegate to other modes. The Orchestrator reads the task, formulates a plan, and uses the `new_task()` tool to spawn work in other modes. Each delegated task runs in its own context. The Orchestrator monitors results and coordinates the sequence.
 
 Custom modes include a `whenToUse` field specifically to guide the Orchestrator's delegation decisions—it reads each mode's `whenToUse` description to decide which mode is appropriate for a given subtask.
 
 ### Important Terminology Note
 
-KiloCode also has a feature it calls "Workflows" (stored in `.kilocode/workflows/`). **These are not workflows in the factory engineering sense.** KiloCode's "Workflows" are commands—reusable step-by-step task instructions invoked with a slash. They are covered in the Commands page of this guide.
+Kilo Code also has a feature it calls "Workflows" (stored in `.kilocode/workflows/`). **These are not workflows in the factory engineering sense.** Kilo Code's "Workflows" are commands—reusable step-by-step task instructions invoked with a slash. They are covered in the Commands page of this guide.
 
-What factory engineering calls a workflow is implemented in KiloCode through Orchestrator Mode, not through KiloCode's "Workflows" feature.
+What factory engineering calls a workflow is implemented in Kilo Code through Orchestrator Mode, not through Kilo Code's "Workflows" feature.
 
-### How to Write Orchestration Instructions for KiloCode
+### How to Write Orchestration Instructions for Kilo Code
 
-Orchestration instructions for KiloCode are written as custom rules or instructions for the Orchestrator mode. The Orchestrator reads these and uses them to decide how to delegate.
+Orchestration instructions for Kilo Code are written as custom rules or instructions for the Orchestrator mode. The Orchestrator reads these and uses them to decide how to delegate.
 
 **Example: Orchestration instructions for feature development**
 
@@ -194,17 +194,17 @@ When implementation is complete:
 
 **Invoke the orchestrator:**
 
-Switch to Orchestrator mode in KiloCode, then give it the specification (slash-workflow then at-artifact):
+Switch to Orchestrator mode in Kilo Code, then give it the specification (slash-workflow then at-artifact):
 
 ```
 /feature-development @docs/specs/submit-sales-order.md
 ```
 
-KiloCode may expose this as a slash command if the orchestration is wired to a workflow; otherwise use the same pattern in your prompt (workflow name + @ artifact). The Orchestrator reads its instructions, verifies a specification was provided, and begins at implementation planning—delegating to named modes in sequence and looping or branching as needed. If no specification is provided, it asks for one and does not continue.
+Kilo Code may expose this as a slash command if the orchestration is wired to a workflow; otherwise use the same pattern in your prompt (workflow name + @ artifact). The Orchestrator reads its instructions, verifies a specification was provided, and begins at implementation planning—delegating to named modes in sequence and looping or branching as needed. If no specification is provided, it asks for one and does not continue.
 
-📖 [KiloCode Custom Modes Documentation](https://kilo.ai/docs/customize/custom-modes)
+📖 [Kilo Code Custom Modes Documentation](https://kilo.ai/docs/customize/custom-modes)
 
-📖 [KiloCode Orchestrator Mode](https://kilo.ai/docs/agent-behavior/orchestrator-mode)
+📖 [Kilo Code Orchestrator Mode](https://kilo.ai/docs/agent-behavior/orchestrator-mode)
 
 ---
 

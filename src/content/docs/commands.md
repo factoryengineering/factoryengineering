@@ -85,7 +85,7 @@ ln -s ../.claude/commands .cursor/commands
 mkdir -p .windsurf
 ln -s ../.claude/commands .windsurf/workflows
 
-# KiloCode
+# Kilo Code
 mkdir -p .kilocode
 ln -s ../.claude/commands .kilocode/workflows
 
@@ -98,7 +98,7 @@ Commit the symlinks so every team member gets the correct structure on clone.
 
 **GitHub Copilot (VS Code)** uses prompt files (`.prompt.md`) with different naming and optional frontmatter, so commands cannot be shared via symlinks. Use a **sync** step instead; the **factory-engineering** skill includes sync instructions and a batch script (see [GitHub Copilot (VS Code)](#github-copilot-vs-code) below).
 
-Stored in `.claude/commands/`, this file is available as `/write-design` in Claude Code and Cursor; with symlinks, the same file is used by Windsurf, KiloCode, and Antigravity. Invoke with **slash-command at-artifact** (e.g. `/write-design @docs/user-stories/billing-email.md`).
+Stored in `.claude/commands/`, this file is available as `/write-design` in Claude Code and Cursor; with symlinks, the same file is used by Windsurf, Kilo Code, and Antigravity. Invoke with **slash-command at-artifact** (e.g. `/write-design @docs/user-stories/billing-email.md`).
 
 ## IDE-by-IDE Reference
 
@@ -166,15 +166,15 @@ ln -s ../.claude/commands .windsurf/workflows
 
 ---
 
-### KiloCode
+### Kilo Code
 
 **Folder location:** `.kilocode/workflows/` (project) or `~/.kilocode/workflows/` (global)
 
 **Invocation:** `/workflow-name` or `@workflow-name`
 
-KiloCode calls them workflows—again, this is KiloCode's storage mechanism for commands, not factory engineering workflows. KiloCode workflows are markdown files that define a sequence of steps. With the symlink, the same file as in [Example command file](#example-command-file) is used.
+Kilo Code calls them workflows—again, this is Kilo Code's storage mechanism for commands, not factory engineering workflows. Kilo Code workflows are markdown files that define a sequence of steps. With the symlink, the same file as in [Example command file](#example-command-file) is used.
 
-**Usage in KiloCode:**
+**Usage in Kilo Code:**
 
 ```
 /write-spec @submit-sales-order
@@ -182,7 +182,7 @@ KiloCode calls them workflows—again, this is KiloCode's storage mechanism for 
 
 Use the symlink from the setup above so `.kilocode/workflows` points to `.claude/commands`.
 
-📖 [KiloCode Workflows Documentation](https://kilo.ai/docs/features/slash-commands/workflows)
+📖 [Kilo Code Workflows Documentation](https://kilo.ai/docs/features/slash-commands/workflows)
 
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: factory-engineering
-description: Configures factory engineering across IDEs. Sets up symlinks so .claude/commands and .claude/skills are available where each IDE expects them (Cursor and GitHub Copilot read .claude/skills directly; Windsurf, KiloCode, and Antigravity need symlinks for skills; Cursor and others need symlinks for commands). Syncs .claude/commands to GitHub Copilot prompt files (.github/prompts/*.prompt.md) for VS Code. Use when configuring slash commands or skills across IDEs, setting up .cursor/commands or .windsurf/workflows from .claude/commands, syncing commands for Copilot, or unifying command and skill folders.
+description: Configures factory engineering across IDEs. Sets up symlinks so .claude/commands and .claude/skills are available where each IDE expects them (Cursor and GitHub Copilot read .claude/skills directly; Windsurf, Kilo Code, and Antigravity need symlinks for skills; Cursor and others need symlinks for commands). Syncs .claude/commands to GitHub Copilot prompt files (.github/prompts/*.prompt.md) for VS Code. Use when configuring slash commands or skills across IDEs, setting up .cursor/commands or .windsurf/workflows from .claude/commands, syncing commands for Copilot, or unifying command and skill folders.
 ---
 
 # Factory Engineering
@@ -13,7 +13,7 @@ One skill for configuring commands, workflows, and skills across IDEs. Canonical
 
 ## When to use
 
-- **Symlinks:** User wants slash commands or skills to work in Cursor, Windsurf, KiloCode, or Antigravity from a single canonical folder. Each IDE looks in a different path; symlinks point those paths to `.claude/commands` and (where needed) `.claude/skills`. Cursor and GitHub Copilot read `.claude/skills/` directly—no skills symlink for them; the script creates skill symlinks only for Windsurf, KiloCode, and Antigravity.
+- **Symlinks:** User wants slash commands or skills to work in Cursor, Windsurf, Kilo Code, or Antigravity from a single canonical folder. Each IDE looks in a different path; symlinks point those paths to `.claude/commands` and (where needed) `.claude/skills`. Cursor and GitHub Copilot read `.claude/skills/` directly—no skills symlink for them; the script creates skill symlinks only for Windsurf, Kilo Code, and Antigravity.
 - **Sync Copilot prompts:** User uses GitHub Copilot (VS Code) and wants `/command-name` in Chat. Copilot uses `.github/prompts/*.prompt.md`, not `.claude/commands/*.md`. Sync converts commands to prompt files.
 
 For Copilot commands, use sync (symlinks do not apply).

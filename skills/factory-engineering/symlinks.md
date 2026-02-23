@@ -2,7 +2,7 @@
 
 Canonical **commands and workflows** live in **`.claude/commands/`**. Canonical **skills** live in **`.claude/skills/`**. Each IDE looks in different folders. The scripts create symlinks so one folder of each type works everywhere.
 
-**Supported IDEs:** Cursor, Windsurf, KiloCode, Antigravity. Cursor and GitHub Copilot read `.claude/skills/` directly—no skills symlink. For Copilot commands use sync (see [sync-copilot-prompts.md](sync-copilot-prompts.md)).
+**Supported IDEs:** Cursor, Windsurf, Kilo Code, Antigravity. Cursor and GitHub Copilot read `.claude/skills/` directly—no skills symlink. For Copilot commands use sync (see [sync-copilot-prompts.md](sync-copilot-prompts.md)).
 
 ---
 
@@ -60,7 +60,7 @@ Default `--type all` creates both command and skill symlinks. If a target is an 
 |-----|------------------|-----------|
 | Cursor | `.cursor/commands` | `../.claude/commands` |
 | Windsurf | `.windsurf/workflows` | `../.claude/commands` |
-| KiloCode | `.kilocode/workflows` | `../.claude/commands` |
+| Kilo Code | `.kilocode/workflows` | `../.claude/commands` |
 | Antigravity | `.agent/workflows` | `../.claude/commands` |
 
 **Skills** (canonical: `.claude/skills/`). Cursor and GitHub Copilot read this path directly—no symlink.
@@ -68,7 +68,7 @@ Default `--type all` creates both command and skill symlinks. If a target is an 
 | IDE | Target (symlink) | Points to |
 |-----|------------------|-----------|
 | Windsurf | `.windsurf/skills` | `../.claude/skills` |
-| KiloCode | `.kilocode/skills` | `../.claude/skills` |
+| Kilo Code | `.kilocode/skills` | `../.claude/skills` |
 | Antigravity | `.agent/skills` | `../.claude/skills` |
 
 Antigravity requires `.agent` to exist; the scripts create it when needed.

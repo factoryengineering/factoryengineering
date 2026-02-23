@@ -45,7 +45,7 @@ Ideas for pre-packaging a set of skills or an MCP server so people have immediat
 
 - Pre-populated `.claude/skills/` (skill-creator, factory-engineering-sync-copilot-prompts, example-factories, bootstrap).
 - `.claude/commands/` with a few stub commands.
-- Symlinks (or a script that creates them) for Cursor, Windsurf, KiloCode, Antigravity.
+- Symlinks (or a script that creates them) for Cursor, Windsurf, Kilo Code, Antigravity.
 - Script (or skill) to generate `.github/prompts/`.
 - Short README: “Clone this repo (or use it as a template) to start your factory.”
 

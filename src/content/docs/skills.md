@@ -104,7 +104,7 @@ Establish one canonical skills location in your repository and use symlinks to p
 
 This folder is the most widely recognized across the ecosystem. Use it as your source of truth.
 
-**Option A — Use the factory-engineering skill:** Install with `npx openskills install michaellperry/factoryengineering`, then ask your agent to create symlinks. The skill sets up symlinks for **commands/workflows** (`.claude/commands/`) and, for IDEs that need them, **skills** (`.claude/skills/` → Windsurf, KiloCode, Antigravity; Cursor and Copilot read `.claude/skills/` directly). Use `--type all` (default) for both, or `--type commands` / `--type skills`. The agent can detect which IDEs you have, confirm with you, and offer to copy existing contents into the canonical folder if a target already exists. On Windows, use the skill's PowerShell script. See the [Commands](/commands) page for the full symlink approach and the skill’s SKILL.md (and symlinks.md) for script options.
+**Option A — Use the factory-engineering skill:** Install with `npx openskills install michaellperry/factoryengineering`, then ask your agent to create symlinks. The skill sets up symlinks for **commands/workflows** (`.claude/commands/`) and, for IDEs that need them, **skills** (`.claude/skills/` → Windsurf, Kilo Code, Antigravity; Cursor and Copilot read `.claude/skills/` directly). Use `--type all` (default) for both, or `--type commands` / `--type skills`. The agent can detect which IDEs you have, confirm with you, and offer to copy existing contents into the canonical folder if a target already exists. On Windows, use the skill's PowerShell script. See the [Commands](/commands) page for the full symlink approach and the skill’s SKILL.md (and symlinks.md) for script options.
 
 **Option B — Create symlinks manually for each IDE:**
 
@@ -112,7 +112,7 @@ This folder is the most widely recognized across the ecosystem. Use it as your s
 # Windsurf
 ln -s ../.claude/skills .windsurf/skills
 
-# KiloCode
+# Kilo Code
 ln -s ../.claude/skills .kilocode/skills
 
 # Antigravity (uses .agent/skills at project level)
@@ -207,7 +207,7 @@ Cascade automatically invokes skills when your request matches a skill's descrip
 
 ---
 
-### KiloCode
+### Kilo Code
 
 **Supports Agent Skills standard:** ✅ Native — one of the first agents to adopt the standard
 
@@ -217,19 +217,19 @@ Cascade automatically invokes skills when your request matches a skill's descrip
 | Project | `.kilocode/skills/` |
 | Global | `~/.kilocode/skills/` |
 
-KiloCode is an open-source VS Code extension with a model aggregator backend that gives you access to 500+ models—including Claude, Gemini, and GPT series—with pay-per-token billing at raw provider rates. This makes it a flexible choice for teams that want model independence without committing to a single vendor.
+Kilo Code is an open-source VS Code extension with a model aggregator backend that gives you access to 500+ models—including Claude, Gemini, and GPT series—with pay-per-token billing at raw provider rates. This makes it a flexible choice for teams that want model independence without committing to a single vendor.
 
-KiloCode loads skills from `.kilocode/skills/`. A symlink to your canonical location is required:
+Kilo Code loads skills from `.kilocode/skills/`. A symlink to your canonical location is required:
 
 ```bash
 ln -s ../.claude/skills .kilocode/skills
 ```
 
-KiloCode was one of the first agents to natively implement the Agent Skills specification with zero-configuration detection. Skills are evaluated before every response—the agent checks all skill descriptions against your request and loads the most relevant one.
+Kilo Code was one of the first agents to natively implement the Agent Skills specification with zero-configuration detection. Skills are evaluated before every response—the agent checks all skill descriptions against your request and loads the most relevant one.
 
-KiloCode also supports mode-specific skills that activate only in specific modes (Code, Architect, Debugger, Orchestrator), which is especially useful for factory engineering workflows where different agents operate in different modes.
+Kilo Code also supports mode-specific skills that activate only in specific modes (Code, Architect, Debugger, Orchestrator), which is especially useful for factory engineering workflows where different agents operate in different modes.
 
-📖 [KiloCode Skills Documentation](https://kilo.ai/docs/agent-behavior/skills)
+📖 [Kilo Code Skills Documentation](https://kilo.ai/docs/agent-behavior/skills)
 
 ---
 
@@ -267,13 +267,13 @@ mkdir -p .claude/skills
 
 **2. Create your first skill:** Use the **skill-creator** skill (see [Installing skill-creator and skill-optimizer](#installing-skill-creator-and-skill-optimizer)). Ask your agent to create a new skill in `.claude/skills`; it will guide you through the workflow and produce a proper SKILL.md and directory structure.
 
-**3. Create symlinks for each IDE your team uses:** Use the **factory-engineering** skill (Option A above) and ask your agent to set up symlinks—it will create command symlinks and skill symlinks for IDEs that need them (Windsurf, KiloCode, Antigravity). Or create them manually:
+**3. Create symlinks for each IDE your team uses:** Use the **factory-engineering** skill (Option A above) and ask your agent to set up symlinks—it will create command symlinks and skill symlinks for IDEs that need them (Windsurf, Kilo Code, Antigravity). Or create them manually:
 
 ```bash
 # Windsurf
 ln -s ../.claude/skills .windsurf/skills
 
-# KiloCode
+# Kilo Code
 ln -s ../.claude/skills .kilocode/skills
 
 # Antigravity

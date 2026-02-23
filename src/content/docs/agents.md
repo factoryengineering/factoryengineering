@@ -11,6 +11,8 @@ An agent is not a prompt template. It is not a set of instructions injected into
 
 In practice, you give an agent a role like "technical specification writer" or "code reviewer." That agent reads from a memory file at the beginning of its session. That file holds everything it learned last time. It executes a task or sequence of tasks. Then, before closing, it writes back new learnings, decisions, and context to that memory file. The next time that agent starts, it reads those accumulated memories and builds on them.
 
+**For factory engineering, use project-level agents.** Define agents in the project (e.g. `.claude/agents/`, `.kilocodemodes`) so roles and memory live with the repo and the whole team shares the same agent setup.
+
 ## Word of Caution: "Agent" is Overused
 
 Many IDEs use the word "agent" to mean different things. Some use it to refer to the overall coding assistant. Some use it for project-specific instructions. **None of these are agents in the factory engineering sense.** We will be very specific about what each IDE actually supports and what it calls those features.
@@ -77,12 +79,12 @@ Only a few IDEs provide true agent support as defined above:
 |-----|-------------------|--------------|---------|----------------------------------|
 | Claude Code | ✅ Yes | Sub-agents | `.claude/agents/` | Native (read/write at session start/end) |
 | GitHub Copilot | ✅ Yes | Custom agents | Project-level (memory requires Pro+) | Yes (instruct agent to read/append a file) |
-| KiloCode | ✅ Yes | Modes | `.kilocode/custom_modes.yaml` | Yes (instruct mode to load from markdown; use `.kilocode/rules/` or mode-specific rules) |
+| Kilo Code | ✅ Yes | Modes | Project: `.kilocodemodes`; rules: `.kilo/rules-{slug}/` | Yes (instruct mode to load from markdown; use `.kilo/rules-{slug}/` or `.kilorules-{slug}`) |
 | Cursor | ❌ No | (feature removed) | N/A | N/A |
 | Windsurf | ❌ No | Cascade (singular) | N/A | N/A |
 | Antigravity | ❌ No | N/A | N/A | N/A |
 
-**Memory via markdown instruction:** Even without native agent memory, you can get the same behavior by instructing the assistant via that IDE’s instruction mechanism (see table) to read from a markdown file at the start of work and append learnings at the end. KiloCode modes used this way function as true agents.
+**Memory via markdown instruction:** Even without native agent memory, you can get the same behavior by instructing the assistant via that IDE’s instruction mechanism (see table) to read from a markdown file at the start of work and append learnings at the end. Kilo Code modes used this way function as true agents.
 
 ---
 
@@ -162,19 +164,19 @@ The agent then reads and writes that memory file as part of its workflow.
 
 ---
 
-## KiloCode: Modes
+## Kilo Code: Modes
 
 **Supports true agents:** ✅ Yes
 
 **Feature name:** Modes
 
-**Storage location:** `.kilocode/custom_modes.yaml`; mode-specific rules in `.kilocode/rules-${mode}/`
+**Storage location:** Project modes: `.kilocodemodes` in the project root (YAML). Global modes: `custom_modes.yaml`. Mode-specific rules: directory `.kilo/rules-{slug}/` — project: `{workspace}/.kilo/rules-{slug}/`, global: `~/.kilo/rules-{slug}/`.
 
-KiloCode modes are true agents when you instruct them to load from a markdown file for memory. Modes support custom instructions and can load project- or mode-specific rules from markdown in `.kilocode/rules/` and `.kilocode/rules-${mode}/`. By adding instructions such as “At the start of each session, read from `spec-writer-memory.md`; at the end, append your learnings to that file,” a mode implements the same persistent, read/write memory pattern as factory-engineering agents.
+Kilo Code modes are true agents when you instruct them to load from a markdown file for memory. Modes support a role definition, custom instructions, and mode-specific rules from `.kilo/rules-{slug}/`. By adding instructions such as “At the start of each session, read from `spec-writer-memory.md`; at the end, append your learnings to that file,” a mode implements the same persistent, read/write memory pattern as factory-engineering agents.
 
-KiloCode also has a project-level “Memory Bank” (`.kilocode/rules/memory-bank/`); for agent-specific memory, use a dedicated markdown file per mode and reference it in that mode’s instructions.
+For agent-specific memory, use a dedicated markdown file per mode and reference it in that mode's role definition or custom instructions.
 
-📖 [KiloCode Custom Modes Documentation](https://kilo.ai/docs/agent-behavior/custom-modes)
+📖 [Kilo Code Custom Modes Documentation](https://kilo.ai/docs/customize/custom-modes)
 
 ---
 
