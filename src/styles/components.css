@@ -118,3 +118,11 @@
 .card-link article {
   height: 100%;
 }
+
+/* Word-wrap Expressive Code code blocks */
+.expressive-code pre,
+.expressive-code pre code,
+.expressive-code .ec-line .code {
+  white-space: pre-wrap !important;
+  overflow-wrap: break-word;
+}

@@ -290,21 +290,3 @@ git commit -m "Initialize software factory skills"
 ```
 
 From this point forward, every team member has the full skills library available in their preferred IDE immediately after cloning the repository.
-
----
-
-## Writing Effective Skills
-
-The `description` field is the most important part of your skill. It determines when the agent loads the skill. Write descriptions that are specific and action-oriented:
-
-**Too vague:** `"Helps with API work"`
-
-**Effective:** `"Use when designing or reviewing REST API endpoints, defining request/response schemas, generating OpenAPI specifications, or evaluating API design decisions for this project."`
-
-Keep supporting files close to the skill. Templates, checklists, and reference documents placed in the skill folder are available to the agent when the skill is invoked—use them to encode your team's specific standards rather than leaving them in prose.
-
-When a skill produces a bad result, don't just fix the output. Ask: *which part of the skill allowed this?* Then update the skill. Commit it. This is how your factory improves.
-
----
-
-*Next: [Commands](/commands) →*
