@@ -5,23 +5,35 @@
       "url": "/"
     },
     {
-      "name": "Documentation",
-      "url": "/getting-started/introduction/overview/"
-    },
-    {
-      "name": "Reference",
+      "name": "Factory Components",
       "url": "",
       "hasChildren": true,
       "children": [
         {
-          "name": "Configuration",
-          "url": "/reference/configuration/"
+          "name": "Skills",
+          "url": "/skills/"
         },
         {
-          "name": "Plugins Reference",
-          "url": "/reference/plugin/"
+          "name": "Commands",
+          "url": "/commands/"
+        },
+        {
+          "name": "Agents",
+          "url": "/agents/"
+        },
+        {
+          "name": "Workflows",
+          "url": "/workflows/"
         }
       ]
+    },
+    {
+      "name": "Articles",
+      "url": "/articles/"
+    },
+    {
+      "name": "Examples",
+      "url": "/examples/"
     }
   ],
   "footer": {

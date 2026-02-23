@@ -5,23 +5,35 @@
       "url": "/"
     },
     {
-      "name": "Documentation",
-      "url": "/fr/getting-started/introduction/overview/"
-    },
-    {
-      "name": "Référence",
+      "name": "Composants d'usine",
       "url": "",
       "hasChildren": true,
       "children": [
         {
-          "name": "Configuration",
-          "url": "/fr/reference/configuration/"
+          "name": "Skills",
+          "url": "/fr/skills/"
         },
         {
-          "name": "Référence des plugins",
-          "url": "/fr/reference/plugin/"
+          "name": "Commands",
+          "url": "/fr/commands/"
+        },
+        {
+          "name": "Agents",
+          "url": "/fr/agents/"
+        },
+        {
+          "name": "Workflows",
+          "url": "/fr/workflows/"
         }
       ]
+    },
+    {
+      "name": "Articles",
+      "url": "/fr/articles/"
+    },
+    {
+      "name": "Examples",
+      "url": "/fr/examples/"
     }
   ],
   "footer": {
