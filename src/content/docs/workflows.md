@@ -1,21 +1,158 @@
 ---
 title: Workflows
-description: Orchestrating agents—workflow documents that guide a top-level orchestrator to delegate, loop, and coordinate specialist agents through complex tasks.
+description: Orchestrating agents. Workflow documents guide a top-level orchestrator to delegate, loop, and coordinate specialist agents through complex tasks.
 ---
 
 # Workflows: Orchestrating Agents
 
-A workflow, in factory engineering, is an orchestration document. It is read by a top-level orchestrator agent that breaks down a large task into discrete pieces, delegates each piece to a named specialist agent, evaluates the results, and decides what to do next. Workflows are not linear checklists. They contain conditions and loops—if the spec reviewer finds gaps, delegate back to the spec-writer. If the implementation passes review, proceed to test. If not, route back to the developer.
+A workflow, in factory engineering, is an orchestration document. It is read by a top-level orchestrator agent that breaks down a large task into discrete pieces, delegates each piece to a named specialist agent, evaluates the results, and decides what to do next. Workflows are not linear checklists. They contain conditions and loops. If the spec reviewer finds gaps, delegate back to the spec-writer; if the implementation passes review, proceed to test; if not, route back to the developer.
 
 This is the highest layer of the software factory. Skills encode knowledge. Commands encode task instructions. Agents are the specialist roles. Workflows define how those agents coordinate to move artifacts through the factory.
 
 ## The Word "Workflow" Is Used Differently by Different IDEs
 
-Before diving in, a critical terminology note: several IDEs use the word "workflow" for something entirely different. Windsurf calls its command mechanism "Workflows." Kilo Code also has a feature it calls "Workflows." Neither of these are workflows in the factory engineering sense—they are commands, task instructions that a single agent follows in sequence.
+Several IDEs use the word "workflow" for something else. Windsurf and Kilo Code both have features they call "Workflows." Those are reusable slash commands, not orchestration of named agents. This page uses the factory engineering meaning: orchestration of agents, with delegation, branching, and looping.
 
-This page covers what factory engineering means by the word—orchestration of named agents—and assesses how close each IDE can come to that capability.
+**Invocation:** Use **slash-workflow at-artifact**, e.g. `/tdd-cycle @docs/specs/order-validation.md`. The workflow name is the filename without `.md`. Store workflows in `.claude/commands/` so they sit alongside commands and can be invoked the same way. Symlinks from `.cursor/commands/`, `.windsurf/workflows/`, `.kilocode/workflows/`, and `.agent/workflows/` point to `.claude/commands/` so every IDE sees the same files (see the [Commands](/commands) page).
 
-**Software factory invocation:** To run a workflow with an artifact, use **slash-workflow at-artifact**, e.g. `/feature-development @docs/specs/submit-sales-order.md`. The workflow name is the filename without `.md`. Workflows are stored in `.claude/commands/`, alongside commands. Symlinks from `.cursor/commands/`, `.windsurf/workflows/`, `.kilocode/workflows/`, and `.agent/workflows/` point to `.claude/commands/` so every IDE sees the same files (see the Commands page).
+---
+
+## Recommended Location: `.claude/commands/`
+
+Store workflow documents in `.claude/commands/`. That gives you:
+
+- **One place for both commands and workflows.** The user invokes a workflow by name; the file lives next to single-agent commands.
+- **Slash-workflow at-artifact.** Invoke with `/workflow-name @path/to/artifact`. The workflow name is the filename without `.md`; the artifact is the input (e.g. a spec, a design, a user story).
+- **Shared across IDEs.** Symlink `.claude/commands/` into each IDE’s commands/workflows folder so the same workflow file is available everywhere.
+
+Do not maintain separate copies of the same workflow in each IDE. Use symlinks. Without the symlink, you would have to keep each copy in sync by hand.
+
+Because workflows are stored in `.claude/commands/` and shared via symlinks (like commands), keep them **IDE-agnostic**: do not rely on `$ARGUMENTS` or other placeholders. Not all IDEs support them. State in the workflow what the user will supply (e.g. a design or specification, via slash-workflow at-artifact) and instruct the orchestrator to stop and prompt the user if that input is missing. See the [Commands](/commands) page for the same pattern.
+
+---
+
+## Example: TDD Cycle Workflow
+
+The following workflow runs a full TDD cycle from design to passing tests. It is stored as `.claude/commands/tdd-cycle.md` and invoked as `/tdd-cycle @path/to/design.md`. It shows delegation to named agents, conditional logic (refactor only when warranted, plan check), and a loop over tests. The orchestrator makes decisions based on what is learned each step. It uses the IDE-agnostic pattern: state what the user supplies and instruct the orchestrator to stop and prompt if missing (no `$ARGUMENTS`).
+
+````markdown
+---
+description: Run a full TDD cycle from design to passing tests
+---
+
+# TDD Cycle
+
+The user will supply a design or specification document. If no design or specification is supplied, stop and prompt the user before proceeding.
+
+You are orchestrating a complete TDD cycle. The design or specification to implement is the document the user supplied. Read it from context. Follow these phases precisely, delegating to the appropriate specialized agents.
+
+---
+
+## Phase 1: Planning
+
+Delegate to the **tdd-planner** agent with the full design specification above. Ask it to produce a complete, ordered test plan covering all phases (structural, behavioral, integration, edge cases).
+
+When the planner returns, **read and internalize the full plan**. Extract the ordered list of tests. This is your working backlog.
+
+---
+
+## Phase 2: TDD Loop
+
+Work through each test in the plan sequentially. For each test:
+
+### Step A: Write the Failing Test
+
+Delegate to the **tdd-test-writer** agent. Provide:
+- The specific test scenario from the plan (be precise: include verifies, forces-into-existence, and why-here from the plan)
+- Any context from previously completed tests that affects scaffolding
+
+After the agent returns, confirm the test is **failing for the right reason** (assertion failure or not-implemented stub, not a compile error).
+
+### Step B: Make the Test Pass
+
+Delegate to the **tdd-code-writer** agent. Provide:
+- The failing test details returned by tdd-test-writer
+- The test scenario and what minimal implementation is needed
+
+After the agent returns, confirm **all previously passing tests still pass** and the new test now passes.
+
+### Step C: Refactor (if needed)
+
+After the test passes, evaluate whether refactoring is warranted. Refactor if:
+- There is obvious duplication introduced by the new code
+- An abstraction is now clearly visible that was not visible before
+- The code violates a clear project convention
+
+If refactoring is warranted, delegate to the **tdd-refactor** agent. Provide:
+- The newly passing code
+- What refactoring you believe is needed and why
+
+After refactoring, confirm all tests still pass.
+
+### Step D: Plan Check
+
+After each completed test, briefly assess:
+- Does the plan still make sense given what was discovered during implementation?
+- Did the implementation reveal any structural decisions that affect upcoming tests?
+- Are there any new edge cases or integration concerns that should be added to the backlog?
+
+If the plan needs significant adjustment (new tests needed, existing tests reordered, a test is now irrelevant), delegate to the **tdd-planner** agent with:
+- The original specification
+- The tests completed so far and what was learned
+- The specific concern or deviation to address
+
+Ask it to produce a revised plan for the remaining tests.
+
+---
+
+## Phase 3: Completion
+
+When all tests in the plan have passed:
+
+1. Run the full test suite to confirm nothing is broken: `npm test`
+2. Run TypeScript type checking: `npm run typecheck`
+3. If any Rust code was modified: `npm run fmt:check`
+
+Summarize what was built:
+- Feature/component implemented
+- Tests written (count and names)
+- Key design decisions that emerged through the TDD process
+- Any deviations from the original plan and why
+
+---
+
+## Orchestration Rules
+
+- **Never write test code yourself.** Always delegate test writing to tdd-test-writer.
+- **Never write implementation code yourself.** Always delegate implementation to tdd-code-writer.
+- **Never refactor yourself.** Always delegate refactoring to tdd-refactor.
+- **Never skip the plan check** between tests. Small course corrections prevent large wasted efforts.
+- **If an agent returns an error or unexpected state**, analyze it yourself before re-delegating. Don't re-run the same agent with the same prompt in a loop.
+- **Track your position in the plan** explicitly. After each test completes, state clearly which test you just finished and which is next.
+- **Proceed to the next test automatically** unless you need user input to resolve an ambiguity. Do not ask for permission between each test.
+````
+
+### What This Example Demonstrates
+
+**Delegation.** The orchestrator never writes tests, implementation, or refactors. It delegates to **tdd-planner**, **tdd-test-writer**, **tdd-code-writer**, and **tdd-refactor**. The workflow states this in both the phase text and the Orchestration Rules.
+
+**Conditional logic.** Step C runs only when refactoring is warranted (duplication, new abstraction, convention violation). Step D runs after every test; the orchestrator decides whether the plan needs revision and only then delegates back to **tdd-planner** with the current state and the specific concern.
+
+**Looping.** Phase 2 is an explicit loop: "Work through each test in the plan sequentially." The plan itself can change mid-loop (Step D), so the orchestrator iterates over a possibly updated backlog.
+
+**Decisions based on what is learned.** The "Plan Check" step tells the orchestrator to use what was discovered during implementation to decide if the plan still makes sense and whether to request a revised plan. Completion asks for a summary of deviations from the original plan and why. The workflow is built to react to what happens during execution.
+
+---
+
+## Agent Participation: Deviations and Opportunities
+
+Workflows run better when specialist agents report back in a way the orchestrator can use. Two kinds of feedback matter:
+
+**Deviations.** When an agent does something different from what was asked (e.g. it simplified a step, skipped something that turned out to be unnecessary, or took a different design turn), it should say so and why. The orchestrator can then update its mental model, adjust the plan (e.g. via a plan-check step), or surface the deviation in the completion summary. The TDD Cycle completion phase explicitly asks for "Any deviations from the original plan and why."
+
+**Opportunities.** When an agent notices something that is not strictly required but would help (refactoring, a missing test, a clearer abstraction, a convention that could be applied), it should report it. The workflow can then decide: delegate to another agent (e.g. tdd-refactor), add an item to the backlog (e.g. in the plan check), or surface it to the user. The TDD example encodes this in Step C (refactor when duplication or abstraction is visible) and in the plan check (new edge cases or integration concerns to add to the backlog).
+
+Instruct agents in the workflow or in their agent definitions to include deviations and opportunities in their responses. The orchestrator reads those responses to decide the next step; without that feedback, the orchestrator is driving blind.
 
 ---
 
@@ -32,341 +169,70 @@ This page covers what factory engineering means by the word—orchestration of n
 
 ---
 
-## Claude Code: Full Workflow Orchestration
+### Claude Code: Full Workflow Orchestration
 
 **Orchestration support:** ✅ Yes
 
-**How it works:** The main Claude Code agent reads an orchestration document from CLAUDE.md or a referenced file and uses the Task tool to delegate work to named subagents. The orchestrator reads the workflow, assesses the situation, and dynamically routes work based on what it discovers. It can loop, branch, and coordinate parallel work.
+Invoke with **slash-workflow at-artifact** (e.g. `/tdd-cycle @path/to/design.md`). The main agent reads the workflow from `.claude/commands/` and the artifact you supplied, then uses the Task tool to delegate work to named subagents. The orchestrator reads the workflow, assesses the situation, and dynamically routes work based on what it discovers. It loops, branches, and coordinates parallel work according to the workflow.
 
-Subagents cannot spawn other subagents—only the main orchestrator can delegate. This means the workflow sits at the orchestrator level, coordinating specialists below it.
+Subagents cannot spawn other subagents. Only the main orchestrator can delegate. The workflow sits at the orchestrator level, coordinating specialists below it.
 
-### How to Write a Claude Code Workflow
+**Where workflows live:** In `.claude/commands/`, one file per workflow (e.g. `tdd-cycle.md`). Invoke with `/tdd-cycle @path/to/design.md`. The orchestrator reads the workflow and the artifact, then follows the phases. It delegates to tdd-planner, tdd-test-writer, tdd-code-writer, and tdd-refactor, and applies the conditional and looping logic in the document.
 
-Workflows for Claude Code are markdown documents written as orchestration instructions. They describe how the orchestrator should assess a situation and which subagents to delegate to. They are not step-by-step scripts—they are decision-making guidance for the orchestrator.
+Define an orchestrator subagent that is restricted to specific tools and subagents, and that is instructed to read a given workflow file before starting. That makes the orchestrator a reusable, named agent the team can invoke by name.
 
-**Where workflows live:** Workflows are markdown files in `.claude/commands/`, the same folder as commands. One file per workflow (e.g. `feature-development.md`). The orchestrator reads that file when you invoke `/feature-development @artifact`.
-
-**Example workflow: Feature Development (`feature-development.md`)**
-
-This workflow assumes the user story and specification are already done. The user provides a specification (which contains a link to the user story). The workflow starts at implementation planning.
-
-````markdown
-# Feature Development Workflow
-
-You are the orchestrator for this project's feature development process.
-The user will provide a technical specification. The specification should 
-contain a link to the user story. User story and specification steps are 
-already complete—begin at implementation planning.
-
-## Input Check
-- If the user has **not** provided a specification: do **not** continue.
-  Ask the user to provide a specification before proceeding. Do not 
-  attempt to write a specification or infer one from a user story.
-- If a specification is provided: read it (and the user story it links to, 
-  if needed for context). Then proceed to Implementation Planning.
-
-## Implementation Planning
-Delegate to @implementation-planner:
-- Input: the specification
-- Expected output: a task breakdown saved to docs/plans/{story-slug}.md
-- Review the plan for completeness. If any tasks are missing, loop back 
-  to the implementation-planner with specific feedback.
-
-## Implementation
-For each task in the implementation plan:
-- Delegate to the appropriate agent based on the task type:
-  - UI tasks → @front-end-developer
-  - API tasks → @back-end-developer
-  - Data model tasks → @back-end-developer
-  - Test tasks → @test-writer
-- Run each task sequentially unless the tasks are independent, in which 
-  case run them in parallel using background subagents
-
-## Review
-After implementation is complete, delegate to @code-reviewer:
-- Input: all modified files
-- If the reviewer finds critical issues, route back to the appropriate 
-  developer agent with the specific findings
-- If the reviewer finds warnings, surface them to the user for a decision
-- Continue until the reviewer approves
-
-## Completion
-When all tasks pass review:
-- Delegate to @test-runner to execute the test suite
-- If tests fail, loop back to the appropriate developer with the failure output
-- When tests pass, report completion to the user with a summary of what 
-  was built
-````
-
-**Invoke the workflow:**
-
-```
-/feature-development @docs/specs/submit-sales-order.md
-```
-
-Execution is **slash-workflow then at-artifact**: the workflow name (filename without `.md`) followed by `@` and the specification path. The file `.claude/commands/feature-development.md` contains the orchestration instructions. The user supplies the specification; the orchestrator reads the workflow, checks that a specification was provided, and begins at implementation planning—delegating to the implementation-planner, developers, and reviewer in sequence, looping where the workflow instructs, and surfacing decisions that require human judgment. If no specification is provided, the orchestrator asks for one and does not continue.
-
-### Restricting Which Subagents an Orchestrator Can Spawn
-
-You can define an orchestrator subagent that has explicit control over which other subagents it can invoke:
-
-````markdown
----
-name: feature-orchestrator
-description: Use to orchestrate feature development from specification through implementation and review. Expects the user to provide a specification (with a link to the user story); does not write specs.
-tools: Task(implementation-planner, front-end-developer, back-end-developer, code-reviewer, test-runner), Read
----
-
-You are the feature development orchestrator for this project.
-
-Read your orchestration instructions from .claude/commands/feature-development.md
-before beginning any feature development task. If the user has not provided a
-specification, ask for one and do not proceed.
-````
-
-This makes the orchestrator itself a reusable, named agent that the team can invoke by name.
-
-📖 [Claude Code Subagents Documentation](https://code.claude.com/docs/en/sub-agents)
-
+📖 [Claude Code Subagents Documentation](https://code.claude.com/docs/en/sub-agents)  
 📖 [Claude Code Agent Teams Documentation](https://code.claude.com/docs/en/agent-teams)
 
 ---
 
-## Kilo Code: Orchestrator Mode
+### Kilo Code: Orchestrator Mode
 
 **Orchestration support:** ✅ Yes
 
-**How it works:** Kilo Code has a built-in Orchestrator mode whose explicit purpose is to break down complex tasks and delegate to other modes. The Orchestrator reads the task, formulates a plan, and uses the `new_task()` tool to spawn work in other modes. Each delegated task runs in its own context. The Orchestrator monitors results and coordinates the sequence.
+Kilo Code has a built-in Orchestrator mode that breaks down complex tasks and delegates to other modes via `new_task()`. The Orchestrator reads the task, formulates a plan, and spawns work in other modes. Custom modes use a `whenToUse` field to guide delegation.
 
-Custom modes include a `whenToUse` field specifically to guide the Orchestrator's delegation decisions—it reads each mode's `whenToUse` description to decide which mode is appropriate for a given subtask.
+**Terminology:** Kilo Code's "Workflows" (in `.kilocode/workflows/`) are commands, but can be used for orchestration of agents. Create a symlink from `.claude/commands/` to `.kilocode/workflows/` so the same workflow file is available everywhere.
 
-### Important Terminology Note
+Factory engineering workflows are implemented in Kilo Code through Orchestrator Mode. Invoke a workflow using the *slash-workflow at-artifact* pattern (e.g. `/tdd-cycle @docs/specs/order-validation.md`).
 
-Kilo Code also has a feature it calls "Workflows" (stored in `.kilocode/workflows/`). **These are not workflows in the factory engineering sense.** Kilo Code's "Workflows" are commands—reusable step-by-step task instructions invoked with a slash. They are covered in the Commands page of this guide.
+Place orchestration instructions in a rule file the Orchestrator reads, then invoke with the same pattern: slash-workflow at-artifact (e.g. `/tdd-cycle @docs/specs/order-validation.md`).
 
-What factory engineering calls a workflow is implemented in Kilo Code through Orchestrator Mode, not through Kilo Code's "Workflows" feature.
-
-### How to Write Orchestration Instructions for Kilo Code
-
-Orchestration instructions for Kilo Code are written as custom rules or instructions for the Orchestrator mode. The Orchestrator reads these and uses them to decide how to delegate.
-
-**Example: Orchestration instructions for feature development**
-
-Place in `.kilo/rules-orchestrator/feature-development.md`:
-
-User story and specification are assumed done. The user provides a specification (which contains a link to the user story). Start at implementation planning.
-
-````markdown
-# Feature Development Orchestration
-
-The user will provide a technical specification (with a link to the user 
-story). User story and specification steps are already complete—begin at 
-implementation planning.
-
-## Input Check
-If the user has **not** provided a specification: do **not** continue. Ask 
-the user to provide a specification before proceeding. Do not attempt to 
-write a specification or infer one from a user story.
-
-If a specification is provided, read it (and the user story it links to if 
-needed), then proceed to Implementation Planning.
-
-## Implementation Planning
-- Delegate to architect mode for implementation planning
-- Input: the specification document
-- Review the plan before proceeding
-
-## Implementation
-For each task in the plan:
-- Route to the appropriate mode:
-  - Frontend work → code mode (with front-end context)
-  - Backend/API → code mode (with backend context)
-  - Tests → code mode (with testing context)
-- If a task fails, delegate to debug mode with the failure output
-- Loop until the task succeeds before moving to the next
-
-## Review
-When implementation is complete:
-- Delegate to a review-focused code mode
-- If issues are found, route back to code mode with specific feedback
-- Repeat until review passes
-````
-
-**Invoke the orchestrator:**
-
-Switch to Orchestrator mode in Kilo Code, then give it the specification (slash-workflow then at-artifact):
-
-```
-/feature-development @docs/specs/submit-sales-order.md
-```
-
-Kilo Code may expose this as a slash command if the orchestration is wired to a workflow; otherwise use the same pattern in your prompt (workflow name + @ artifact). The Orchestrator reads its instructions, verifies a specification was provided, and begins at implementation planning—delegating to named modes in sequence and looping or branching as needed. If no specification is provided, it asks for one and does not continue.
-
-📖 [Kilo Code Custom Modes Documentation](https://kilo.ai/docs/customize/custom-modes)
-
-📖 [Kilo Code Orchestrator Mode](https://kilo.ai/docs/agent-behavior/orchestrator-mode)
+📖 [Kilo Code Custom Modes](https://kilo.ai/docs/customize/custom-modes)  
+📖 [Kilo Code Orchestrator Mode](https://kilo.ai/docs/code-with-ai/agents/orchestrator-mode)
 
 ---
 
-## GitHub Copilot: Agent HQ (Cross-Agent, Not In-Session)
+### GitHub Copilot: Agent HQ (Cross-Agent, Not In-Session)
 
-**Orchestration support:** ⚠️ Partial — cross-agent assignment, not in-session orchestration
+**Orchestration support:** ⚠️ Partial
 
-In early February 2026, GitHub launched **Agent HQ** for Copilot Pro+ and Enterprise subscribers. Agent HQ is a unified dashboard where developers can assign tasks to GitHub Copilot, Anthropic's Claude Code, or OpenAI's Codex, and let those agents work asynchronously within GitHub's native workflows. All sessions are logged, and all agent output surfaces through the same PR and review workflow.
-
-This is orchestration at a different level than what factory engineering describes. Agent HQ does not have an orchestrator agent that reads a workflow document and dynamically delegates to specialist sub-agents based on conditions. Instead, it gives developers a single interface to manually assign tasks to different agents and monitor their progress.
-
-What it does provide that is relevant to factory engineering:
-
-- **Parallel agent work**: Assign the same task to multiple agents and compare approaches
-- **Asynchronous operation**: Agents work independently and submit PRs for review
-- **Cross-agent visibility**: A single pane of glass for all agent activity across your repository
-- **GitHub-native integration**: Agent output fits into your existing PR and code review process
-
-For factory engineering purposes, GitHub Agent HQ is the closest thing to a workflow layer that GitHub Copilot offers today. You can assign a user story to one agent, review its output, then assign follow-up work to another agent—approximating the sequence of a factory workflow, but with human routing between each step rather than an orchestrator.
+GitHub Agent HQ (Feb 2026) lets developers assign tasks to different agents and monitor progress in a single dashboard. It does not provide an in-session orchestrator that reads a workflow document and delegates to specialist subagents. You approximate a workflow by manually routing work between agents and reviewing their output.
 
 📖 [GitHub Agent HQ](https://github.com/features/copilot/agents)
 
-📖 [The New Stack: GitHub Agent HQ Launch Coverage (Feb 4, 2026)](https://thenewstack.io/github-agent-hq/)
+---
+
+### Cursor, Windsurf, Antigravity: No Orchestration Support
+
+**Cursor** has no orchestrator and no way for one agent to delegate to named specialists from a workflow document. **Windsurf** calls its slash commands "Workflows"; they are commands, not agent orchestration. **Antigravity** does not support multi-agent orchestration. In these environments, the closest you can get is running commands yourself in sequence. That is human orchestration, not workflow-driven agent orchestration.
 
 ---
 
-## Cursor: No Orchestration Support
+## Writing Effective Workflows
 
-**Orchestration support:** ❌ No
+A factory engineering workflow is orchestration logic: decision-making guidance for an agent that reads the situation and routes work dynamically.
 
-Cursor has no orchestrator agent and no mechanism for one agent to delegate to named specialist agents based on a workflow document. Cursor operates as a single agent and does not support the multi-agent coordination layer that factory engineering workflows require.
+**Do not use `$ARGUMENTS`.** Workflows live in `.claude/commands/` and are shared via symlinks; not all IDEs support placeholders. State what the user will supply and instruct the orchestrator to stop and prompt if it is missing.
 
-The closest Cursor can come is chaining commands manually—running one command, reviewing output, then running another. This is human orchestration, not agent orchestration.
+**Describe conditions, not just steps.** A list of steps in order is a command. A workflow tells the orchestrator how to respond to what it finds (e.g. refactor only when warranted; delegate back to the planner only when the plan needs adjustment).
 
----
+**Name agents explicitly.** The orchestrator delegates to specific agents. State which agent handles which work (e.g. tdd-test-writer for tests, tdd-refactor for refactors).
 
-## Windsurf: No Orchestration Support (Terminology Collision)
+**Define loop and branch conditions.** When does the orchestrator loop (e.g. for each test; loop until review passes)? What triggers a re-delegation (e.g. plan no longer makes sense)? What constitutes completion?
 
-**Orchestration support:** ❌ No
+**Include escalation paths.** When should the orchestrator surface a decision to the user instead of proceeding? Define those gates.
 
-**Terminology note:** Windsurf calls its command mechanism "Workflows." These are step-by-step task instructions stored in `.windsurf/workflows/` and invoked with a slash. They are covered in the Commands page of this guide. They are not workflows in the factory engineering sense.
+**Expect deviations and opportunities from agents.** Tell agents to report when they deviated from the ask or when they see an opportunity (e.g. refactoring, extra tests). Use that feedback in conditionals and in the completion summary.
 
-Windsurf has a single agent, Cascade. Cascade cannot spawn specialist sub-agents or delegate work to named agents based on a workflow document. The factory engineering workflow concept—an orchestrator coordinating specialists—does not have an equivalent in Windsurf today.
-
-The closest Windsurf can come is writing a Windsurf "workflow" (command) that sequences multiple steps within a single Cascade session, approximating a linear process but without the branching, looping, or multi-agent delegation that factory engineering workflows provide.
-
----
-
-## Antigravity: No Orchestration Support
-
-**Orchestration support:** ❌ No
-
-Antigravity does not support multi-agent orchestration. It operates as a single agent and has no mechanism for reading a workflow document and delegating to named specialist agents.
-
----
-
-## Writing Effective Factory Engineering Workflows
-
-A factory engineering workflow is not a checklist. It is orchestration logic—decision-making guidance for an agent that is reading the situation and routing work dynamically.
-
-### Principles for Workflow Documents
-
-**Describe conditions, not just steps.** A workflow that only lists steps in order is a command, not a workflow. A real workflow tells the orchestrator how to respond to what it finds.
-
-**Name agents explicitly.** The orchestrator delegates to specific named agents. Be precise about which agent handles which type of work.
-
-**Define loop conditions.** When does the orchestrator loop back? What triggers a re-run? What constitutes completion? State these explicitly.
-
-**Include escalation paths.** When should the orchestrator surface a decision to the human rather than proceeding autonomously? Define these gates.
-
-### Example: Specification Review Workflow
-
-````markdown
-# Specification Review Workflow
-
-You are orchestrating a specification review process.
-
-## Input
-A technical specification document.
-
-## Initial Assessment
-Read the specification. Evaluate completeness against our specification 
-standards in docs/spec-standards.md.
-
-If the specification is missing any required sections, delegate to 
-@spec-writer with a specific list of missing elements.
-Loop until all required sections are present.
-
-## Domain Review
-Delegate to @domain-expert for a review of the specification's correctness 
-against our domain model.
-- If the domain expert flags factual errors, route back to @spec-writer 
-  with the specific errors.
-- If the domain expert flags ambiguities, surface them to the user.
-- Continue until the domain expert approves.
-
-## Technical Feasibility
-Delegate to @technical-architect for a feasibility review.
-- If the architect flags implementation concerns, route back to @spec-writer 
-  with those concerns.
-- If the architect flags conflicts with existing architecture, surface to 
-  the user for a decision.
-- Continue until the architect approves.
-
-## Completion
-When all reviews pass, mark the specification as approved and update its 
-status in the artifact registry.
-Report completion to the user with a summary of any decisions that were 
-made during the review process.
-````
-
-### When a Workflow Produces Poor Results
-
-When a workflow produces poor orchestration—the orchestrator makes a wrong routing decision, loops unnecessarily, or misses a condition—update the workflow document. Make the condition more explicit. Add an example of the edge case. Commit the change. This is how your factory improves.
-
----
-
-## Setting Up Workflows: Step-by-Step
-
-**1. Create your commands directory:**
-
-```bash
-mkdir -p .claude/commands
-```
-
-**2. Add your first workflow:**
-
-Create `.claude/commands/feature-development.md` and paste the Feature Development Workflow markdown from the example above. Workflows live in the same folder as commands.
-
-**3. Create symlinks for other IDEs (see the [Commands](/commands) page).** Use the **factory-engineering** skill (`npx openskills install michaellperry/factoryengineering`) and run the skill to set up symlinks for your IDEs. The skill sets up both **commands/workflows** (`.claude/commands/`) and **skills** (`.claude/skills/`) by default. It can detect which IDEs you have and offer to copy existing contents if a target folder already exists. On Windows, use the skill's PowerShell script. Or create symlinks manually:
-
-```bash
-ln -s ../.claude/commands .cursor/commands
-ln -s ../.claude/commands .windsurf/workflows
-ln -s ../.claude/commands .kilocode/workflows
-mkdir -p .agent && ln -s ../.claude/commands .agent/workflows
-```
-
-**4. Define the orchestrator agent (Claude Code):**
-
-```bash
-cat > .claude/agents/orchestrator.md << 'EOF'
----
-name: orchestrator
-description: Orchestrates feature development from specification through implementation and review. Use when the user provides a specification; ask for a specification if none is provided.
-tools: Task(implementation-planner, front-end-developer, back-end-developer, code-reviewer, test-runner), Read
----
-
-You are the feature development orchestrator for this project.
-
-Before beginning any task, read the appropriate workflow document from
-.claude/commands/ to understand how to coordinate the specialist agents.
-
-Your role is to break down work, delegate to specialists, evaluate their
-output, and coordinate the sequence until the work is complete. Do not
-proceed without a specification from the user.
-EOF
-```
-
-**5. Commit everything:**
-
-```bash
-git add .claude/commands/ .claude/agents/orchestrator.md .cursor .windsurf .kilocode .agent
-git commit -m "Initialize factory engineering workflows and orchestrator"
-```
+When a workflow produces poor orchestration (wrong routing, unnecessary loops, or missed conditions), update the workflow. Make the condition explicit, add an edge-case example, and commit. That is how the factory improves.
