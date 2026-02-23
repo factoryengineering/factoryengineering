@@ -71,6 +71,21 @@ Write **exactly one** failing test based on the scenario and criteria provided. 
 
 The agent reads MEMORY.md at start, writes one failing test and any minimal stubs, runs the test, then appends what it learned (e.g. "this project uses Jest, not Vitest" or "stub constructors use `_param` for unused args"). The next run builds on that.
 
+---
+
+## Why Agents Matter in Factory Engineering
+
+Agents with persistent memory solve the context amnesia problem. Without persistent memory, an agent must re-learn the project's patterns, standards, and architectural decisions every time it starts a new session. With persistent memory, the agent builds on what it learned before.
+
+This is especially powerful when you have specialized agents for different roles:
+- A spec-writer agent learns how your team writes specifications
+- A code-reviewer agent learns your code quality standards
+- An implementation-planner agent learns how to break down work effectively
+
+Each agent accumulates domain knowledge specific to its role and the project. Over time, each agent becomes more effective and more aligned with your team's practices.
+
+---
+
 ## IDE Support for True Agents
 
 Only a few IDEs provide true agent support as defined above:
@@ -88,7 +103,7 @@ Only a few IDEs provide true agent support as defined above:
 
 ---
 
-## Claude Code
+### Claude Code
 
 **Supports true agents:**✅ Yes
 
@@ -137,7 +152,7 @@ The agent reads its memory file, writes the test, and appends new learnings to t
 
 ---
 
-## GitHub Copilot
+### GitHub Copilot
 
 **Supports true agents:** ✅ Yes
 
@@ -188,7 +203,7 @@ Assign the custom agent to a task or issue to instantiate it; it will follow the
 
 ---
 
-## Kilo Code: Modes
+### Kilo Code: Modes
 
 **Supports true agents:** ✅ Yes
 
@@ -224,7 +239,7 @@ customModes:
 
 ---
 
-## Cursor: No Agent Support (Removed)
+### Cursor: No Agent Support (Removed)
 
 **Supports true agents:** ❌ No
 
@@ -234,7 +249,7 @@ You can still implement the memory pattern: in a `.cursor/rules` rule or in `AGE
 
 ---
 
-## Windsurf: No Agent Support (Cascade Only)
+### Windsurf: No Agent Support (Cascade Only)
 
 **Supports true agents:** ❌ No
 
@@ -244,103 +259,8 @@ Cascade is a single, shared agent that all users work with in a given Windsurf s
 
 ---
 
-## Antigravity: No Agent Support
+### Antigravity: No Agent Support
 
 **Supports true agents:** ❌ No
 
 Google Antigravity does not support agents in the factory engineering sense. It uses skills (which are different from agents) and does not provide role-based, stateful agents with persistent memory. You can instruct the assistant via `AGENTS.md`, `GEMINI.md`, or a skill’s `SKILL.md` to read from a markdown file at the start of work and append learnings at the end, achieving the same memory pattern.
-
----
-
-## Setting Up Agents in Claude Code
-
-The following shows how to set up agents for factory engineering in Claude Code (which provides native agent memory):
-
-**1. Create agent directories:**
-
-```bash
-mkdir -p .claude/agents/spec-writer
-mkdir -p .claude/agents/code-reviewer
-mkdir -p .claude/agents/implementation-planner
-```
-
-**2. Create agent definitions:**
-
-```bash
-cat > .claude/agents/spec-writer/AGENT.md << 'EOF'
-# Specification Writer Agent
-
-## Role
-You are an elite technical specification writer. Your job is to transform user stories into detailed, unambiguous technical specifications that implementation teams can execute against with zero guesswork.
-
-## Memory Protocol
-At the start of each session, read: spec-writer-memory.md
-At the end of each session, append your learnings to: spec-writer-memory.md
-
-What goes in memory:
-- Patterns you discover about how this team writes specifications
-- Architectural decisions you learn about
-- Standards the team values
-- Common mistakes to avoid
-
-## Standards Reference
-Reference our specification standards in docs/spec-standards.md
-
-## Success Criteria
-Specifications include:
-- Clear feature description
-- Complete user flows (numbered steps)
-- Data model and schema
-- API endpoints and contracts
-- Error handling and edge cases
-- Performance requirements
-- Acceptance criteria
-EOF
-```
-
-**3. Create memory files:**
-
-```bash
-cat > .claude/agents/spec-writer/spec-writer-memory.md << 'EOF'
-# Spec Writer Memory Bank
-
-## Team Patterns
-[To be filled by agent based on learnings]
-
-## Standards Learned
-[To be filled by agent based on learnings]
-
-## Previous Work
-[Agent will append specifications written and patterns discovered]
-EOF
-```
-
-**4. Commit to repository:**
-
-```bash
-git add .claude/agents/
-git commit -m "Initialize factory engineering agents"
-```
-
-**5. Use the agent:**
-
-In Claude Code, reference the agent by name:
-
-```
-@spec-writer write a specification for: submit sales order
-```
-
-The agent automatically loads its role definition and reads its memory file.
-
----
-
-## Why Agents Matter in Factory Engineering
-
-Agents with persistent memory solve the context amnesia problem. Without persistent memory, an agent must re-learn the project's patterns, standards, and architectural decisions every time it starts a new session. With persistent memory, the agent builds on what it learned before.
-
-This is especially powerful when you have specialized agents for different roles:
-- A spec-writer agent learns how your team writes specifications
-- A code-reviewer agent learns your code quality standards
-- An implementation-planner agent learns how to break down work effectively
-
-Each agent accumulates domain knowledge specific to its role and the project. Over time, each agent becomes more effective and more aligned with your team's practices.
