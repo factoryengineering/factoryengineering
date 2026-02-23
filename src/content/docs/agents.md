@@ -143,7 +143,7 @@ The agent reads its memory file, writes the test, and appends new learnings to t
 
 **Feature name:** Custom agents
 
-**Storage location:** Repository: `.github/agents/CUSTOM-AGENT-NAME.md`. Organization or enterprise: `/agents/CUSTOM-AGENT-NAME.md` in a `.github-private` repository.
+**Storage location:** Repository: `.github/agents/{agent-name}.md`. Organization or enterprise: `/agents/{agent-name}.md` in a `.github-private` repository.
 
 **Note:** Memory support requires Copilot Pro or Pro+ plan. Custom agents are in public preview for JetBrains IDEs, Eclipse, and Xcode and may change.
 
@@ -155,8 +155,8 @@ Custom agents are specialized versions of the Copilot coding agent that you tail
 2. Set `name` (unique identifier) and `description` (purpose and capabilities).
 3. In the body, write the **prompt**: custom instructions that define the agent’s behavior and expertise.
 4. Optionally specify **tools** the agent can use; if omitted, the agent can use all available tools (built-in and MCP). At organization/enterprise level you can add `mcp-server` configuration.
-5. For persistent memory, add instructions such as: “At the start of each session, read `path/to/memory.md`. At the end of each session, append your learnings to that file.” For compatibility with Claude Code agents, specify the path `.claude/agent-memory/CUSTOM-AGENT-NAME/MEMORY.md`.
-6. Save the file as `.github/agents/CUSTOM-AGENT-NAME.md` in the repo (or in the org/enterprise `.github-private` repo under `/agents/`).
+5. For persistent memory, add instructions such as: “At the start of each session, read `path/to/memory.md`. At the end of each session, append your learnings to that file.” For compatibility with Claude Code agents, specify the path `.claude/agent-memory/{agent-name}/MEMORY.md`.
+6. Save the file as `.github/agents/{agent-name}.md` in the repo (or in the org/enterprise `.github-private` repo under `/agents/`).
 
 Example agent profile (repository-level):
 
@@ -194,11 +194,31 @@ Assign the custom agent to a task or issue to instantiate it; it will follow the
 
 **Feature name:** Modes
 
-**Storage location:** Project modes: `.kilocodemodes` in the project root (YAML). Global modes: `custom_modes.yaml`. Mode-specific rules: directory `.kilo/rules-{slug}/` — project: `{workspace}/.kilo/rules-{slug}/`, global: `~/.kilo/rules-{slug}/`.
+**Storage location:** Project modes: `.kilocodemodes` in the project root (YAML).
 
-Kilo Code modes are true agents when you instruct them to load from a markdown file for memory. Modes support a role definition, custom instructions, and mode-specific rules from `.kilo/rules-{slug}/`. By adding instructions such as “At the start of each session, read from `spec-writer-memory.md`; at the end, append your learnings to that file,” a mode implements the same persistent, read/write memory pattern as factory-engineering agents.
+Kilo Code modes are true agents that work within their own context window. Modes support a role definition, custom instructions, and mode-specific rules from `.kilo/rules-{slug}/`. By adding instructions such as “At the start of each session, read from `.claude/agent-memory/{mode-name}/MEMORY.md`; at the end, append your learnings to that file,” a mode implements the persistent, read/write memory pattern.
 
-For agent-specific memory, use a dedicated markdown file per mode and reference it in that mode's role definition or custom instructions.
+Example mode definition:
+
+```yaml
+customModes:
+  - slug: spec-writer
+    name: 📝 Spec Writer
+    description: Technical specification writer. Transforms user stories into detailed, unambiguous technical specs.
+    roleDefinition: |
+      You are a technical specification writer.
+      At the start of each session, read .claude/agent-memory/spec-writer/MEMORY.md.
+      At the end of each session, append your learnings to that file.
+      Write specs that include clear feature description, user flows, data model, API contracts, and acceptance criteria.
+    groups:
+      - read
+      - - edit
+        - fileRegex: \.(md|mdx)$
+          description: Markdown and MDX only
+    customInstructions: Update your agent memory with team patterns, standards learned, and spec conventions you discover.
+```
+
+**Note:** The `- - edit` is not a typo. In Kilo Code, `groups` is a list: each entry is either a capability string (e.g. `read`) or a list whose first element is the capability (e.g. `edit`) and whose remaining elements are options for that capability. So `- - edit` means “a list item that is itself a list: `[edit, { fileRegex, description }]`”—i.e. the “edit” capability with scoping rules.
 
 📖 [Kilo Code Custom Modes Documentation](https://kilo.ai/docs/customize/custom-modes)
 
