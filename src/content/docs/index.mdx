@@ -17,19 +17,27 @@ import Grid from "~/components/user-components/Grid.astro";
 <span class='light-text'>of your factory</span>" description="Build a custom factory specifically for each unique software project and team using features common to most AI IDEs.">
 
 <Grid columns={4}>
-  <Card title="Skills" icon="setting" iconColor="#FF8585">
-    Reusable capabilities that extend your AI assistant with specialized <strong>knowledge</strong>, <strong>opinions</strong>, and <strong>tools</strong>.
-  </Card>
-  <Card title="Commands" icon="forward-slash" iconColor="#7BE1A4">
-    Single-purpose instructions for specific <strong>tasks</strong> and <strong>procedures</strong>, composable and easy to use.
-  </Card>
+  <a href="/skills" class="card-link">
+    <Card title="Skills" icon="setting" iconColor="#FF8585">
+      Reusable capabilities that extend your AI assistant with specialized <strong>knowledge</strong>, <strong>opinions</strong>, and <strong>tools</strong>.
+    </Card>
+  </a>
+  <a href="/commands" class="card-link">
+    <Card title="Commands" icon="forward-slash" iconColor="#7BE1A4">
+      Single-purpose instructions for specific <strong>tasks</strong> and <strong>procedures</strong>, composable and easy to use.
+    </Card>
+  </a>
 
-  <Card title="Agents" icon="puzzle" iconColor="#FFD97B">
-    <strong>Roles</strong> with <strong>memory</strong> that handle complex construction and decision-making processes.
-  </Card>
-  <Card title="Workflows" icon="list-format" iconColor="#979BFF">
-    Multi-step processes that <strong>coordinate</strong> multiple agents to accomplish sophisticated <strong>orchestrations</strong>.
-  </Card>
+  <a href="/agents" class="card-link">
+    <Card title="Agents" icon="puzzle" iconColor="#FFD97B">
+      <strong>Roles</strong> with <strong>memory</strong> that handle complex construction and decision-making processes.
+    </Card>
+  </a>
+  <a href="/workflows" class="card-link">
+    <Card title="Workflows" icon="list-format" iconColor="#979BFF">
+      Multi-step processes that <strong>coordinate</strong> multiple agents to accomplish sophisticated <strong>orchestrations</strong>.
+    </Card>
+  </a>
 
 </Grid>
 </Section>
