@@ -143,24 +143,48 @@ The agent reads its memory file, writes the test, and appends new learnings to t
 
 **Feature name:** Custom agents
 
-**Note:** Memory support requires Copilot Pro or Pro+ plan
+**Storage location:** Repository: `.github/agents/CUSTOM-AGENT-NAME.md`. Organization or enterprise: `/agents/CUSTOM-AGENT-NAME.md` in a `.github-private` repository.
 
-GitHub Copilot custom agents support true agents when you instruct them to read from and append to a markdown memory file at the start and end of each session. Define a custom agent with explicit memory instructions:
+**Note:** Memory support requires Copilot Pro or Pro+ plan. Custom agents are in public preview for JetBrains IDEs, Eclipse, and Xcode and may change.
+
+Custom agents are specialized versions of the Copilot coding agent that you tailor to your workflows, conventions, and use cases. You define them once with **agent profiles**: Markdown files with YAML frontmatter that specify name, description, prompt, and optionally tools or MCP servers. For factory-engineering-style persistent memory, include explicit instructions in the prompt to read from a markdown file at session start and append learnings at session end.
+
+**Defining an agent:**
+
+1. Create an agent profile as a Markdown file with YAML frontmatter.
+2. Set `name` (unique identifier) and `description` (purpose and capabilities).
+3. In the body, write the **prompt**: custom instructions that define the agent’s behavior and expertise.
+4. Optionally specify **tools** the agent can use; if omitted, the agent can use all available tools (built-in and MCP). At organization/enterprise level you can add `mcp-server` configuration.
+5. For persistent memory, add instructions such as: “At the start of each session, read `path/to/memory.md`. At the end of each session, append your learnings to that file.” For compatibility with Claude Code agents, specify the path `.claude/agent-memory/CUSTOM-AGENT-NAME/MEMORY.md`.
+6. Save the file as `.github/agents/CUSTOM-AGENT-NAME.md` in the repo (or in the org/enterprise `.github-private` repo under `/agents/`).
+
+Example agent profile (repository-level):
 
 ```markdown
-# Custom Agent: Spec Writer
+---
+name: spec-writer
+description: Technical specification writer
+---
 
 You are a technical specification writer.
 
-At the start of each session, read docs/.spec-writer-memory.md
+At the start of each session, read .claude/agent-memory/spec-writer/MEMORY.md
 At the end of each session, append your learnings to that file.
 
 [Rest of your role definition]
 ```
 
-The agent then reads and writes that memory file as part of its workflow.
+**Invoking an agent:**
 
-📖 [GitHub Copilot Custom Agents Documentation](https://docs.github.com/en/copilot/concepts/agents/about-agents)
+After you create agent profiles, they appear in:
+
+- **Copilot coding agent on GitHub.com:** Agents tab and panel, issue assignment, and pull requests.
+- **Copilot coding agent in IDEs:** Visual Studio Code, JetBrains IDEs, Eclipse, and Xcode (some properties may behave differently or be ignored per environment).
+- **GitHub Copilot CLI.**
+
+Assign the custom agent to a task or issue to instantiate it; it will follow the profile’s prompt and, if you added them, the memory read/append instructions.
+
+📖 [GitHub Copilot Custom Agents Documentation](https://docs.github.com/en/copilot/concepts/agents/coding-agent/about-custom-agents)
 
 ---
 
