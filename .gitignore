@@ -1,7 +1,5 @@
 # build output
 dist/
-# generated markdown export
-public/markdown/
 # generated types
 .astro/
 
