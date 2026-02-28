@@ -1,0 +1,5 @@
+# Factory Engineering markdown index
+https://factoryengineering.dev/markdown/skills.md
+https://factoryengineering.dev/markdown/commands.md
+https://factoryengineering.dev/markdown/workflows.md
+https://factoryengineering.dev/markdown/agents.md

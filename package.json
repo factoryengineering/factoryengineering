@@ -8,6 +8,7 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
+    "prebuild": "node scripts/export-markdown.mjs",
     "build": "astro build",
     "preview": "astro preview"
   },
