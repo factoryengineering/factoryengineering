@@ -1,18 +1,30 @@
-import { cp, mkdir, rm } from "node:fs/promises";
+import { copyFile, mkdir, readdir } from "node:fs/promises";
 import path from "node:path";
 
 const sourceDir = path.resolve("src/content/docs");
-const targetDir = path.resolve("public/markdown");
+const targetDir = path.resolve("dist");
+const markdownExtensions = new Set([".md", ".mdx"]);
 
-// Recreate the output directory on each build to prevent stale files.
-await rm(targetDir, { recursive: true, force: true });
-await mkdir(targetDir, { recursive: true });
+async function exportDirectory(currentDir) {
+  const entries = await readdir(currentDir, { withFileTypes: true });
 
-await cp(sourceDir, targetDir, {
-  recursive: true,
-  filter: (filePath) => {
-    const ext = path.extname(filePath).toLowerCase();
-    if (!ext) return true;
-    return ext === ".md" || ext === ".mdx";
-  },
-});
+  for (const entry of entries) {
+    const sourcePath = path.join(currentDir, entry.name);
+    if (entry.isDirectory()) {
+      await exportDirectory(sourcePath);
+      continue;
+    }
+
+    const ext = path.extname(entry.name).toLowerCase();
+    if (!markdownExtensions.has(ext)) continue;
+
+    const relativePath = path.relative(sourceDir, sourcePath);
+    const targetRelativePath = relativePath.replace(/\.(md|mdx)$/i, ".md");
+    const targetPath = path.join(targetDir, targetRelativePath);
+
+    await mkdir(path.dirname(targetPath), { recursive: true });
+    await copyFile(sourcePath, targetPath);
+  }
+}
+
+await exportDirectory(sourceDir);
