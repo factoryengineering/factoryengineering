@@ -1,0 +1,6 @@
+{
+  "mimeTypes": {
+    ".md": "text/markdown; charset=utf-8",
+    ".mdx": "text/markdown; charset=utf-8"
+  }
+}
