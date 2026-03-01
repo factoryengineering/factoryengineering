@@ -72,7 +72,7 @@ From here, every team member uses **slash-command at-artifact** (e.g. `/write-sp
 
 Both **commands** and **workflows** are stored in `.claude/commands/`. Each IDE looks in a different folder. Use symlinks so that one canonical location works everywhere.
 
-**Option A — Use the factory-engineering skill:** Install with `npx openskills install michaellperry/factoryengineering`, then ask your agent to create symlinks for your selected IDEs. The skill sets up symlinks for **commands/workflows** (`.claude/commands/`) and **skills** (`.claude/skills/`) in one go (or use `--type commands` to do only commands). The agent can **detect** which IDEs you have (e.g. run the script with `--detect`), confirm with you, then create symlinks. If a target folder already exists (e.g. `.cursor/commands`), the skill will **offer to copy** its contents into the canonical folder and then replace it with a symlink (`--copy-existing`). On **Windows**, use the skill’s PowerShell script (`Setup-Symlinks.ps1`).
+**Option A — Use the factory-engineering skill:** Install with `npx openskills install factoryengineering/skills`, then ask your agent to create symlinks for your selected IDEs. The skill sets up symlinks for **commands/workflows** (`.claude/commands/`) and **skills** (`.claude/skills/`) in one go (or use `--type commands` to do only commands). The agent can **detect** which IDEs you have (e.g. run the script with `--detect`), confirm with you, then create symlinks. If a target folder already exists (e.g. `.cursor/commands`), the skill will **offer to copy** its contents into the canonical folder and then replace it with a symlink (`--copy-existing`). On **Windows**, use the skill’s PowerShell script (`Setup-Symlinks.ps1`).
 
 **Option B — Create symlinks manually for each IDE:** Run these from your **repository root**. The symlink target `../.claude/commands` is resolved relative to the link’s directory (e.g. `.cursor/`), so it correctly points at the repo’s `.claude/commands/`.
 
@@ -209,7 +209,7 @@ Create the symlink from the setup above: `mkdir -p .agent` then `ln -s ../.claud
 **Use the factory-engineering skill** for sync (workflow, frontmatter rules, and batch script):
 
 ```bash
-npx openskills install michaellperry/factoryengineering
+npx openskills install factoryengineering/skills
 ```
 
 Then:

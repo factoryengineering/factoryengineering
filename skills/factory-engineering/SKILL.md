@@ -7,7 +7,7 @@ description: Configures factory engineering across IDEs. Sets up symlinks so .cl
 
 One skill for configuring commands, workflows, and skills across IDEs. Canonical locations: **`.claude/commands/`** (commands and workflows), **`.claude/skills/`** (skills).
 
-**Installation:** `npx openskills install michaellperry/factoryengineering`. Then ask the agent to set up symlinks or sync Copilot prompts as needed.
+**Installation:** `npx openskills install factoryengineering/skills`. Then ask the agent to set up symlinks or sync Copilot prompts as needed.
 
 ---
 

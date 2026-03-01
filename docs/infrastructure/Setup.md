@@ -4,7 +4,7 @@ This guide walks through setting up GitHub Actions to build and deploy the Facto
 
 ## Prerequisites
 
-- GitHub repository: `michaellperry/factoryengineering`
+- GitHub repository: `factoryengineering/factoryengineering`
 - Custom domain: `factoryengineering.dev` (hosted at DNSimple)
 - Azure account with appropriate permissions
 
@@ -27,7 +27,7 @@ This guide walks through setting up GitHub Actions to build and deploy the Facto
 4. **GitHub Integration:**
    - Click "Sign in with GitHub"
    - Authorize Azure
-   - **Organization**: `michaellperry`
+   - **Organization**: `factoryengineering`
    - **Repository**: `factoryengineering`
    - **Branch**: `main`
 
@@ -140,7 +140,7 @@ After everything is set up:
 
 2. **Watch the GitHub Actions run at:**
    ```
-   https://github.com/michaellperry/factoryengineering/actions
+   https://github.com/factoryengineering/factoryengineering/actions
    ```
 
 3. **Once complete, visit:**
