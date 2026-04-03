@@ -181,7 +181,9 @@ Agent Skills work across the Copilot coding agent, Copilot CLI, and VS Code. Ena
 
 Cursor looks for skills in `.cursor/skills/` first, then in `.claude/skills/` for compatibility—similar to GitHub Copilot. If you use `.claude/skills/` as your canonical location, **no symlink is needed**; Cursor will find your skills automatically. Skills are loaded when they match your request, based on the `description` field in each `SKILL.md` frontmatter.
 
-📖 [Cursor Documentation](https://docs.cursor.com)
+**Plugins (v2.5+):** The [Cursor Marketplace](https://cursor.com/marketplace) also distributes skills as part of plugin packages. Plugins bundle skills alongside subagents, MCP servers, hooks, and rules into one-click installs. Skills installed via plugins follow the same `SKILL.md` format and discovery mechanism — the plugin system supplements the folder convention, it does not replace it.
+
+📖 [Cursor Agent Skills Documentation](https://cursor.com/docs/skills) · [Cursor Marketplace](https://cursor.com/marketplace)
 
 ---
 

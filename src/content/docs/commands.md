@@ -138,6 +138,8 @@ Since Cursor uses `.cursor/commands/` and we're storing our canonical commands i
 ln -s ../.claude/commands .cursor/commands
 ```
 
+**Built-in commands (v3.0):** Cursor 3 added `/worktree` (creates an isolated git worktree so agents work without conflicts) and `/best-of-n` (runs the same prompt across multiple models in parallel worktrees and compares results). These are built-in commands, not user-defined — your custom commands in `.cursor/commands/` continue to work alongside them.
+
 📖 [Cursor Custom Commands Documentation](https://docs.cursor.com/chat/custom-commands)
 
 ---

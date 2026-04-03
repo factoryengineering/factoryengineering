@@ -95,7 +95,7 @@ Only a few IDEs provide true agent support as defined above:
 | Claude Code | ✅ Yes | Sub-agents | `.claude/agents/` | Native (read/write at session start/end) |
 | GitHub Copilot | ✅ Yes | Custom agents | Project-level (memory requires Pro+) | Yes (instruct agent to read/append a file) |
 | Kilo Code | ✅ Yes | Modes | Project: `.kilocodemodes`; rules: `.kilo/rules-{slug}/` | Yes (instruct mode to load from markdown; use `.kilo/rules-{slug}/` or `.kilorules-{slug}`) |
-| Cursor | ❌ No | (feature removed) | N/A | N/A |
+| Cursor | ✅ Yes | Subagents + Plugins | `.cursor/agents/` (project); `~/.cursor/agents/` (global) | Yes (instruct agent via `.cursor/rules` or `AGENTS.md`) |
 | Windsurf | ❌ No | Cascade (singular) | N/A | N/A |
 | Antigravity | ❌ No | N/A | N/A | N/A |
 
@@ -239,13 +239,25 @@ customModes:
 
 ---
 
-### Cursor: No Agent Support (Removed)
+### Cursor: Subagents and Plugins (v2.4+)
 
-**Supports true agents:** ❌ No
+**Supports true agents:** ✅ Yes
 
-Cursor previously had custom agent modes (called "custom agents"), but this feature was removed in recent versions. The functionality was consolidated into commands and other features, which do not provide the persistent agent memory capability you defined.
+Cursor reintroduced agent support in v2.4 (January 2026) with **subagents** — independent agents that handle discrete parts of a parent agent's task. Each subagent runs in its own context with configurable prompts, tool access, and model selection.
 
-You can still implement the memory pattern: in a `.cursor/rules` rule or in `AGENTS.md`, instruct the assistant to read from a markdown file at the start of work and append learnings at the end.
+**Built-in subagents:** Explore (codebase navigation), Bash (shell commands), and Browser (browser interactions).
+
+**Custom subagents** are Markdown files with YAML frontmatter stored in `.cursor/agents/` (project-scoped) or `~/.cursor/agents/` (global). Frontmatter fields include `name`, `description`, `model` (inherit, fast, or a specific model ID), `readonly`, and `is_background`.
+
+**Async subagents (v2.5):** Subagents can run asynchronously — the parent continues working while subagents execute in the background. Subagents can also spawn their own subagents, creating a tree of coordinated work.
+
+**Plugins (v2.5):** The [Cursor Marketplace](https://cursor.com/marketplace) packages skills, subagents, MCP servers, hooks, and rules into one-click installs. Plugins extend agent capabilities across your stack (e.g. Atlassian, Datadog, Stripe, Figma).
+
+**Agents Window (v3.0, April 2026):** A standalone workspace for running many agents in parallel across repos, worktrees, and cloud environments. Agent Tabs display multiple chats side-by-side in a grid. New commands include `/worktree` (isolated git worktree per agent) and `/best-of-n` (run the same prompt across multiple models and compare results). **Design Mode** lets you annotate UI elements in the browser to give agents precise visual feedback.
+
+**Memory:** Instruct agents via `.cursor/rules` or `AGENTS.md` to read from a markdown file at the start of work and append learnings at the end.
+
+📖 [Cursor Subagents Documentation](https://cursor.com/docs/subagents) · [Cursor Changelog](https://cursor.com/changelog)
 
 ---
 

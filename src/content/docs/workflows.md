@@ -163,7 +163,7 @@ Instruct agents in the workflow or in their agent definitions to include deviati
 | Claude Code | ✅ Yes | CLAUDE.md + subagent orchestration | Main agent reads workflow, delegates via Task tool |
 | Kilo Code | ✅ Yes | Orchestrator Mode | Built-in orchestrator delegates to named modes |
 | GitHub Copilot | ⚠️ Partial | Agent HQ | Cross-agent task assignment, not in-session orchestration |
-| Cursor | ❌ No | — | No orchestration layer |
+| Cursor | ⚠️ Partial | Agents Window + subagent delegation | Parent agents delegate to subagents; no workflow-document orchestrator |
 | Windsurf | ❌ No (terminology collision) | "Workflows" = commands | Cascade has no orchestration capability |
 | Antigravity | ❌ No | — | No orchestration layer |
 
@@ -213,9 +213,23 @@ GitHub Agent HQ (Feb 2026) lets developers assign tasks to different agents and 
 
 ---
 
-### Cursor, Windsurf, Antigravity: No Orchestration Support
+### Cursor: Partial Orchestration via Subagent Delegation
 
-**Cursor** has no orchestrator and no way for one agent to delegate to named specialists from a workflow document. **Windsurf** calls its slash commands "Workflows"; they are commands, not agent orchestration. **Antigravity** does not support multi-agent orchestration. In these environments, the closest you can get is running commands yourself in sequence. That is human orchestration, not workflow-driven agent orchestration.
+**Orchestration support:** ⚠️ Partial
+
+Cursor's Agents Window (v3.0, April 2026) lets you run many agents in parallel across repos, worktrees, and cloud environments. A parent agent can delegate work to custom subagents defined in `.cursor/agents/`, and subagents can spawn their own subagents (v2.5+), creating a tree of coordinated work.
+
+However, Cursor does not have a dedicated orchestrator that reads a workflow document and delegates to named specialists based on its contents. The delegation is ad-hoc — the parent agent decides how to split work based on its prompt, not by following a structured workflow file. You can approximate workflow-driven orchestration by writing detailed instructions in a command file and relying on the parent agent to follow them, but there is no enforcement layer.
+
+**Closest pattern:** Write a command in `.cursor/commands/` that describes phases and specialist subagents. Invoke it with `/command-name @artifact`. The parent agent reads the command and delegates to subagents, but routing logic depends on the model's interpretation rather than a built-in orchestration engine.
+
+📖 [Cursor Subagents Documentation](https://cursor.com/docs/subagents) · [Cursor Agents Window](https://cursor.com/changelog/3-0)
+
+---
+
+### Windsurf, Antigravity: No Orchestration Support
+
+**Windsurf** calls its slash commands "Workflows"; they are commands, not agent orchestration. **Antigravity** does not support multi-agent orchestration. In these environments, the closest you can get is running commands yourself in sequence. That is human orchestration, not workflow-driven agent orchestration.
 
 ---
 
