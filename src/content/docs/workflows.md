@@ -162,7 +162,7 @@ Instruct agents in the workflow or in their agent definitions to include deviati
 |-----|----------------------|--------------|-------|
 | Claude Code | ✅ Yes | CLAUDE.md + subagent orchestration | Main agent reads workflow, delegates via Task tool |
 | Kilo Code | ✅ Yes | Orchestrator Mode | Built-in orchestrator delegates to named modes |
-| GitHub Copilot | ⚠️ Partial | Agent HQ | Cross-agent task assignment, not in-session orchestration |
+| GitHub Copilot | ⚠️ Partial | Fleet mode (CLI) + Agent HQ | Fleet mode provides in-session sub-agent orchestration via `/fleet`; no workflow-document consumption. Agent HQ for cross-agent task assignment |
 | Cursor | ⚠️ Partial | Agents Window + subagent delegation | Parent agents delegate to subagents; no workflow-document orchestrator |
 | Windsurf | ❌ No (terminology collision) | "Workflows" = commands | Cascade has no orchestration capability |
 | Antigravity | ❌ No | — | No orchestration layer |
@@ -203,13 +203,15 @@ Place orchestration instructions in a rule file the Orchestrator reads, then inv
 
 ---
 
-### GitHub Copilot: Agent HQ (Cross-Agent, Not In-Session)
+### GitHub Copilot: Fleet Mode and Agent HQ
 
-**Orchestration support:** ⚠️ Partial
+**Orchestration support:** ⚠️ Partial (in-session sub-agent orchestration, but no workflow-document consumption)
 
-GitHub Agent HQ (Feb 2026) lets developers assign tasks to different agents and monitor progress in a single dashboard. It does not provide an in-session orchestrator that reads a workflow document and delegates to specialist subagents. You approximate a workflow by manually routing work between agents and reviewing their output.
+**Fleet mode (`/fleet`):** The Copilot CLI reached GA on February 25, 2026 ([GitHub Changelog](https://github.blog/changelog/)) and introduced Fleet mode — in-session orchestration through parallel sub-agent spawning. Invoke `/fleet` to start a Fleet session where the orchestrator breaks down a task, spawns parallel sub-agents, and coordinates their work. Fleet mode runs in the Copilot CLI and operates within a single session. Note that Fleet mode provides task decomposition and parallel sub-agent coordination, but does not read a structured workflow document the way Claude Code or Kilo Code's orchestrators do — the orchestration is driven by the model's interpretation of the task, not by a workflow file.
 
-📖 [GitHub Agent HQ](https://github.com/features/copilot/agents)
+**Agent HQ:** GitHub Agent HQ (Feb 2026) lets developers assign tasks to different agents and monitor progress in a single dashboard. Agent HQ is cross-agent task assignment — you route work between agents and review their output. Fleet mode and Agent HQ are complementary: Fleet mode handles in-session orchestration (one task, multiple parallel sub-agents), while Agent HQ handles cross-session coordination (multiple tasks, multiple agents, dashboard monitoring).
+
+📖 [GitHub Copilot CLI Documentation](https://docs.github.com/en/copilot/copilot-cli) · [GitHub Agent HQ](https://github.com/features/copilot/agents)
 
 ---
 
