@@ -1,21 +1,6 @@
 ---
-import Search from "./Search.astro";
 const { data } = Astro.locals.starlightRoute.entry;
 const { title = data.title, tagline } = data.hero || {};
-const { sidebar } = Astro.locals.starlightRoute;
-
-function getFirstHref(item: any): string | null {
-  if (typeof item?.href === "string" && item.href) {
-    return item.href;
-  }
-  if (item?.entries && Array.isArray(item.entries) && item.entries.length > 0) {
-    return getFirstHref(item.entries[0]);
-  }
-  return null; // No valid href found
-}
-
-// check if 404 page
-const is404 = Astro.locals.starlightRoute?.id === "404";
 ---
 
 <div
@@ -23,39 +8,6 @@ const is404 = Astro.locals.starlightRoute?.id === "404";
 >
   {title && <h1 set:html={title} class="mb-8 text-center rounded-2xl" />}
   {tagline && <p set:html={tagline} class="text-xl text-center" />}
-
-  {
-    !is404 && (
-      <div class="mt-12 max-w-4xl">
-        <div class="search-container rounded-2xl p-2 mb-6">
-          <div class="search-bar">
-            <Search />
-          </div>
-        </div>
-
-        <div class="flex justify-center items-center flex-wrap gap-4">
-          <p class="text-base font-normal">
-            {Astro.locals.t("hero.popular", "Popular")}:
-          </p>
-          <div class="flex gap-4 badges px-3 py-2.5 rounded-xl flex-wrap justify-center">
-            {sidebar.map((item: any) => {
-              const href = getFirstHref(item);
-              return (
-                <div class="badge rounded-lg px-2 py-1.5 group transition">
-                  <a
-                    class="cursor-pointer text-text no-underline group-hover:text-black dark:group-hover:text-white transition-colors"
-                    href={href}
-                  >
-                    {item.label}
-                  </a>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-    )
-  }
 </div>
 
 <style>
@@ -66,36 +18,12 @@ const is404 = Astro.locals.starlightRoute?.id === "404";
       letter-spacing: -4px;
       color: var(--sl-color-white);
     }
-    .search-container {
-      width: 90%;
-      margin: auto;
-      border: 1px solid
-        color-mix(in srgb, var(--sl-color-white) 5%, transparent);
-    }
-
-    .badges {
-      background-color: color-mix(
-        in srgb,
-        var(--sl-color-white) 3%,
-        transparent
-      );
-    }
-    .badge {
-      background: color-mix(in srgb, var(--sl-color-white) 7%, transparent);
-      font-size: 14px;
-    }
-    .badge:hover {
-      background: color-mix(in srgb, var(--sl-color-white) 15%, transparent);
-    }
 
     @media (max-width: 940px) {
       h1 {
         font-size: 3.5rem !important;
         line-height: 3.5rem !important;
         letter-spacing: -2px;
-      }
-      .search-container {
-        width: 100%;
       }
     }
   }
