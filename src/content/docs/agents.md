@@ -162,9 +162,9 @@ The agent reads its memory file, writes the test, and appends new learnings to t
 
 **Note:** Memory support requires Copilot Pro or Pro+ plan.
 
-Custom agents are specialized versions of the Copilot coding agent that you tailor to your workflows, conventions, and use cases. You define them once with **agent profiles**: Markdown files with YAML frontmatter that specify name, description, prompt, and optionally tools or MCP servers. Custom agents, sub-agents, and the plan agent are GA across VS Code, JetBrains IDEs, Eclipse, and Xcode as of March 2026.
+Custom agents are specialized versions of the Copilot coding agent that you tailor to your workflows, conventions, and use cases. You define them once with **agent profiles**: Markdown files with YAML frontmatter that specify name, description, prompt, and optionally tools or MCP servers. Custom agents, sub-agents, and the plan agent are GA across VS Code, JetBrains IDEs, Eclipse, and Xcode (announced March 11, 2026 via [GitHub Changelog](https://github.blog/changelog/)).
 
-**Sub-agents:** Custom agents can spawn sub-agents to handle discrete subtasks within a session. A parent agent delegates work to a sub-agent, which runs in its own context with its own tool access, then returns results to the parent. This enables in-session orchestration similar to Claude Code's subagent model. Sub-agents are defined the same way as custom agents (`.github/agents/{agent-name}.md`) and can be invoked by the parent agent during task execution.
+**Sub-agents:** Custom agents can spawn sub-agents to handle discrete subtasks within a session. A parent agent delegates work to a sub-agent, which runs in its own context with its own tool access, then returns results to the parent. Sub-agents are defined the same way as custom agents (`.github/agents/{agent-name}.md`) and can be invoked by the parent agent during task execution.
 
 For factory-engineering-style persistent memory, include explicit instructions in the prompt to read from a markdown file at session start and append learnings at session end.
 
