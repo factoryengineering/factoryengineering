@@ -16,6 +16,10 @@
     {
       "label": "Examples",
       "items": [{"label": "Browse Examples", "slug": "examples"}]
+    },
+    {
+      "label": "About",
+      "items": [{"label": "About", "slug": "about"}]
     }
   ]
 }
