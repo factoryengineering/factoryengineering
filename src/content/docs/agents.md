@@ -93,7 +93,7 @@ Only a few IDEs provide true agent support as defined above:
 | IDE | True Agent Support | Feature Name | Storage | Memory via markdown instruction |
 |-----|-------------------|--------------|---------|----------------------------------|
 | Claude Code | ✅ Yes | Sub-agents | `.claude/agents/` | Native (read/write at session start/end) |
-| GitHub Copilot | ✅ Yes | Custom agents | Project-level (memory requires Pro+) | Yes (instruct agent to read/append a file) |
+| GitHub Copilot | ✅ Yes | Custom agents + sub-agents | Project-level (memory requires Pro+) | Yes (instruct agent to read/append a file) |
 | Kilo Code | ✅ Yes | Modes | Project: `.kilocodemodes`; rules: `.kilo/rules-{slug}/` | Yes (instruct mode to load from markdown; use `.kilo/rules-{slug}/` or `.kilorules-{slug}`) |
 | Cursor | ✅ Yes | Subagents + Plugins | `.cursor/agents/` (project); `~/.cursor/agents/` (global) | Yes (instruct agent via `.cursor/rules` or `AGENTS.md`) |
 | Windsurf | ❌ No | Cascade (singular) | N/A | N/A |
@@ -160,9 +160,13 @@ The agent reads its memory file, writes the test, and appends new learnings to t
 
 **Storage location:** Repository: `.github/agents/{agent-name}.md`. Organization or enterprise: `/agents/{agent-name}.md` in a `.github-private` repository.
 
-**Note:** Memory support requires Copilot Pro or Pro+ plan. Custom agents are in public preview for JetBrains IDEs, Eclipse, and Xcode and may change.
+**Note:** Memory support requires Copilot Pro or Pro+ plan.
 
-Custom agents are specialized versions of the Copilot coding agent that you tailor to your workflows, conventions, and use cases. You define them once with **agent profiles**: Markdown files with YAML frontmatter that specify name, description, prompt, and optionally tools or MCP servers. For factory-engineering-style persistent memory, include explicit instructions in the prompt to read from a markdown file at session start and append learnings at session end.
+Custom agents are specialized versions of the Copilot coding agent that you tailor to your workflows, conventions, and use cases. You define them once with **agent profiles**: Markdown files with YAML frontmatter that specify name, description, prompt, and optionally tools or MCP servers. Custom agents, sub-agents, and the plan agent are GA across VS Code, JetBrains IDEs, Eclipse, and Xcode as of March 2026.
+
+**Sub-agents:** Custom agents can spawn sub-agents to handle discrete subtasks within a session. A parent agent delegates work to a sub-agent, which runs in its own context with its own tool access, then returns results to the parent. This enables in-session orchestration similar to Claude Code's subagent model. Sub-agents are defined the same way as custom agents (`.github/agents/{agent-name}.md`) and can be invoked by the parent agent during task execution.
+
+For factory-engineering-style persistent memory, include explicit instructions in the prompt to read from a markdown file at session start and append learnings at session end.
 
 **Defining an agent:**
 
