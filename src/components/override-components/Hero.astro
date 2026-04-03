@@ -4,7 +4,7 @@ const { title = data.title, tagline } = data.hero || {};
 ---
 
 <div
-  class="hero flex flex-col items-center mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-35"
+  class="hero flex flex-col items-center mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16"
 >
   {title && <h1 set:html={title} class="mb-8 text-center rounded-2xl" />}
   {tagline && <p set:html={tagline} class="text-xl text-center" />}
