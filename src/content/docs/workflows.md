@@ -165,7 +165,7 @@ Instruct agents in the workflow or in their agent definitions to include deviati
 | GitHub Copilot | ⚠️ Partial | Fleet mode (CLI) + Agent HQ | Fleet mode provides in-session sub-agent orchestration via `/fleet`; no workflow-document consumption. Agent HQ for cross-agent task assignment |
 | Cursor | ⚠️ Partial | Agents Window + subagent delegation | Parent agents delegate to subagents; no workflow-document orchestrator |
 | Windsurf | ❌ No (terminology collision) | "Workflows" = commands | Cascade has no orchestration capability |
-| Antigravity | ❌ No | — | No orchestration layer |
+| Antigravity | ⚠️ Partial | AgentKit 2.0 Manager View | Parallel async orchestration across specialized agents; UI-driven, no workflow-document consumption |
 
 ---
 
@@ -229,9 +229,19 @@ However, Cursor does not have a dedicated orchestrator that reads a workflow doc
 
 ---
 
-### Windsurf, Antigravity: No Orchestration Support
+### Windsurf: No Orchestration Support
 
-**Windsurf** calls its slash commands "Workflows"; they are commands, not agent orchestration. **Antigravity** does not support multi-agent orchestration. In these environments, the closest you can get is running commands yourself in sequence. That is human orchestration, not workflow-driven agent orchestration.
+**Windsurf** calls its slash commands "Workflows"; they are commands, not agent orchestration. Cascade is a single shared agent with no delegation layer, so the closest you can get is running commands yourself in sequence. That is human orchestration, not workflow-driven agent orchestration.
+
+---
+
+### Antigravity: Partial Orchestration via AgentKit 2.0 Manager View
+
+**Orchestration support:** ⚠️ Partial
+
+Antigravity's **AgentKit 2.0 Manager View** (March 2026) orchestrates multiple specialized agents in parallel with asynchronous task execution. You can run frontend, backend, testing, and DevOps agents side-by-side, assign different models (Gemini, Claude, GPT) to each, and coordinate their output from a single view.
+
+However, Manager View is UI-driven rather than workflow-document-driven. It does not read a structured workflow file the way Claude Code or Kilo Code's orchestrators do — routing and delegation are managed through the Manager View interface, not encoded in a `.claude/commands/{workflow}.md` file. You can approximate workflow-driven orchestration by writing detailed instructions in a command file and invoking agents from Manager View, but there is no orchestrator-as-agent that reads the workflow and delegates to named specialists based on its contents.
 
 ---
 

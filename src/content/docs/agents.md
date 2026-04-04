@@ -97,7 +97,7 @@ Only a few IDEs provide true agent support as defined above:
 | Kilo Code | ✅ Yes | Modes | Project: `.kilocodemodes`; rules: `.kilo/rules-{slug}/` | Yes (instruct mode to load from markdown; use `.kilo/rules-{slug}/` or `.kilorules-{slug}`) |
 | Cursor | ✅ Yes | Subagents + Plugins | `.cursor/agents/` (project); `~/.cursor/agents/` (global) | Yes (instruct agent via `.cursor/rules` or `AGENTS.md`) |
 | Windsurf | ❌ No | Cascade (singular) | N/A | N/A |
-| Antigravity | ❌ No | N/A | N/A | N/A |
+| Antigravity | ✅ Yes | AgentKit 2.0 (specialized agents) | IDE-managed profiles (Manager View) | Yes (instruct agents via `AGENTS.md`, `GEMINI.md`, or `SKILL.md`) |
 
 **Memory via markdown instruction:** Even without native agent memory, you can get the same behavior by instructing the assistant via that IDE’s instruction mechanism (see table) to read from a markdown file at the start of work and append learnings at the end. Kilo Code modes used this way function as true agents.
 
@@ -275,8 +275,12 @@ Cascade is a single, shared agent that all users work with in a given Windsurf s
 
 ---
 
-### Antigravity: No Agent Support
+### Antigravity: AgentKit 2.0
 
-**Supports true agents:** ❌ No
+**Supports true agents:** ✅ Yes
 
-Google Antigravity does not support agents in the factory engineering sense. It uses skills (which are different from agents) and does not provide role-based, stateful agents with persistent memory. You can instruct the assistant via `AGENTS.md`, `GEMINI.md`, or a skill’s `SKILL.md` to read from a markdown file at the start of work and append learnings at the end, achieving the same memory pattern.
+Google Antigravity introduced agent support with **AgentKit 2.0** (March 2026). AgentKit 2.0 ships with 16 specialized agents across frontend, backend, testing, and DevOps roles, and each agent runs in its own context. You can assign a different model (Gemini, Claude, GPT) to each agent, so a reasoning-heavy role can run on one model while a fast-iteration role runs on another.
+
+**Role specialization:** Each of the built-in agents has a distinct role definition and tool scope. AgentKit 2.0's **Manager View** lets you orchestrate multiple agents in parallel with asynchronous task execution, so specialized agents run side-by-side rather than as a single shared assistant.
+
+**Persistent memory via markdown instruction:** AgentKit 2.0 does not provide a built-in persistent-memory slot per agent. Get the same pattern by instructing each agent via `AGENTS.md`, `GEMINI.md`, or a skill's `SKILL.md` to read from a markdown file at the start of work and append learnings at the end. For compatibility with Claude Code agents, use the path `.claude/agent-memory/{agent-name}/MEMORY.md`.
