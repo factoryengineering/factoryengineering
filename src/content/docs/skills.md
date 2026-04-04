@@ -245,7 +245,7 @@ Kilo Code also supports mode-specific skills that activate only in specific mode
 | Project | `.agent/skills/` |
 | Global | `~/.gemini/antigravity/skills/` |
 
-Google Antigravity is an AI-native IDE powered by Gemini. It uses progressive disclosure for skills—each skill sits dormant until a request matches its description, at which point it is loaded into the agent's context.
+Google Antigravity is an AI-native IDE powered by Gemini. It uses progressive disclosure for skills—each skill sits dormant until a request matches its description, at which point it is loaded into the agent's context. **AgentKit 2.0** (March 2026) added multi-agent orchestration via Manager View but did not change skills loading: skills still live in `.agent/skills/` and are loaded on-demand by whichever specialized agent is handling the task.
 
 Antigravity uses `.agent/skills/` at the project level. A symlink to your canonical location is required:
 
