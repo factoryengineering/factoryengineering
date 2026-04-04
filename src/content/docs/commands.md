@@ -184,7 +184,7 @@ Kilo Code calls them workflows—again, this is Kilo Code's storage mechanism fo
 
 Use the symlink from the setup above so `.kilocode/workflows` points to `.claude/commands`.
 
-📖 [Kilo Code Workflows Documentation](https://kilo.ai/docs/features/slash-commands/workflows)
+📖 [Kilo Code Workflows Documentation](https://kilo.ai/docs/customize/workflows)
 
 ---
 
