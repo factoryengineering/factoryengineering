@@ -26,7 +26,7 @@ This alignment between skills and code is fundamental to factory engineering.
 
 ## The Agent Skills Open Standard
 
-The IDEs covered here all implement the **Agent Skills open standard**, originally pioneered by Anthropic and Claude Code and now adopted across the ecosystem. The standard is published and maintained at **[agentskills.io](https://agentskills.io)**.
+The IDEs covered here all implement the **Agent Skills open standard**, originally pioneered by Anthropic and Claude Code and now adopted across every major AI IDE vendor—Claude Code, GitHub Copilot, Cursor, Windsurf, Kilo Code, Google Antigravity, and OpenAI Codex. Agent Skills has effectively become a platform-level convention rather than an IDE-specific feature, with enterprise adoption visible through projects like [Elastic's agent-skills repository](https://github.com/elastic/agent-skills). The standard is published and maintained at **[agentskills.io](https://agentskills.io)**.
 
 A skill is a directory containing:
 
@@ -38,7 +38,7 @@ my-skill/
 └── resources/        # Optional: templates and reference files
 ```
 
-The `SKILL.md` file uses YAML frontmatter to declare the skill's name and description. The description is critical—it is what the agent reads to determine whether to load and apply the skill:
+The `SKILL.md` file uses YAML frontmatter to declare the skill's name and description. The description is critical—it is what the agent reads to determine whether to load and apply the skill. The standard also defines optional invocation controls such as `user-invocable` (whether a user can call the skill explicitly by name) and `disable-model-invocation` (prevent the model from auto-loading the skill, reserving it for explicit invocation):
 
 ```markdown
 ---
@@ -118,6 +118,9 @@ ln -s ../.claude/skills .kilocode/skills
 # Antigravity (uses .agent/skills at project level)
 ln -s ../.claude/skills .agent/skills
 
+# OpenAI Codex
+ln -s ../.claude/skills .codex/skills
+
 # Cursor and GitHub Copilot read .claude/skills directly — no symlink needed
 ```
 
@@ -181,7 +184,7 @@ Agent Skills work across the Copilot coding agent, Copilot CLI, and VS Code. Ena
 
 Cursor looks for skills in `.cursor/skills/` first, then in `.claude/skills/` for compatibility—similar to GitHub Copilot. If you use `.claude/skills/` as your canonical location, **no symlink is needed**; Cursor will find your skills automatically. Skills are loaded when they match your request, based on the `description` field in each `SKILL.md` frontmatter.
 
-**Plugins (v2.5+):** The [Cursor Marketplace](https://cursor.com/marketplace) also distributes skills as part of plugin packages. Plugins bundle skills alongside subagents, MCP servers, hooks, and rules into one-click installs. Skills installed via plugins follow the same `SKILL.md` format and discovery mechanism — the plugin system supplements the folder convention, it does not replace it.
+**Plugins (March 2026):** Cursor's Plugins system integrates skills as first-class plugin components. The [Cursor Marketplace](https://cursor.com/marketplace) distributes plugin packages that bundle skills alongside subagents, MCP servers, hooks, and rules into one-click installs. Skills installed via plugins follow the same `SKILL.md` format and discovery mechanism — the plugin system supplements the folder convention, it does not replace it. Project-scoped skills committed to `.claude/skills/` continue to work unchanged alongside plugin-delivered skills.
 
 📖 [Cursor Agent Skills Documentation](https://cursor.com/docs/skills) · [Cursor Marketplace](https://cursor.com/marketplace)
 
@@ -257,6 +260,36 @@ ln -s ../.claude/skills .agent/skills
 
 ---
 
+### OpenAI Codex
+
+**Supports Agent Skills standard:** ✅ Yes — adopted December 2025
+
+**Folder locations:**
+| Scope | Path |
+|-------|------|
+| Project | `.codex/skills/` |
+| Global | `~/.codex/skills/` |
+
+OpenAI Codex adopted the Agent Skills open standard in December 2025, bringing parity with the rest of the AI IDE ecosystem. Codex loads skills from `.codex/skills/` and evaluates each skill's `description` to decide when to load it — the same progressive disclosure model used by Claude Code, Cursor, and Copilot. A symlink to your canonical location is required:
+
+```bash
+ln -s ../.claude/skills .codex/skills
+```
+
+Codex supports the standard `user-invocable` and `disable-model-invocation` frontmatter properties for controlling when a skill is loaded automatically versus invoked by name.
+
+📖 [OpenAI Codex Skills Documentation](https://developers.openai.com/codex/skills)
+
+---
+
+## Ecosystem: Agent Skills as a Platform Standard
+
+Agent Skills is no longer an IDE-specific feature — it is a platform-level standard adopted by every major AI IDE vendor. Claude Code pioneered the format; GitHub Copilot, Cursor, Windsurf, Kilo Code, Google Antigravity, and OpenAI Codex have all implemented it natively. Enterprise organizations publish shared skill libraries (for example, [Elastic's agent-skills repository](https://github.com/elastic/agent-skills)) and the specification is maintained openly at [agentskills.io](https://agentskills.io).
+
+For factory engineering, this ecosystem-wide support is a defining strength. A skill authored in your repository today works across whichever IDE your teammates choose, and continues to work as the market evolves. You are investing in an open, portable standard — not a single vendor's proprietary format.
+
+---
+
 ## Complete Setup: Step-by-Step
 
 Here is the full setup for a team using multiple IDEs with one canonical skills location.
@@ -281,13 +314,16 @@ ln -s ../.claude/skills .kilocode/skills
 # Antigravity
 ln -s ../.claude/skills .agent/skills
 
+# OpenAI Codex
+ln -s ../.claude/skills .codex/skills
+
 # Cursor and GitHub Copilot read .claude/skills directly — no symlink needed
 ```
 
 **4. Commit everything:**
 
 ```bash
-git add .claude/skills .cursor .windsurf .kilocode .agent
+git add .claude/skills .cursor .windsurf .kilocode .agent .codex
 git commit -m "Initialize software factory skills"
 ```
 
