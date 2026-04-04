@@ -143,7 +143,7 @@ Claude Code extends the base standard with additional features including invocat
 
 **Getting started:** Use the **skill-creator** skill to create new skills (see [Installing skill-creator and skill-optimizer](#installing-skill-creator-and-skill-optimizer)). It guides you through the workflow and produces a proper skill directory and SKILL.md.
 
-📖 [Claude Code Skills Documentation](https://docs.claude.ai/code/skills)
+📖 [Claude Code Skills Documentation](https://code.claude.com/docs/en/slash-commands)
 
 ---
 
@@ -231,7 +231,7 @@ Kilo Code was one of the first agents to natively implement the Agent Skills spe
 
 Kilo Code also supports mode-specific skills that activate only in specific modes (Code, Architect, Debugger, Orchestrator), which is especially useful for factory engineering workflows where different agents operate in different modes.
 
-📖 [Kilo Code Skills Documentation](https://kilo.ai/docs/agent-behavior/skills)
+📖 [Kilo Code Skills Documentation](https://kilo.ai/docs/customize/skills)
 
 ---
 
