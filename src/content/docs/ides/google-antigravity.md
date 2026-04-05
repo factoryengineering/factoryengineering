@@ -34,7 +34,7 @@ For more about how skills work in factory engineering, see [Skills](/skills).
 
 ## Commands
 
-**Folder location:** `.agent/workflows/` (project) or `~/.gemini/antigravity/skills/` (global skills; workflows are in `.agent/workflows/`)
+**Folder location:** `.agent/workflows/` (project)
 
 **Invocation:** `/workflow-name` — Antigravity treats files in `.agent/workflows/` as workflows. With the symlink, your `.claude/commands/` files appear there. Use **slash-command at-artifact** (e.g. `/write-spec @submit-sales-order`).
 
