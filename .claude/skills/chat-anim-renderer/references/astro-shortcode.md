@@ -20,10 +20,11 @@ const { src, alt = 'Chat animation' } = Astro.props;
 </div>
 
 <style>
+  /* Do NOT wrap in @layer — Starlight's .sl-markdown-content image styles
+     live in @layer starlight.content and would win over layered rules.
+     Unlayered styles beat all layered styles in the cascade. */
   .chat-anim-embed {
     clear: both;
-    display: flow-root;
-    margin-bottom: 2rem;
   }
   .chat-anim-img {
     display: block;
@@ -31,7 +32,7 @@ const { src, alt = 'Chat animation' } = Astro.props;
     width: 100%;
     height: auto;
     border-radius: 10px;
-    border: 1px solid #252a38;
+    border: 1px solid var(--sl-color-gray-6);
     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
   }
   @media (min-width: 900px) {
@@ -63,5 +64,15 @@ image pipelines — raw GIFs in content collections are not served automatically
 ## Section isolation
 
 `clear: both` on `.chat-anim-embed` prevents two consecutive embeds from
-floating side-by-side. `display: flow-root` contains the float so wrapping
-prose stays bounded to its own section.
+floating side-by-side — each new embed drops below the previous one's float.
+The wrapper deliberately does **not** have `display: flow-root`, so the floated
+image escapes the wrapper and the subsequent prose wraps around it. The next
+`.chat-anim-embed`'s `clear: both` then ends that float naturally.
+
+## Common pitfall
+
+If the image renders at 100% width instead of 360px, Starlight's
+`.sl-markdown-content :is(img, ...)` rule (in `@layer starlight.content`) is
+winning the cascade. Confirm your component's `<style>` block is NOT wrapped
+in `@layer starlight.core { ... }` — unlayered styles beat all layered styles,
+but layered rules compete on specificity and sub-layer order.

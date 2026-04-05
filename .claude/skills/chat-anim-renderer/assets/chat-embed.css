@@ -6,9 +6,10 @@
 */
 
 .chat-anim-embed {
+  /* Only clear — no flow-root. The float must escape the wrapper so that
+     following prose wraps around it. The next .chat-anim-embed's own
+     clear: both drops it below the float, preserving section isolation. */
   clear: both;
-  display: flow-root;
-  margin-bottom: 2rem;
 }
 
 .chat-anim-img {

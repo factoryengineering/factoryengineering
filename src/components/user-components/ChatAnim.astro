@@ -1,0 +1,40 @@
+---
+interface Props {
+  src: string;
+  alt?: string;
+}
+
+const { src, alt = "Chat animation" } = Astro.props;
+---
+
+<div class="chat-anim-embed">
+  <img src={src} alt={alt} class="chat-anim-img" loading="lazy" />
+</div>
+
+<style>
+  .chat-anim-embed {
+    clear: both;
+  }
+  .chat-anim-img {
+    display: block;
+    max-width: 360px;
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    border: 1px solid var(--sl-color-gray-6);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+  }
+  @media (min-width: 900px) {
+    .chat-anim-img {
+      float: right;
+      margin: 0 0 1.5rem 2rem;
+    }
+  }
+  @media (max-width: 899px) {
+    .chat-anim-img {
+      float: none;
+      max-width: 100%;
+      margin: 0 0 1.5rem 0;
+    }
+  }
+</style>

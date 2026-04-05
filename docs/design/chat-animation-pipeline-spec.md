@@ -19,9 +19,9 @@ tools/chat-anim/
   package.json
 
 src/content/articles/
-  some-article.md              # content page (MD/MDX in a content collection)
-src/content/chat-anims/
-  ask-plan-agent.chat.yaml     # conversation source file (co-located by name)
+  some-article.mdx             # content page (MDX, can import the ChatAnim component)
+chat-anims/
+  ask-plan-agent.chat.yaml     # conversation source file
 
 public/animations/
   ask-plan-agent.gif           # build output: served at /animations/ask-plan-agent.gif
@@ -30,9 +30,10 @@ src/components/user-components/
   ChatAnim.astro               # presentational embed component
 ```
 
-YAML sources live outside `src/content/docs/` so Astro's content-collection
-loader does not treat them as pages. GIFs are written to `public/animations/`
-because Astro serves `public/` at the site root.
+YAML sources live at the repo-root `chat-anims/` directory, outside
+`src/content/` so Astro's content-collection loaders cannot accidentally parse
+them as pages. GIFs are written to `public/animations/` because Astro serves
+`public/` at the site root.
 
 ---
 
@@ -195,7 +196,7 @@ The encoded GIF is written to `public/animations/`, using the YAML file's
 basename with a `.gif` extension:
 
 ```
-src/content/chat-anims/ask-plan-agent.chat.yaml
+chat-anims/ask-plan-agent.chat.yaml
   →  public/animations/ask-plan-agent.gif
 ```
 
@@ -216,7 +217,7 @@ not commit `dist/`.
 ```json
 {
   "scripts": {
-    "build:anims": "node tools/chat-anim/render.js --glob 'src/content/chat-anims/**/*.chat.yaml'",
+    "build:anims": "node tools/chat-anim/render.js --glob 'chat-anims/**/*.chat.yaml'",
     "build":       "yarn build:anims && astro build && node scripts/export-markdown.mjs"
   }
 }
@@ -334,10 +335,8 @@ allows MDX.
 */
 
 .chat-anim-embed {
-  /* Force a new block formatting context — prevents adjacency with prior floats */
+  /* Clear any preceding float so each embed begins a new section. */
   clear: both;
-  display: flow-root;   /* contains the float without overflow:hidden hacks */
-  margin-bottom: 2rem;
 }
 
 .chat-anim-img {
@@ -368,7 +367,9 @@ allows MDX.
 }
 ```
 
-**How section isolation works:** The `clear: both` on `.chat-anim-embed` ensures each new embed starts below any preceding floated element. `display: flow-root` on the wrapper contains the float so that the text following the embed in the DOM wraps correctly around the image without bleeding into the next embed's region.
+**How section isolation works:** The `clear: both` on `.chat-anim-embed` ensures each new embed starts below any preceding float. The wrapper does **not** establish a new block-formatting context (no `display: flow-root`) — this is deliberate, so the floated image escapes the wrapper and following prose wraps around it. When the next `.chat-anim-embed` appears later in the DOM, its own `clear: both` drops it below the escaped float, isolating one animation's section from the next.
+
+**Important:** do not wrap these styles in `@layer starlight.core`. Starlight's markdown styles include `.sl-markdown-content :is(img, ...) { max-width: 100%; }` in `@layer starlight.content`, which has higher specificity. Unlayered component styles beat all layered styles in the cascade, so declare the rules at the component scope without a layer wrapper.
 
 ---
 
@@ -384,5 +385,5 @@ allows MDX.
 | `src/components/user-components/ChatAnim.astro` | Presentational embed component |
 | `src/styles/chat-embed.css` | Float/responsive embed styles |
 | `.github/workflows/build.yml` | CI configuration (Azure Static Web Apps) |
-| `src/content/chat-anims/**/*.chat.yaml` | Authored conversation files |
+| `chat-anims/**/*.chat.yaml` | Authored conversation files |
 | `public/animations/*.gif` | Build artifacts (gitignored) |
