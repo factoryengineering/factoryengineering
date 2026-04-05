@@ -110,4 +110,4 @@ For full setup details on defining, configuring, and invoking agents in each IDE
 - **[Kilo Code](/ides/kilo-code#agents)** — Modes as true agents; defined in `.kilocodemodes` (YAML); rules in `.kilo/rules-{slug}/`
 - **[Cursor](/ides/cursor#agents)** — Subagents + Plugins; defined in `.cursor/agents/`; async delegation (v2.5+); Agents Window (v3.0)
 - **[Windsurf](/ides/windsurf#agents)** — No true agent support; Cascade is a single shared agent
-- **[Google Antigravity](/ides/google-antigravity#agents)** — AgentKit 2.0 with 16 specialized agents; Manager View orchestration
+- **[Antigravity](/ides/google-antigravity#agents)** — AgentKit 2.0 with 16 specialized agents; Manager View orchestration
