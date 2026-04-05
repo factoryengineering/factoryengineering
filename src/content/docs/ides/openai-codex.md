@@ -17,7 +17,7 @@ OpenAI Codex adopted the Agent Skills open standard in December 2025, reaching p
 |-------|------|
 | Project | `.agents/skills/` |
 | User | `~/.agents/skills/` |
-| Admin | `/etc/agents/skills/` |
+| Admin | `/etc/codex/skills/` |
 
 Codex uses the shared `.agents/skills/` convention (not a Codex-specific folder) and evaluates each skill's `description` via progressive disclosure to decide when to load it. Symlinks to a canonical skills directory are supported.
 
@@ -38,11 +38,11 @@ For more about how skills work in factory engineering, see [Skills](/skills).
 
 ## Commands
 
-**Folder location:** Not natively supported as slash-command markdown files. Codex's primary reusable-instruction mechanism is the Agent Skills standard (`$skill-name` invocation), not per-file slash commands.
+**Slash-command markdown file support:** ⚠️ Needs investigation — Codex's primary reusable-instruction mechanism is the Agent Skills standard (`$skill-name` invocation, `/skills` to list loaded skills), and whether Codex also reads per-file slash-command markdown from a dedicated folder has not been confirmed in official documentation at the time of writing.
 
-**Invocation:** Use `$skill-name` to invoke a skill explicitly, or `/skills` to list loaded skills. To use factory-engineering commands in Codex, author them as skills (one skill per command) under `.agents/skills/` so they are invocable by name.
+**Practical approach today:** Use skills. To share factory-engineering commands with a Codex user, author them as skills (one skill per command) under `.agents/skills/` so they are invocable by name via `$skill-name`. For teams maintaining canonical `.claude/commands/*.md` files, wrap each command in a thin SKILL.md that references the command body, or invoke commands by reading the markdown file directly from context.
 
-For teams maintaining canonical `.claude/commands/*.md` files, the practical approach today is to either (a) wrap each command in a thin SKILL.md that references the command body, or (b) invoke commands by reading the markdown file directly from context. Native slash-command markdown parity (the pattern used by Claude Code, Cursor, Windsurf, Kilo Code, and Antigravity) is not supported.
+This page will be updated once OpenAI's documentation confirms whether Codex supports slash-command markdown files alongside skills.
 
 For more about how commands work in factory engineering, see [Commands](/commands).
 
@@ -54,7 +54,7 @@ For more about how commands work in factory engineering, see [Commands](/command
 
 **Feature name:** Custom agents (sub-agents with role definitions)
 
-**Storage location:** `.agents/` (TOML profiles)
+**Storage location:** TOML profiles — Project: `.codex/agents/`; User: `~/.codex/agents/`
 
 OpenAI Codex added sub-agents with custom role definitions in March 2026. Each custom agent is defined in a TOML file that declares its role, tool access, and model. Codex ships with three built-in agents — `default`, `worker`, and `explorer` — and lets you author additional custom agents for specialized roles.
 
@@ -64,7 +64,7 @@ OpenAI Codex added sub-agents with custom role definitions in March 2026. Each c
 
 **Memory via markdown instruction:** Get the factory-engineering memory pattern by instructing each custom agent (in its TOML role definition or referenced skill) to read from a markdown file at the start of work and append learnings at the end. Use the path `.claude/agent-memory/{agent-name}/MEMORY.md` for cross-IDE compatibility.
 
-📖 [OpenAI Codex Sub-Agents Documentation](https://developers.openai.com/codex/agents)
+📖 [OpenAI Codex Sub-Agents Documentation](https://developers.openai.com/codex/subagents)
 
 For more about how agents work in factory engineering, see [Agents](/agents).
 
@@ -72,15 +72,15 @@ For more about how agents work in factory engineering, see [Agents](/agents).
 
 ## Workflows
 
-**Orchestration support:** ✅ Yes — native sub-agent orchestration
+**Orchestration support:** ⚠️ Partial — native sub-agent delegation, workflow-document consumption unverified
 
-Codex provides native workflow orchestration through its sub-agent system. The top-level agent spawns custom sub-agents in parallel, routes results between them, and manages thread lifecycle. Orchestration is configurable via:
+Codex provides native **sub-agent delegation**: the top-level agent spawns custom sub-agents in parallel, routes results between them, and manages thread lifecycle. Orchestration is configurable via:
 
 - **`max_threads`** — maximum concurrent sub-agents (default: `6`)
 - **Depth limits** — how deep sub-agents can spawn further sub-agents
-- **Role delegation** — specialized agents are invoked by name from the orchestrator
+- **Role delegation** — specialized TOML-defined agents are invoked by name from the parent agent
 
-This pattern maps directly to factory-engineering workflows: the top-level agent acts as the orchestrator, reads a workflow document, and delegates to named specialist agents (sub-agents) based on the workflow's branching and looping logic. Combined with the Agent Skills standard, Codex can run the same orchestration patterns as Claude Code and Kilo Code, with the caveat that specialist roles are TOML-defined rather than markdown-defined.
+Whether Codex's parent agent reads a structured workflow document (the way Claude Code and Kilo Code orchestrators do) and routes based on its branching/looping logic has not been confirmed in official documentation at the time of writing. You can approximate workflow-driven orchestration by writing a detailed workflow markdown file and providing it to the parent agent as context, but there is no documented orchestrator-as-agent that reads a workflow file and delegates to named specialists based on its contents.
 
 For more about how workflows work in factory engineering, see [Workflows](/workflows).
 
@@ -89,5 +89,5 @@ For more about how workflows work in factory engineering, see [Workflows](/workf
 ## External Docs
 
 - [OpenAI Codex Skills Documentation](https://developers.openai.com/codex/skills)
-- [OpenAI Codex Sub-Agents Documentation](https://developers.openai.com/codex/agents)
+- [OpenAI Codex Sub-Agents Documentation](https://developers.openai.com/codex/subagents)
 - [Agent Skills Standard](https://agentskills.io)
