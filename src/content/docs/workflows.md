@@ -169,79 +169,14 @@ Instruct agents in the workflow or in their agent definitions to include deviati
 
 ---
 
-### Claude Code: Full Workflow Orchestration
+For full details on workflow orchestration in each IDE, see the dedicated IDE pages:
 
-**Orchestration support:** ✅ Yes
-
-Invoke with **slash-workflow at-artifact** (e.g. `/tdd-cycle @path/to/design.md`). The main agent reads the workflow from `.claude/commands/` and the artifact you supplied, then uses the Task tool to delegate work to named subagents. The orchestrator reads the workflow, assesses the situation, and dynamically routes work based on what it discovers. It loops, branches, and coordinates parallel work according to the workflow.
-
-Subagents cannot spawn other subagents. Only the main orchestrator can delegate. The workflow sits at the orchestrator level, coordinating specialists below it.
-
-**Where workflows live:** In `.claude/commands/`, one file per workflow (e.g. `tdd-cycle.md`). Invoke with `/tdd-cycle @path/to/design.md`. The orchestrator reads the workflow and the artifact, then follows the phases. It delegates to tdd-planner, tdd-test-writer, tdd-code-writer, and tdd-refactor, and applies the conditional and looping logic in the document.
-
-Define an orchestrator subagent that is restricted to specific tools and subagents, and that is instructed to read a given workflow file before starting. That makes the orchestrator a reusable, named agent the team can invoke by name.
-
-📖 [Claude Code Subagents Documentation](https://code.claude.com/docs/en/sub-agents)  
-📖 [Claude Code Agent Teams Documentation](https://code.claude.com/docs/en/agent-teams)
-
----
-
-### Kilo Code: Orchestrator Mode
-
-**Orchestration support:** ✅ Yes
-
-Kilo Code has a built-in Orchestrator mode that breaks down complex tasks and delegates to other modes via `new_task()`. The Orchestrator reads the task, formulates a plan, and spawns work in other modes. Custom modes use a `whenToUse` field to guide delegation.
-
-**Terminology:** Kilo Code's "Workflows" (in `.kilocode/workflows/`) are commands, but can be used for orchestration of agents. Create a symlink from `.claude/commands/` to `.kilocode/workflows/` so the same workflow file is available everywhere.
-
-Factory engineering workflows are implemented in Kilo Code through Orchestrator Mode. Invoke a workflow using the *slash-workflow at-artifact* pattern (e.g. `/tdd-cycle @docs/specs/order-validation.md`).
-
-Place orchestration instructions in a rule file the Orchestrator reads, then invoke with the same pattern: slash-workflow at-artifact (e.g. `/tdd-cycle @docs/specs/order-validation.md`).
-
-📖 [Kilo Code Custom Modes](https://kilo.ai/docs/customize/custom-modes)  
-📖 [Kilo Code Orchestrator Mode](https://kilo.ai/docs/code-with-ai/agents/orchestrator-mode)
-
----
-
-### GitHub Copilot: Fleet Mode and Agent HQ
-
-**Orchestration support:** ⚠️ Partial (in-session sub-agent orchestration, but no workflow-document consumption)
-
-**Fleet mode (`/fleet`):** The Copilot CLI reached GA on February 25, 2026 ([GitHub Changelog](https://github.blog/changelog/)) and introduced Fleet mode — in-session orchestration through parallel sub-agent spawning. Invoke `/fleet` to start a Fleet session where the orchestrator breaks down a task, spawns parallel sub-agents, and coordinates their work. Fleet mode runs in the Copilot CLI and operates within a single session. Note that Fleet mode provides task decomposition and parallel sub-agent coordination, but does not read a structured workflow document the way Claude Code or Kilo Code's orchestrators do — the orchestration is driven by the model's interpretation of the task, not by a workflow file.
-
-**Agent HQ:** GitHub Agent HQ (Feb 2026) lets developers assign tasks to different agents and monitor progress in a single dashboard. Agent HQ is cross-agent task assignment — you route work between agents and review their output. Fleet mode and Agent HQ are complementary: Fleet mode handles in-session orchestration (one task, multiple parallel sub-agents), while Agent HQ handles cross-session coordination (multiple tasks, multiple agents, dashboard monitoring).
-
-📖 [GitHub Copilot CLI Documentation](https://docs.github.com/en/copilot/copilot-cli) · [GitHub Agent HQ](https://github.com/features/copilot/agents)
-
----
-
-### Cursor: Partial Orchestration via Subagent Delegation
-
-**Orchestration support:** ⚠️ Partial
-
-Cursor's Agents Window (v3.0, April 2026) lets you run many agents in parallel across repos, worktrees, and cloud environments. A parent agent can delegate work to custom subagents defined in `.cursor/agents/`, and subagents can spawn their own subagents (v2.5+), creating a tree of coordinated work.
-
-However, Cursor does not have a dedicated orchestrator that reads a workflow document and delegates to named specialists based on its contents. The delegation is ad-hoc — the parent agent decides how to split work based on its prompt, not by following a structured workflow file. You can approximate workflow-driven orchestration by writing detailed instructions in a command file and relying on the parent agent to follow them, but there is no enforcement layer.
-
-**Closest pattern:** Write a command in `.cursor/commands/` that describes phases and specialist subagents. Invoke it with `/command-name @artifact`. The parent agent reads the command and delegates to subagents, but routing logic depends on the model's interpretation rather than a built-in orchestration engine.
-
-📖 [Cursor Subagents Documentation](https://cursor.com/docs/subagents) · [Cursor Agents Window](https://cursor.com/changelog/3-0)
-
----
-
-### Windsurf: No Orchestration Support
-
-**Windsurf** calls its slash commands "Workflows"; they are commands, not agent orchestration. Cascade is a single shared agent with no delegation layer, so the closest you can get is running commands yourself in sequence. That is human orchestration, not workflow-driven agent orchestration.
-
----
-
-### Antigravity: Partial Orchestration via AgentKit 2.0 Manager View
-
-**Orchestration support:** ⚠️ Partial
-
-Antigravity's **AgentKit 2.0 Manager View** (March 2026) orchestrates multiple specialized agents in parallel with asynchronous task execution. You can run frontend, backend, testing, and DevOps agents side-by-side, assign different models (Gemini, Claude, GPT) to each, and coordinate their output from a single view.
-
-However, Manager View is UI-driven rather than workflow-document-driven. It does not read a structured workflow file the way Claude Code or Kilo Code's orchestrators do — routing and delegation are managed through the Manager View interface, not encoded in a `.claude/commands/{workflow}.md` file. You can approximate workflow-driven orchestration by writing detailed instructions in a command file and invoking agents from Manager View, but there is no orchestrator-as-agent that reads the workflow and delegates to named specialists based on its contents.
+- **[Claude Code](/ides/claude-code#workflows)** — ✅ Full orchestration. Main agent reads workflow from `.claude/commands/`, delegates via Task tool to named subagents with looping, branching, and parallel coordination.
+- **[Kilo Code](/ides/kilo-code#workflows)** — ✅ Full orchestration. Built-in Orchestrator mode delegates to other modes via `new_task()`. Invoke with slash-workflow at-artifact.
+- **[GitHub Copilot](/ides/github-copilot#workflows)** — ⚠️ Partial. Fleet mode (`/fleet`) provides in-session sub-agent orchestration; Agent HQ for cross-agent task assignment. No workflow-document consumption.
+- **[Cursor](/ides/cursor#workflows)** — ⚠️ Partial. Agents Window (v3.0) runs agents in parallel; subagent delegation is ad-hoc, not workflow-document-driven.
+- **[Windsurf](/ides/windsurf#workflows)** — ❌ No orchestration. "Workflows" are commands; Cascade is a single agent with no delegation.
+- **[Google Antigravity](/ides/google-antigravity#workflows)** — ⚠️ Partial. AgentKit 2.0 Manager View provides UI-driven parallel agent orchestration; no workflow-document consumption.
 
 ---
 

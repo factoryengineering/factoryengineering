@@ -141,155 +141,17 @@ Commit the symlinks to your repository. Every team member gets the correct folde
 
 ## IDE-by-IDE Reference
 
-### Claude Code
+Every major AI IDE supports the Agent Skills standard. The table below summarizes folder locations and symlink requirements. For full setup details, see each IDE's dedicated page.
 
-**Supports Agent Skills standard:** ✅ Native implementation
-
-**Folder locations:**
-| Scope | Path |
-|-------|------|
-| Project | `.claude/skills/` |
-| Global | `~/.claude/skills/` |
-
-Claude Code automatically detects skills in `.claude/skills/` and loads them into context when relevant to your request. Skills can also be invoked explicitly using the skill name in your prompt.
-
-Claude Code extends the base standard with additional features including invocation controls and dynamic context injection. The `anthropics/skills` repository on GitHub provides a growing collection of community and official skills ready to use.
-
-**Getting started:** Use the **skill-creator** skill to create new skills (see [Installing skill-creator and skill-optimizer](#installing-skill-creator-and-skill-optimizer)). It guides you through the workflow and produces a proper skill directory and SKILL.md.
-
-📖 [Claude Code Skills Documentation](https://code.claude.com/docs/en/slash-commands)
-
----
-
-### GitHub Copilot
-
-**Supports Agent Skills standard:** ✅ Native — reads both `.claude/skills/` and `.github/skills/`
-
-**Folder locations:**
-| Scope | Path |
-|-------|------|
-| Project (primary) | `.github/skills/` |
-| Project (compatibility) | `.claude/skills/` |
-| Personal (primary) | `~/.copilot/skills/` |
-| Personal (compatibility) | `~/.claude/skills/` |
-
-GitHub Copilot reads from both `.github/skills/` and `.claude/skills/` at the project level, which means **no symlink is needed** if you use `.claude/skills/` as your canonical location. Copilot will find your skills automatically.
-
-Agent Skills work across the Copilot coding agent, Copilot CLI, and VS Code. Enable the `chat.useAgentSkills` setting in VS Code to activate the feature.
-
-📖 [GitHub Copilot Agent Skills Documentation](https://docs.github.com/en/copilot/how-tos/use-copilot-agents/coding-agent/create-skills)
-
----
-
-### Cursor
-
-**Supports Agent Skills standard:** ✅ Yes — primary `.cursor/skills/`, compatibility `.claude/skills/`
-
-**Folder locations:**
-| Scope | Path |
-|-------|------|
-| Project (primary) | `.cursor/skills/` |
-| Project (compatibility) | `.claude/skills/` |
-| Global (primary) | `~/.cursor/skills/` |
-| Global (compatibility) | `~/.claude/skills/` |
-
-Cursor looks for skills in `.cursor/skills/` first, then in `.claude/skills/` for compatibility—similar to GitHub Copilot. If you use `.claude/skills/` as your canonical location, **no symlink is needed**; Cursor will find your skills automatically. Skills are loaded when they match your request, based on the `description` field in each `SKILL.md` frontmatter.
-
-**Plugins (March 2026):** Cursor's Plugins system integrates skills as first-class plugin components. The [Cursor Marketplace](https://cursor.com/marketplace) distributes plugin packages that bundle skills alongside subagents, MCP servers, hooks, and rules into one-click installs. Skills installed via plugins follow the same `SKILL.md` format and discovery mechanism — the plugin system supplements the folder convention, it does not replace it. Project-scoped skills committed to `.claude/skills/` continue to work unchanged alongside plugin-delivered skills.
-
-📖 [Cursor Agent Skills Documentation](https://cursor.com/docs/skills) · [Cursor Marketplace](https://cursor.com/marketplace)
-
----
-
-### Windsurf
-
-**Supports Agent Skills standard:** ✅ Yes, via `.windsurf/skills/`
-
-**Folder locations:**
-| Scope | Path |
-|-------|------|
-| Project | `.windsurf/skills/` |
-| Global | `~/.windsurf/skills/` |
-
-Windsurf's Cascade agent looks for skills in `.windsurf/skills/`. A symlink to your canonical location is required:
-
-```bash
-ln -s ../.claude/skills .windsurf/skills
-```
-
-Cascade automatically invokes skills when your request matches a skill's description. To invoke a skill explicitly, type `@skill-name` in the Cascade input.
-
-📖 [Windsurf Cascade Skills Documentation](https://docs.windsurf.com/windsurf/cascade/skills)
-
----
-
-### Kilo Code
-
-**Supports Agent Skills standard:** ✅ Native — one of the first agents to adopt the standard
-
-**Folder locations:**
-| Scope | Path |
-|-------|------|
-| Project | `.kilocode/skills/` |
-| Global | `~/.kilocode/skills/` |
-
-Kilo Code is an open-source VS Code extension with a model aggregator backend that gives you access to 500+ models—including Claude, Gemini, and GPT series—with pay-per-token billing at raw provider rates. This makes it a flexible choice for teams that want model independence without committing to a single vendor.
-
-Kilo Code loads skills from `.kilocode/skills/`. A symlink to your canonical location is required:
-
-```bash
-ln -s ../.claude/skills .kilocode/skills
-```
-
-Kilo Code was one of the first agents to natively implement the Agent Skills specification with zero-configuration detection. Skills are evaluated before every response—the agent checks all skill descriptions against your request and loads the most relevant one.
-
-Kilo Code also supports mode-specific skills that activate only in specific modes (Code, Architect, Debugger, Orchestrator), which is especially useful for factory engineering workflows where different agents operate in different modes.
-
-📖 [Kilo Code Skills Documentation](https://kilo.ai/docs/customize/skills)
-
----
-
-### Google Antigravity
-
-**Supports Agent Skills standard:** ✅ Yes, using its own folder structure
-
-**Folder locations:**
-| Scope | Path |
-|-------|------|
-| Project | `.agent/skills/` |
-| Global | `~/.gemini/antigravity/skills/` |
-
-Google Antigravity is an AI-native IDE powered by Gemini. It uses progressive disclosure for skills—each skill sits dormant until a request matches its description, at which point it is loaded into the agent's context. **AgentKit 2.0** (March 2026) added multi-agent orchestration via Manager View but did not change skills loading: skills still live in `.agent/skills/` and are loaded on-demand by whichever specialized agent is handling the task.
-
-Antigravity uses `.agent/skills/` at the project level. A symlink to your canonical location is required:
-
-```bash
-ln -s ../.claude/skills .agent/skills
-```
-
-📖 [Google Antigravity Skills Documentation](https://antigravity.google/docs/skills)
-
----
-
-### OpenAI Codex
-
-**Supports Agent Skills standard:** ✅ Yes — adopted December 2025
-
-**Folder locations:**
-| Scope | Path |
-|-------|------|
-| Project | `.codex/skills/` |
-| Global | `~/.codex/skills/` |
-
-OpenAI Codex adopted the Agent Skills open standard in December 2025, bringing parity with the rest of the AI IDE ecosystem. Codex loads skills from `.codex/skills/` and evaluates each skill's `description` to decide when to load it — the same progressive disclosure model used by Claude Code, Cursor, and Copilot. A symlink to your canonical location is required:
-
-```bash
-ln -s ../.claude/skills .codex/skills
-```
-
-Codex supports the standard `user-invocable` and `disable-model-invocation` frontmatter properties for controlling when a skill is loaded automatically versus invoked by name.
-
-📖 [OpenAI Codex Skills Documentation](https://developers.openai.com/codex/skills)
+| IDE | Project Folder | Symlink Needed? | Details |
+|-----|---------------|-----------------|---------|
+| [Claude Code](/ides/claude-code) | `.claude/skills/` | No (canonical location) | [Full setup →](/ides/claude-code#skills) |
+| [GitHub Copilot](/ides/github-copilot) | `.github/skills/` + `.claude/skills/` | No (reads `.claude/skills/` directly) | [Full setup →](/ides/github-copilot#skills) |
+| [Cursor](/ides/cursor) | `.cursor/skills/` + `.claude/skills/` | No (reads `.claude/skills/` directly) | [Full setup →](/ides/cursor#skills) |
+| [Windsurf](/ides/windsurf) | `.windsurf/skills/` | ✅ Yes | [Full setup →](/ides/windsurf#skills) |
+| [Kilo Code](/ides/kilo-code) | `.kilocode/skills/` | ✅ Yes | [Full setup →](/ides/kilo-code#skills) |
+| [Google Antigravity](/ides/google-antigravity) | `.agent/skills/` | ✅ Yes | [Full setup →](/ides/google-antigravity#skills) |
+| [OpenAI Codex](/ides/openai-codex) | `.codex/skills/` | ✅ Yes | [Full setup →](/ides/openai-codex#skills) |
 
 ---
 
