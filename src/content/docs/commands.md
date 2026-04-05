@@ -1,6 +1,6 @@
 ---
 title: Commands
-description: Reusable task instructions-lightweight markdown files that encode repeatable steps for specific tasks, invoked with a slash or `@` symbol in your IDE.
+description: Reusable task instructions—lightweight markdown files that encode repeatable steps for specific tasks, invoked with a slash or `@` symbol in your IDE.
 ---
 
 # Commands: Reusable Task Instructions
