@@ -8,24 +8,31 @@ This pipeline converts a YAML conversation file into an animated GIF as part of 
 
 ## Repository Layout
 
+This spec targets the Factory Engineering site (Astro Starlight, Yarn, TypeScript strict).
+
 ```
-/tools/chat-anim/
+tools/chat-anim/
   render.js          # entry point — orchestrates the full pipeline
   template.html      # Handlebars template, driven by conversation data
   capture.js         # Puppeteer frame capture
   defaults.js        # visual constants aligned to factoryengineering.dev
   package.json
 
-/content/
-  some-article/
-    index.md         # content page
-    ask-plan-agent.chat.yaml   # conversation source file
-    ask-plan-agent.gif         # build output (generated, not committed)
+src/content/articles/
+  some-article.md              # content page (MD/MDX in a content collection)
+src/content/chat-anims/
+  ask-plan-agent.chat.yaml     # conversation source file (co-located by name)
 
-/site/
-  css/
-    chat-embed.css   # float/responsive embed styles
+public/animations/
+  ask-plan-agent.gif           # build output: served at /animations/ask-plan-agent.gif
+
+src/components/user-components/
+  ChatAnim.astro               # presentational embed component
 ```
+
+YAML sources live outside `src/content/docs/` so Astro's content-collection
+loader does not treat them as pages. GIFs are written to `public/animations/`
+because Astro serves `public/` at the site root.
 
 ---
 
@@ -184,42 +191,57 @@ The `-loop 0` flag (FFmpeg) / implicit looping (gifski) causes the GIF to loop i
 
 ### Stage 5 — Output
 
-The encoded GIF is written to the same directory as the source YAML file, with the `.chat.yaml` extension replaced by `.gif`:
+The encoded GIF is written to `public/animations/`, using the YAML file's
+basename with a `.gif` extension:
 
 ```
-ask-plan-agent.chat.yaml  →  ask-plan-agent.gif
+src/content/chat-anims/ask-plan-agent.chat.yaml
+  →  public/animations/ask-plan-agent.gif
 ```
 
-The `.gif` output is a build artifact. It should be listed in `.gitignore` and regenerated on each build. If build output is committed (e.g., for GitHub Pages), commit only the `dist/` or `_site/` directory, not the intermediate frames.
+The resulting URL at runtime is `/animations/ask-plan-agent.gif`, which is what
+`<ChatAnim src="..." />` references in MDX.
+
+The `.gif` output is a build artifact. `public/animations/*.gif` should be
+listed in `.gitignore` and regenerated on each build. The deployed `dist/`
+output (produced by `yarn build`) is what Azure Static Web Apps serves — do
+not commit `dist/`.
 
 ---
 
 ## Build Integration
 
-### npm Script
+### Yarn Scripts
 
 ```json
 {
   "scripts": {
-    "build:anims": "node tools/chat-anim/render.js --glob 'content/**/*.chat.yaml'",
-    "build":       "npm run build:anims && eleventy"
+    "build:anims": "node tools/chat-anim/render.js --glob 'src/content/chat-anims/**/*.chat.yaml'",
+    "build":       "yarn build:anims && astro build && node scripts/export-markdown.mjs"
   }
 }
 ```
 
-`render.js` accepts `--glob` to process all matching files, or a single `--file` argument for targeted rebuilds.
+`yarn build:anims` regenerates every GIF into `public/animations/`, which
+Astro then bundles into `dist/` during `astro build`. `render.js` accepts
+`--glob` to process all matching files, or a single `--file` argument for
+targeted rebuilds during authoring.
 
-### GitHub Actions
+### GitHub Actions (Azure Static Web Apps)
+
+The site's primary deployment target is Azure Static Web Apps. The animation
+build runs before `astro build` so the GIFs land in `public/animations/` and
+are bundled into `dist/` like any other static asset.
 
 ```yaml
-name: Build Site
+name: Build and Deploy
 
 on:
   push:
     branches: [main]
 
 jobs:
-  build:
+  build_and_deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -227,29 +249,33 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'yarn'
 
-      - name: Install system dependencies
-        run: |
-          sudo apt-get install -y ffmpeg
-          # Optional: install gifski
-          # cargo install gifski
+      - name: Install ffmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+        # Optional: install gifski via cargo if any YAML opts into encoder: gifski
 
       - name: Install Node dependencies
-        run: npm ci
+        run: yarn install --frozen-lockfile
 
       - name: Build animations
-        run: npm run build:anims
-        # Puppeteer downloads Chromium on first run via postinstall.
-        # Pin the Puppeteer version to control the Chromium revision.
+        run: yarn build:anims
+        # Puppeteer downloads Chromium on postinstall.
+        # Pin the puppeteer version to control the Chromium revision —
+        # changing it can shift text anti-aliasing output.
 
       - name: Build site
-        run: npm run build
+        run: yarn build
 
-      - name: Deploy
-        uses: peaceiris/actions-gh-pages@v4
+      - name: Deploy to Azure Static Web Apps
+        uses: Azure/static-web-apps-deploy@v1
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./_site
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          action: upload
+          app_location: '/'
+          output_location: 'dist'
+          skip_app_build: true   # we already ran yarn build above
 ```
 
 **CI note:** Puppeteer on Linux requires `--no-sandbox` in headless mode. Set this in `capture.js`:
@@ -263,28 +289,42 @@ const browser = await puppeteer.launch({
 
 ## Embedding in Content Pages
 
-### Shortcode / Custom Tag
+### Astro Component
 
-The site's static site generator (Eleventy, Hugo, Astro, etc.) should register a shortcode that accepts the GIF filename and optional alt text:
+Content pages embed animations through a presentational Astro component at
+`src/components/user-components/ChatAnim.astro`:
 
-**Eleventy example (`chat_anim` shortcode):**
-```js
-eleventyConfig.addShortcode('chat_anim', (filename, alt = 'Chat animation') => {
-  return `
+```astro
+---
+interface Props {
+  src: string;         // path relative to site root, e.g. /animations/foo.gif
+  alt?: string;
+}
+const { src, alt = 'Chat animation' } = Astro.props;
+---
 <div class="chat-anim-embed">
-  <img src="${filename}" alt="${alt}" class="chat-anim-img" loading="lazy">
-</div>`;
-});
+  <img src={src} alt={alt} class="chat-anim-img" loading="lazy" />
+</div>
 ```
 
-**Usage in Markdown:**
-```
-{% chat_anim "ask-plan-agent.gif", "Demonstrating the Ask-Plan-Agent cycle" %}
+The component is responsible for the wrapper element; the float/responsive
+styles live in `src/styles/chat-embed.css` (imported from `global.css`) or in
+a scoped `<style>` block on the component itself.
+
+**Usage in MDX:**
+```mdx
+import ChatAnim from '~/components/user-components/ChatAnim.astro';
+
+<ChatAnim src="/animations/ask-plan-agent.gif" alt="Ask-Plan-Agent cycle demo" />
 
 The Ask-Plan-Agent cycle front-loads human judgment to the cheapest moment...
 ```
 
-### Embed CSS (`chat-embed.css`)
+Plain Markdown (`.md`) pages cannot import components. Articles that embed
+animations must use `.mdx` or migrate their frontmatter to a collection that
+allows MDX.
+
+### Embed CSS (`src/styles/chat-embed.css`)
 
 ```css
 /*
@@ -341,7 +381,8 @@ The Ask-Plan-Agent cycle front-loads human judgment to the cheapest moment...
 | `tools/chat-anim/capture.js` | Puppeteer frame capture |
 | `tools/chat-anim/defaults.js` | Visual/timing constants |
 | `tools/chat-anim/package.json` | Dependencies: puppeteer, handlebars, js-yaml, glob |
-| `site/css/chat-embed.css` | Float/responsive embed styles |
-| `.github/workflows/build.yml` | CI configuration |
-| `content/**/*.chat.yaml` | Authored conversation files |
-| `content/**/*.gif` | Build artifacts (gitignored) |
+| `src/components/user-components/ChatAnim.astro` | Presentational embed component |
+| `src/styles/chat-embed.css` | Float/responsive embed styles |
+| `.github/workflows/build.yml` | CI configuration (Azure Static Web Apps) |
+| `src/content/chat-anims/**/*.chat.yaml` | Authored conversation files |
+| `public/animations/*.gif` | Build artifacts (gitignored) |
