@@ -166,6 +166,7 @@ Instruct agents in the workflow or in their agent definitions to include deviati
 | Cursor | ⚠️ Partial | Agents Window + subagent delegation | Parent agents delegate to subagents; no workflow-document orchestrator |
 | Windsurf | ❌ No (terminology collision) | "Workflows" = commands | Cascade has no orchestration capability |
 | Antigravity | ⚠️ Partial | AgentKit 2.0 Manager View | Parallel async orchestration across specialized agents; UI-driven, no workflow-document consumption |
+| OpenAI Codex | ⚠️ Partial | Native sub-agent delegation | Parent agent spawns TOML-defined sub-agents in parallel; configurable `max_threads` (default 6) and depth limits. Workflow-document consumption unverified |
 
 ---
 
@@ -177,6 +178,7 @@ For full details on workflow orchestration in each IDE, see the dedicated IDE pa
 - **[Cursor](/ides/cursor#workflows)** — ⚠️ Partial. Agents Window (v3.0) runs agents in parallel; subagent delegation is ad-hoc, not workflow-document-driven.
 - **[Windsurf](/ides/windsurf#workflows)** — ❌ No orchestration. "Workflows" are commands; Cascade is a single agent with no delegation.
 - **[Google Antigravity](/ides/google-antigravity#workflows)** — ⚠️ Partial. AgentKit 2.0 Manager View provides UI-driven parallel agent orchestration; no workflow-document consumption.
+- **[OpenAI Codex](/ides/openai-codex#workflows)** — ⚠️ Partial. Parent agent spawns parallel sub-agents with configurable `max_threads` (default 6) and depth limits; specialist roles defined in TOML profiles. Workflow-document consumption (orchestrator reading a workflow file and routing based on its contents) is not confirmed in official documentation.
 
 ---
 

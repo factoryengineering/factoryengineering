@@ -115,7 +115,7 @@ Establish one canonical skills location in your repository and use symlinks to p
 
 This folder is the most widely recognized across the ecosystem. Use it as your source of truth.
 
-**Option A — Use the factory-engineering skill:** Install with `npx openskills install factoryengineering/skills`, then ask your agent to create symlinks. The skill sets up symlinks for **commands/workflows** (`.claude/commands/`) and, for IDEs that need them, **skills** (`.claude/skills/` → Windsurf, Kilo Code, Antigravity; Cursor and Copilot read `.claude/skills/` directly). Use `--type all` (default) for both, or `--type commands` / `--type skills`. The agent can detect which IDEs you have, confirm with you, and offer to copy existing contents into the canonical folder if a target already exists. On Windows, use the skill's PowerShell script. See the [Commands](/commands) page for the full symlink approach and the skill’s SKILL.md (and symlinks.md) for script options.
+**Option A — Use the factory-engineering skill:** Install with `npx openskills install factoryengineering/skills`, then ask your agent to create symlinks. The skill sets up symlinks for **commands/workflows** (`.claude/commands/`) and, for IDEs that need them, **skills** (`.claude/skills/` → Windsurf, Kilo Code, Antigravity, OpenAI Codex; Cursor and Copilot read `.claude/skills/` directly). Use `--type all` (default) for both, or `--type commands` / `--type skills`. The agent can detect which IDEs you have, confirm with you, and offer to copy existing contents into the canonical folder if a target already exists. On Windows, use the skill's PowerShell script. See the [Commands](/commands) page for the full symlink approach and the skill’s SKILL.md (and symlinks.md) for script options.
 
 **Option B — Create symlinks manually for each IDE:**
 
@@ -130,7 +130,7 @@ ln -s ../.claude/skills .kilocode/skills
 ln -s ../.claude/skills .agent/skills
 
 # OpenAI Codex
-ln -s ../.claude/skills .codex/skills
+ln -s ../.claude/skills .agents/skills
 
 # Cursor and GitHub Copilot read .claude/skills directly — no symlink needed
 ```
@@ -151,7 +151,7 @@ Every major AI IDE supports the Agent Skills standard. The table below summarize
 | [Windsurf](/ides/windsurf) | `.windsurf/skills/` | ✅ Yes | [Full setup →](/ides/windsurf#skills) |
 | [Kilo Code](/ides/kilo-code) | `.kilocode/skills/` | ✅ Yes | [Full setup →](/ides/kilo-code#skills) |
 | [Google Antigravity](/ides/google-antigravity) | `.agent/skills/` | ✅ Yes | [Full setup →](/ides/google-antigravity#skills) |
-| [OpenAI Codex](/ides/openai-codex) | `.codex/skills/` | ✅ Yes | [Full setup →](/ides/openai-codex#skills) |
+| [OpenAI Codex](/ides/openai-codex) | `.agents/skills/` | ✅ Yes | [Full setup →](/ides/openai-codex#skills) |
 
 ---
 
@@ -175,7 +175,7 @@ mkdir -p .claude/skills
 
 **2. Create your first skill:** Use the **skill-creator** skill (see [Installing skill-creator and skill-optimizer](#installing-skill-creator-and-skill-optimizer)). Ask your agent to create a new skill in `.claude/skills`; it will guide you through the workflow and produce a proper SKILL.md and directory structure.
 
-**3. Create symlinks for each IDE your team uses:** Use the **factory-engineering** skill (Option A above) and ask your agent to set up symlinks—it will create command symlinks and skill symlinks for IDEs that need them (Windsurf, Kilo Code, Antigravity). Or create them manually:
+**3. Create symlinks for each IDE your team uses:** Use the **factory-engineering** skill (Option A above) and ask your agent to set up symlinks—it will create command symlinks and skill symlinks for IDEs that need them (Windsurf, Kilo Code, Antigravity, OpenAI Codex). Or create them manually:
 
 ```bash
 # Windsurf
@@ -188,7 +188,7 @@ ln -s ../.claude/skills .kilocode/skills
 ln -s ../.claude/skills .agent/skills
 
 # OpenAI Codex
-ln -s ../.claude/skills .codex/skills
+ln -s ../.claude/skills .agents/skills
 
 # Cursor and GitHub Copilot read .claude/skills directly — no symlink needed
 ```
@@ -196,7 +196,7 @@ ln -s ../.claude/skills .codex/skills
 **4. Commit everything:**
 
 ```bash
-git add .claude/skills .cursor .windsurf .kilocode .agent .codex
+git add .claude/skills .cursor .windsurf .kilocode .agent .agents
 git commit -m "Initialize software factory skills"
 ```
 
