@@ -76,6 +76,12 @@
 .list-body li a{
   text-decoration: none;
   color: inherit;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 1rem 0;
+  margin: -1rem 0;
 }
 
 .list-body li:last-child {
