@@ -61,6 +61,17 @@ description: Use when designing or reviewing REST APIs, defining endpoints, requ
 
 The agent loads only the skills relevant to the current task, keeping context lean and responses accurate. This is called **progressive disclosure**—skills sit dormant until needed.
 
+A skill that should only be invoked explicitly by name—never auto-loaded by the model—declares both optional properties in its frontmatter:
+
+```markdown
+---
+name: release-notes
+description: Generate release notes from the current milestone. Run only when explicitly requested.
+user-invocable: true
+disable-model-invocation: true
+---
+```
+
 ---
 
 ## Installing skill-creator and skill-optimizer
