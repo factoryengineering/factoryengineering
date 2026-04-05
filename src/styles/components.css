@@ -132,3 +132,8 @@
   white-space: pre-wrap !important;
   overflow-wrap: break-word;
 }
+
+/* Code blocks need full width — clear any preceding float */
+.sl-markdown-content .expressive-code {
+  clear: both;
+}

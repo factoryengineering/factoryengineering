@@ -7,10 +7,9 @@ description: Learn about Factory Engineering concepts, best practices, and metho
 
 Explore in-depth articles about building custom software factories with AI development tools.
 
-## Getting Started
+## Build Your Software Factory
 
-- [Introduction to Factory Engineering](/articles/01-introduction-to-factory-engineering) - Learn the fundamentals of building custom software factories
-- [Building Your First Skill](/articles/02-building-your-first-skill) - A step-by-step guide to creating custom skills
+- [Do the Work, Then Capture It](/articles/03-do-the-work-then-capture-it) - The fastest way to create a skill is to do the work first, then capture what the assistant just learned
 
 ## Core Concepts
 
@@ -27,5 +26,3 @@ Explore in-depth articles about building custom software factories with AI devel
 Traditional development environments require extensive manual configuration. Factory Engineering provides a composable, reproducible approach to building development environments tailored to your specific needs.
 
 ---
-
-Browse all articles in the [Articles collection](/articles/).

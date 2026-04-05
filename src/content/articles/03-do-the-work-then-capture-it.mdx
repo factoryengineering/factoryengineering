@@ -1,0 +1,153 @@
+---
+title: "Do the Work, Then Capture It"
+description: "The fastest way to create a skill is to do the work first, get the output right, then ask the assistant to capture what it just learned"
+publishDate: 2026-04-05
+author: "Factory Engineering Team"
+tags: ["tutorial", "skills", "hands-on", "series-build-your-factory"]
+draft: false
+---
+
+import ChatAnim from '~/components/user-components/ChatAnim.astro';
+
+# Do the Work, Then Capture It
+
+*Build Your Software Factory — Article 1 of 20*
+
+<ChatAnim src="/animations/03-do-the-work-then-capture-it.gif" alt="Developer correcting LINQ query standards, then capturing them as a skill" />
+
+You need a repository method. Active products in a category, most recently updated first, projected to a DTO. Open your AI IDE and ask for it.
+
+> Add a method to `ProductRepository` that returns the 10 most recently updated active products in a given category, projected to `ProductListItemDto` including the category name.
+
+The assistant gives you something like this:
+
+```csharp
+public async Task<List<ProductListItemDto>> GetRecentActiveAsync(int categoryId)
+    => await _db.Products
+        .Where(p => p.CategoryId == categoryId && p.IsActive)
+        .OrderByDescending(p => p.UpdatedAt)
+        .Take(10)
+        .Select(p => new ProductListItemDto
+        {
+            Id = p.Id,
+            Name = p.Name,
+            CategoryName = p.Category.Name,
+            UpdatedAt = p.UpdatedAt
+        })
+        .ToListAsync();
+```
+
+It works. It's also wrong — at least by your team's standards.
+
+## Correction 1: Query syntax, not method chaining
+
+Your team reads LINQ as query syntax. Joins, filters, projections — they all use `from`, `where`, `orderby`, `select`. Method calls are reserved for terminal operations like `Take` and `ToListAsync`. You tell the assistant:
+
+> We use query syntax on this team. Rewrite the filtering, ordering, and projection as a query expression. Method calls are only for terminal operations.
+
+The assistant rewrites:
+
+```csharp
+public async Task<List<ProductListItemDto>> GetRecentActiveAsync(int categoryId)
+    => await (
+        from p in _db.Products
+        where p.CategoryId == categoryId && p.IsActive
+        orderby p.UpdatedAt descending
+        select new ProductListItemDto
+        {
+            Id = p.Id,
+            Name = p.Name,
+            CategoryName = p.Category.Name,
+            UpdatedAt = p.UpdatedAt
+        })
+        .Take(10)
+        .ToListAsync();
+```
+
+Better — but it's still one expression. The query definition and the execution are tangled together.
+
+## Correction 2: Separate the query from execution
+
+Your team builds the `IQueryable` as a local variable, then executes it on the next line. This makes queries composable — you can layer on `.AsNoTracking()`, `.Skip()`, or pass the query to a shared paging helper without untangling a fluent chain. You tell the assistant:
+
+> Assign the query to a local variable first, then apply `Take` and `ToListAsync` separately.
+
+Now the assistant produces what you want:
+
+```csharp
+public async Task<List<ProductListItemDto>> GetRecentActiveAsync(int categoryId)
+{
+    var query =
+        from p in _db.Products
+        where p.CategoryId == categoryId && p.IsActive
+        orderby p.UpdatedAt descending
+        select new ProductListItemDto
+        {
+            Id = p.Id,
+            Name = p.Name,
+            CategoryName = p.Category.Name,
+            UpdatedAt = p.UpdatedAt
+        };
+
+    return await query.Take(10).ToListAsync();
+}
+```
+
+That meets your standard. Two corrections, two patterns. Now capture them.
+
+## Ask the assistant to capture it
+
+The assistant already has the context — the corrections you made, the reasoning behind them, the working example. It's not going to imagine a skill from nothing. It's going to document what just happened. Say:
+
+> Create a skill that captures the LINQ standards you just followed.
+
+The assistant produces a skill file:
+
+```markdown
+---
+description: Guidelines for writing LINQ queries using
+  Entity Framework Core. Use when writing LINQ queries.
+---
+
+## Separate specification from execution
+
+Always use query syntax (`from...select`) and separate
+IQueryable definition from async execution:
+
+​```csharp
+// Preferred
+var customersSpec =
+    from customer in context.Customer
+    where customer.CustomerGUID == customerGuid
+    select new { customer.CustomerID, customer.Name };
+var customers = await customersSpec.ToListAsync();
+
+// Avoid: Method chaining with immediate execution
+var customers = await context.Customer
+    .Where(customer => customer.CustomerGUID == customerGuid)
+    .Select(customer => new { customer.CustomerID, customer.Name })
+    .ToListAsync();
+​```
+```
+
+Two corrections became two rules. The example is drawn from real work, not invented. That's the whole point.
+
+## Save and commit
+
+Put the file in `.claude/skills/linq-standards/SKILL.md` and commit it. Every developer who clones the repo now has the skill. When they ask the assistant to write a LINQ query, it loads this skill and follows your team's standards — without anyone having to correct it again.
+
+## The first draft is rough
+
+Look at that skill again. It covers the two patterns you corrected, but it doesn't cover joins, grouping, or subqueries. The description says "use when writing LINQ queries" — is that too broad? Too narrow? You don't know yet.
+
+That's fine. You just finished step one of the skill creation cycle:
+
+**Capture** → Test → Retrospective → Refine → Optimize
+
+The skill exists. It encodes real standards from real work. In the next article, we test it in a clean room — a fresh conversation with no prior context — to see if it holds up without hand-holding.
+
+---
+
+*Next: [Article 2 — Test Your Skill in a Clean Room](/articles/02-test-your-skill-in-a-clean-room)*
+
+For background on skill structure and folder locations, see the [Skills page](/skills). For the formal skill specification, see [agentskills.io](https://agentskills.io).

@@ -1,0 +1,31 @@
+config:
+  height: 680
+
+exchanges:
+  - role: user
+    text: "Add a method that returns the 10 most recently updated active products in a category."
+
+  - role: assistant
+    text: |
+      await _db.Products
+        .Where(p => p.IsActive)
+        .OrderByDescending(p => p.UpdatedAt)
+        .Take(10)
+        .Select(...)
+        .ToListAsync();
+
+  - role: user
+    text: "We use query syntax on this team, not method chaining."
+
+  - role: assistant
+    text: |
+      var query =
+        from p in _db.Products
+        where p.IsActive
+        orderby p.UpdatedAt descending
+        select new ProductListItemDto { ... };
+
+      return await query.Take(10).ToListAsync();
+
+  - role: user
+    text: "Now create a skill that captures the LINQ standards you just followed."
