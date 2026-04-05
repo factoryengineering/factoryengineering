@@ -10,6 +10,19 @@
       ]
     },
     {
+      "label": "IDEs",
+      "items": [
+        {"label": "Overview", "slug": "ides"},
+        {"label": "Claude Code", "slug": "ides/claude-code"},
+        {"label": "GitHub Copilot", "slug": "ides/github-copilot"},
+        {"label": "Cursor", "slug": "ides/cursor"},
+        {"label": "Windsurf", "slug": "ides/windsurf"},
+        {"label": "Kilo Code", "slug": "ides/kilo-code"},
+        {"label": "Google Antigravity", "slug": "ides/google-antigravity"},
+        {"label": "OpenAI Codex", "slug": "ides/openai-codex"}
+      ]
+    },
+    {
       "label": "Articles",
       "items": [{"label": "Browse Articles", "slug": "articles"}]
     },
