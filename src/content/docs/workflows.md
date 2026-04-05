@@ -13,7 +13,7 @@ This is the highest layer of the software factory. Skills encode knowledge. Comm
 
 Several IDEs use the word "workflow" for something else. Windsurf and Kilo Code both have features they call "Workflows." Those are reusable slash commands, not orchestration of named agents. This page uses the factory engineering meaning: orchestration of agents, with delegation, branching, and looping.
 
-**Invocation:** Use **slash-workflow at-artifact**, e.g. `/tdd-cycle @docs/specs/order-validation.md`. The workflow name is the filename without `.md`. Store workflows in `.claude/commands/` so they sit alongside commands and can be invoked the same way. Symlinks from `.cursor/commands/`, `.windsurf/workflows/`, `.kilocode/workflows/`, and `.agent/workflows/` point to `.claude/commands/` so every IDE sees the same files (see the [Commands](/commands) page).
+**Invocation:** Use **slash-workflow at-artifact**, e.g. `/tdd-cycle @docs/specs/order-validation.md`. The workflow name is the filename without `.md`. Store workflows in `.claude/commands/` so they sit alongside commands and can be invoked the same way. Symlinks from `.cursor/commands/`, `.windsurf/workflows/`, `.kilocode/workflows/`, `.agent/workflows/`, and `.codex/prompts/` point to `.claude/commands/` so every IDE sees the same files (see the [Commands](/commands) page).
 
 ---
 
@@ -166,6 +166,7 @@ Instruct agents in the workflow or in their agent definitions to include deviati
 | Cursor | ⚠️ Partial | Agents Window + subagent delegation | Parent agents delegate to subagents; no workflow-document orchestrator |
 | Windsurf | ❌ No (terminology collision) | "Workflows" = commands | Cascade has no orchestration capability |
 | Antigravity | ⚠️ Partial | AgentKit 2.0 Manager View | Parallel async orchestration across specialized agents; UI-driven, no workflow-document consumption |
+| OpenAI Codex | ⚠️ Partial | Parallel worktrees | Parallel agent execution across git worktrees; no workflow-document orchestrator |
 
 ---
 
@@ -242,6 +243,18 @@ However, Cursor does not have a dedicated orchestrator that reads a workflow doc
 Antigravity's **AgentKit 2.0 Manager View** (March 2026) orchestrates multiple specialized agents in parallel with asynchronous task execution. You can run frontend, backend, testing, and DevOps agents side-by-side, assign different models (Gemini, Claude, GPT) to each, and coordinate their output from a single view.
 
 However, Manager View is UI-driven rather than workflow-document-driven. It does not read a structured workflow file the way Claude Code or Kilo Code's orchestrators do — routing and delegation are managed through the Manager View interface, not encoded in a `.claude/commands/{workflow}.md` file. You can approximate workflow-driven orchestration by writing detailed instructions in a command file and invoking agents from Manager View, but there is no orchestrator-as-agent that reads the workflow and delegates to named specialists based on its contents.
+
+---
+
+### OpenAI Codex: Partial Orchestration via Parallel Worktrees
+
+**Orchestration support:** ⚠️ Partial
+
+OpenAI Codex supports running multiple agents in parallel across isolated git worktrees, letting you dispatch several tasks concurrently without conflicts. Codex also reads `AGENTS.md` for repository-local instructions, so you can encode orchestration guidance there and have it applied to every Codex session in the repo.
+
+However, Codex does not have a dedicated orchestrator that reads a workflow document and delegates to named specialist agents based on its contents. Parallelism is achieved by launching multiple Codex sessions against worktrees; coordination between those sessions is human-driven rather than agent-driven. You can approximate workflow-driven orchestration by storing a workflow document in `.claude/commands/` (surfaced to Codex via the symlink to `.codex/prompts/`) and invoking it with **slash-workflow at-artifact**, but the routing logic depends on the model's interpretation rather than a built-in orchestration engine.
+
+📖 [OpenAI Codex Documentation](https://developers.openai.com/codex)
 
 ---
 

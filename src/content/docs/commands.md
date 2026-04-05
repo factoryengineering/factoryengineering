@@ -92,6 +92,10 @@ ln -s ../.claude/commands .kilocode/workflows
 # Antigravity
 mkdir -p .agent
 ln -s ../.claude/commands .agent/workflows
+
+# OpenAI Codex
+mkdir -p .codex
+ln -s ../.claude/commands .codex/prompts
 ```
 
 Commit the symlinks so every team member gets the correct structure on clone.
@@ -195,6 +199,29 @@ Use the symlink from the setup above so `.kilocode/workflows` points to `.claude
 **Invocation:** `/workflow-name` — Antigravity treats files in `.agent/workflows/` as workflows. With the symlink, your `.claude/commands/` files appear there. Use **slash-command at-artifact** (e.g. `/write-spec @submit-sales-order`).
 
 Create the symlink from the setup above: `mkdir -p .agent` then `ln -s ../.claude/commands .agent/workflows`. Without the symlink, you would have to maintain a separate copy of commands in `.agent/workflows/`.
+
+---
+
+### OpenAI Codex
+
+**Folder location:** `.codex/prompts/` (project) or `~/.codex/prompts/` (global)
+
+**Invocation:** `/prompt-name` — the filename without `.md` becomes the slash command (e.g. `write-spec.md` → `/write-spec`). Use **slash-command at-artifact** (e.g. `/write-spec @submit-sales-order`). Follow the [recommended pattern](#example-command-file): state what the user supplies and instruct the LLM to stop and prompt if it is missing. Do not rely on `$ARGUMENTS`—commands are shared via symlinks and not all IDEs support it.
+
+OpenAI Codex adopted the Agent Skills open standard in December 2025 and reads user-defined prompts from `.codex/prompts/` as slash commands. Create a symlink so your canonical `.claude/commands/` files are available in Codex:
+
+```bash
+mkdir -p .codex
+ln -s ../.claude/commands .codex/prompts
+```
+
+**Usage in Codex:**
+
+```
+/write-spec @submit-sales-order
+```
+
+📖 [OpenAI Codex Documentation](https://developers.openai.com/codex)
 
 ---
 

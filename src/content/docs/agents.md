@@ -98,6 +98,7 @@ Only a few IDEs provide true agent support as defined above:
 | Cursor | ✅ Yes | Subagents + Plugins | `.cursor/agents/` (project); `~/.cursor/agents/` (global) | Yes (instruct agent via `.cursor/rules` or `AGENTS.md`) |
 | Windsurf | ❌ No | Cascade (singular) | N/A | N/A |
 | Antigravity | ✅ Yes | AgentKit 2.0 (specialized agents) | IDE-managed profiles (Manager View) | Yes (instruct agents via `AGENTS.md`, `GEMINI.md`, or `SKILL.md`) |
+| OpenAI Codex | ⚠️ Via instruction | `AGENTS.md` + parallel worktrees | Repo-level `AGENTS.md` | Yes (instruct via `AGENTS.md` or a `SKILL.md` to read/append a file) |
 
 **Memory via markdown instruction:** Even without native agent memory, you can get the same behavior by instructing the assistant via that IDE’s instruction mechanism (see table) to read from a markdown file at the start of work and append learnings at the end. Kilo Code modes used this way function as true agents.
 
@@ -284,3 +285,19 @@ Google Antigravity introduced agent support with **AgentKit 2.0** (March 2026). 
 **Role specialization:** Each of the built-in agents has a distinct role definition and tool scope. AgentKit 2.0's **Manager View** lets you orchestrate multiple agents in parallel with asynchronous task execution, so specialized agents run side-by-side rather than as a single shared assistant.
 
 **Persistent memory via markdown instruction:** AgentKit 2.0 does not provide a built-in persistent-memory slot per agent. Get the same pattern by instructing each agent via `AGENTS.md`, `GEMINI.md`, or a skill's `SKILL.md` to read from a markdown file at the start of work and append learnings at the end. For compatibility with Claude Code agents, use the path `.claude/agent-memory/{agent-name}/MEMORY.md`.
+
+---
+
+### OpenAI Codex
+
+**Supports true agents:** ⚠️ Via instruction (no native named-agent feature)
+
+OpenAI Codex does not provide a native named-agent feature comparable to Claude Code's sub-agents or Kilo Code's modes. Codex runs as a single coding agent per session. You can, however, get the factory-engineering agent pattern by instructing Codex through `AGENTS.md` (repository-local instructions that Codex reads at the start of every session) or through a skill's `SKILL.md` in `.codex/skills/`, telling the agent to read from a markdown memory file at the start of work and append learnings at the end.
+
+**Parallel execution:** Codex supports running multiple sessions in parallel across isolated git worktrees, so you can dispatch specialized "agents" — each driven by a different `AGENTS.md` scope or skill — concurrently. Coordination between those sessions is human-driven.
+
+**Persistent memory via markdown instruction:** For compatibility with Claude Code agents, use the path `.claude/agent-memory/{agent-name}/MEMORY.md`. Example instruction to include in `AGENTS.md` or a skill:
+
+> At the start of each session, read `.claude/agent-memory/spec-writer/MEMORY.md`. At the end of each session, append your learnings to that file.
+
+📖 [OpenAI Codex Documentation](https://developers.openai.com/codex)
