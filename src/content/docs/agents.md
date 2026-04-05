@@ -98,6 +98,7 @@ Only a few IDEs provide true agent support as defined above:
 | Cursor | ✅ Yes | Subagents + Plugins | `.cursor/agents/` (project); `~/.cursor/agents/` (global) | Yes (instruct agent via `.cursor/rules` or `AGENTS.md`) |
 | Windsurf | ❌ No | Cascade (singular) | N/A | N/A |
 | Antigravity | ✅ Yes | AgentKit 2.0 (specialized agents) | IDE-managed profiles (Manager View) | Yes (instruct agents via `AGENTS.md`, `GEMINI.md`, or `SKILL.md`) |
+| OpenAI Codex | ⚠️ Partial | Custom agents (sub-agents with TOML roles) | `.agents/` (TOML profiles) | Yes (instruct agent via role definition or `AGENTS.md` to read/append a markdown file) |
 
 **Memory via markdown instruction:** Even without native agent memory, you can get the same behavior by instructing the assistant via that IDE's instruction mechanism (see table) to read from a markdown file at the start of work and append learnings at the end. Kilo Code modes used this way function as true agents.
 
@@ -111,3 +112,4 @@ For full setup details on defining, configuring, and invoking agents in each IDE
 - **[Cursor](/ides/cursor#agents)** — Subagents + Plugins; defined in `.cursor/agents/`; async delegation (v2.5+); Agents Window (v3.0)
 - **[Windsurf](/ides/windsurf#agents)** — No true agent support; Cascade is a single shared agent
 - **[Antigravity](/ides/google-antigravity#agents)** — AgentKit 2.0 with 16 specialized agents; Manager View orchestration
+- **[OpenAI Codex](/ides/openai-codex#agents)** — Custom agents via TOML role profiles (March 2026); built-in `default`/`worker`/`explorer` agents; no native persistent memory — use markdown-instruction pattern

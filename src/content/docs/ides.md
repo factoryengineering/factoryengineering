@@ -21,7 +21,7 @@ Choose your IDE below for a dedicated guide covering everything you need to set 
 | [Windsurf](/ides/windsurf) | ✅ Via symlink | ✅ `/workflow` | ❌ No | ❌ No | [→ Guide](/ides/windsurf) |
 | [Kilo Code](/ides/kilo-code) | ✅ Native | ✅ `/workflow` | ✅ Modes | ✅ Orchestrator Mode | [→ Guide](/ides/kilo-code) |
 | [Google Antigravity](/ides/google-antigravity) | ✅ Via symlink | ✅ `/workflow` | ✅ AgentKit 2.0 | ⚠️ Partial (Manager View) | [→ Guide](/ides/google-antigravity) |
-| [OpenAI Codex](/ides/openai-codex) | ✅ Via symlink | — | — | — | [→ Guide](/ides/openai-codex) |
+| [OpenAI Codex](/ides/openai-codex) | ✅ Via symlink | ⚠️ Skills only (`$skill-name`) | ⚠️ Custom agents (TOML) | ✅ Sub-agent orchestration | [→ Guide](/ides/openai-codex) |
 
 ---
 
