@@ -1,0 +1,37 @@
+/*
+  chat-anim embed styles.
+  Each embed is a block-level section boundary.
+  Wide screens: GIF floats right; following text wraps left.
+  Narrow screens: GIF is full-width; text stacks below.
+*/
+
+.chat-anim-embed {
+  clear: both;
+  display: flow-root;
+  margin-bottom: 2rem;
+}
+
+.chat-anim-img {
+  display: block;
+  max-width: 360px;
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  border: 1px solid #252a38;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+}
+
+@media (min-width: 900px) {
+  .chat-anim-img {
+    float: right;
+    margin: 0 0 1.5rem 2rem;
+  }
+}
+
+@media (max-width: 899px) {
+  .chat-anim-img {
+    float: none;
+    max-width: 100%;
+    margin: 0 0 1.5rem 0;
+  }
+}
