@@ -101,7 +101,7 @@ The assistant already has the context — the corrections you made, the reasonin
 
 The assistant produces a skill file:
 
-```markdown
+````markdown
 ---
 description: Guidelines for writing LINQ queries using
   Entity Framework Core. Use when writing LINQ queries.
@@ -112,7 +112,7 @@ description: Guidelines for writing LINQ queries using
 Always use query syntax (`from...select`) and separate
 IQueryable definition from async execution:
 
-​```csharp
+```csharp
 // Preferred
 var customersSpec =
     from customer in context.Customer
@@ -125,8 +125,8 @@ var customers = await context.Customer
     .Where(customer => customer.CustomerGUID == customerGuid)
     .Select(customer => new { customer.CustomerID, customer.Name })
     .ToListAsync();
-​```
 ```
+````
 
 Two corrections became two rules. The example is drawn from real work, not invented. That's the whole point.
 
