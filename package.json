@@ -8,7 +8,8 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
-    "build": "astro build && node scripts/export-markdown.mjs",
+    "build:anims": "node tools/chat-anim/render.js --glob '{chat-anims,src/content/docs}/**/*.chat.yaml'",
+    "build": "yarn build:anims && astro build && node scripts/export-markdown.mjs",
     "preview": "astro preview"
   },
   "dependencies": {
@@ -24,6 +25,10 @@
   },
   "devDependencies": {
     "astro-vtbot": "^2.1.9",
+    "glob": "^10.3.10",
+    "handlebars": "^4.7.8",
+    "js-yaml": "^4.1.0",
+    "puppeteer": "^23.0.0",
     "tailwindcss": "^4.1.17",
     "typescript": "^5.9.3"
   }

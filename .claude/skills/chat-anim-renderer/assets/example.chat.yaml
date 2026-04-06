@@ -1,0 +1,11 @@
+exchanges:
+  - role: user
+    text: "What is the Ask-Plan-Agent cycle?"
+
+  - role: assistant
+    text: |
+      The Ask-Plan-Agent cycle is a disciplined workflow for AI-assisted development.
+
+      Ask: articulate the goal clearly, treating context as a scarce resource.
+      Plan: the agent produces a step-by-step plan before writing any code.
+      Agent: only then does the agent execute — making targeted, auditable changes.

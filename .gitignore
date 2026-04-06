@@ -20,8 +20,11 @@ pnpm-debug.log*
 # macOS-specific files
 .DS_Store
 
-# playwright logs
-.playwright-mcp/*.log
+# playwright mcp artifacts
+.playwright-mcp/
 
 # PowerPoint temp file
 docs/design/~$*.pptx
+
+# chat animation build artifacts
+public/animations/*.gif

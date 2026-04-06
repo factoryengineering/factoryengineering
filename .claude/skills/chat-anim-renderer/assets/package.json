@@ -1,0 +1,19 @@
+{
+  "name": "chat-anim",
+  "version": "0.1.0",
+  "private": true,
+  "description": "YAML-to-GIF chat animation pipeline.",
+  "main": "render.js",
+  "bin": {
+    "chat-anim": "./render.js"
+  },
+  "scripts": {
+    "build:anims": "node render.js --glob 'content/**/*.chat.yaml'"
+  },
+  "dependencies": {
+    "glob": "^10.3.10",
+    "handlebars": "^4.7.8",
+    "js-yaml": "^4.1.0",
+    "puppeteer": "^23.0.0"
+  }
+}

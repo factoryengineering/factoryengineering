@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Chat Animation</title>
+<style>
+  :root {
+    --bg: {{config.bg}};
+    --surface: {{config.surface}};
+    --border: {{config.border}};
+    --user-bg: {{config.user_bg}};
+    --user-text: {{config.user_text}};
+    --user-label: {{config.user_label}};
+    --ai-bg: {{config.ai_bg}};
+    --ai-text: {{config.ai_text}};
+    --ai-label: {{config.ai_label}};
+    --muted: {{config.muted}};
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    width: {{config.width}}px;
+    height: {{config.height}}px;
+    background: var(--bg);
+    font-family: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+    font-size: {{config.font_size_bubble}}px;
+    line-height: {{config.line_height}};
+    color: var(--user-text);
+    overflow: hidden;
+  }
+  #viewport {
+    width: 100%;
+    height: 100%;
+    padding: {{config.window_padding}}px;
+    overflow: hidden;
+    scroll-behavior: smooth;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+  #stack {
+    display: flex;
+    flex-direction: column;
+    gap: {{config.bubble_gap}}px;
+  }
+  .bubble {
+    max-width: calc({{config.bubble_max_width_pct}} * 100%);
+    padding: {{config.bubble_padding}};
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+  .bubble.user {
+    align-self: flex-end;
+    background: var(--user-bg);
+    color: var(--user-text);
+  }
+  .bubble.assistant {
+    align-self: flex-start;
+    background: var(--ai-bg);
+    color: var(--ai-text);
+  }
+  .label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 6px;
+    opacity: 0.85;
+  }
+  .bubble.user .label { color: var(--user-label); }
+  .bubble.assistant .label { color: var(--ai-label); }
+  .caret::after {
+    content: "\2588";
+    display: inline-block;
+    margin-left: 2px;
+    opacity: 0.9;
+    animation: blink 1s steps(2, start) infinite;
+    color: var(--muted);
+  }
+  @keyframes blink { to { visibility: hidden; } }
+</style>
+</head>
+<body>
+  <div id="viewport">
+    <div id="stack"></div>
+  </div>
+
+<script>
+const CONFIG = {{{config_json}}};
+const EXCHANGES = {{{exchanges_json}}};
+
+const stack = document.getElementById('stack');
+const viewport = document.getElementById('viewport');
+
+const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+const scrollToBottom = () => { viewport.scrollTop = viewport.scrollHeight; };
+
+function makeBubble(role) {
+  const el = document.createElement('div');
+  el.className = `bubble ${role} caret`;
+  const label = document.createElement('div');
+  label.className = 'label';
+  label.textContent = role === 'user' ? 'You' : 'Assistant';
+  const body = document.createElement('span');
+  body.className = 'body';
+  el.appendChild(label);
+  el.appendChild(body);
+  stack.appendChild(el);
+  return { el, body };
+}
+
+async function typeInto(bubble, text, charDelay) {
+  for (let i = 0; i < text.length; i++) {
+    bubble.body.textContent += text[i];
+    scrollToBottom();
+    await sleep(charDelay);
+  }
+}
+
+async function run() {
+  // Wait one frame so fonts/layout settle before animation starts.
+  await document.fonts.ready;
+  await sleep(50);
+
+  for (let i = 0; i < EXCHANGES.length; i++) {
+    const ex = EXCHANGES[i];
+    const bubble = makeBubble(ex.role);
+    scrollToBottom();
+    await sleep(CONFIG.think_delay_ms);
+    const delay = ex.role === 'user' ? CONFIG.char_delay_user_ms : CONFIG.char_delay_ai_ms;
+    await typeInto(bubble, ex.text, delay);
+    bubble.el.classList.remove('caret');
+  }
+
+  window.dispatchEvent(new Event('animationComplete'));
+}
+
+document.addEventListener('DOMContentLoaded', run);
+</script>
+</body>
+</html>
