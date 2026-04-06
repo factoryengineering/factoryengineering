@@ -37,11 +37,11 @@ public async Task<List<ProductListItemDto>> GetRecentActiveAsync(int categoryId)
         .ToListAsync();
 ```
 
-It works. It's also wrong — at least by your team's standards.
+It works. It's also wrong... at least by your team's standards.
 
 ## Correction 1: Query syntax, not method chaining
 
-Your team reads LINQ as query syntax. Joins, filters, projections — they all use `from`, `where`, `orderby`, `select`. Method calls are reserved for terminal operations like `Take` and `ToListAsync`. You tell the assistant:
+Your team reads LINQ as query syntax. Joins, filters, projections. They all use `from`, `where`, `orderby`, `select`. Method calls are reserved for terminal operations like `ToListAsync`. You tell the assistant:
 
 > We use query syntax on this team. Rewrite the filtering, ordering, and projection as a query expression. Method calls are only for terminal operations.
 
@@ -64,11 +64,11 @@ public async Task<List<ProductListItemDto>> GetRecentActiveAsync(int categoryId)
         .ToListAsync();
 ```
 
-Better — but it's still one expression. The query definition and the execution are tangled together.
+Better. But it's still one expression. The query definition and the execution are tangled together.
 
 ## Correction 2: Separate the query from execution
 
-Your team builds the `IQueryable` as a local variable, then executes it on the next line. This makes queries composable — you can layer on `.AsNoTracking()`, `.Skip()`, or pass the query to a shared paging helper without untangling a fluent chain. You tell the assistant:
+Your team builds the `IQueryable` as a local variable, then executes it on the next line. This makes queries composable. You can layer on `.AsNoTracking()`, `.Skip()`, or pass the query to a shared paging helper without untangling a fluent chain. You tell the assistant:
 
 > Assign the query to a local variable first, then apply `Take` and `ToListAsync` separately.
 
@@ -138,7 +138,7 @@ Put the file in `.claude/skills/linq-standards/SKILL.md` and commit it. Every de
 
 ## The first draft is rough
 
-Look at that skill again. It covers the two patterns you corrected, but it doesn't cover joins, grouping, or subqueries. The description says "use when writing LINQ queries" — is that too broad? Too narrow? You don't know yet.
+Look at that skill again. It covers the two patterns you corrected, but it doesn't cover joins, grouping, or subqueries. The description says "use when writing LINQ queries." Is that too broad? Too narrow? You don't know yet.
 
 That's fine. You just finished step one of the skill creation cycle:
 
@@ -148,6 +148,6 @@ The skill exists. It encodes real standards from real work. In the next article,
 
 ---
 
-*Next: [Article 2 — Test Your Skill in a Clean Room](/articles/02-test-your-skill-in-a-clean-room)*
+*Next: Article 2 — Test Your Skill in a Clean Room*
 
 For background on skill structure and folder locations, see the [Skills page](/skills). For the formal skill specification, see [agentskills.io](https://agentskills.io).

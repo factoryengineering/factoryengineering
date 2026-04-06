@@ -26,6 +26,24 @@ Apply this skill when writing or editing tutorial articles, particularly the Bui
 - Direct, not conversational. No "let's go ahead and" or "as you can see." State what happens and move on.
 - Show confidence in the method. The article is teaching a workflow that works — present it as such.
 
+## Punctuation — m-dash
+
+Use the m-dash (—) only for:
+
+- **Header separation:** "Build Your Software Factory — Article 1 of 20"
+- **Parenthetical exposition**, where the text between the dashes is a sentence fragment that cannot stand on its own: "In the next article, we test it in a clean room — a fresh conversation with no prior context — to see if it holds up without hand-holding."
+
+Do not use the m-dash for:
+
+- **Pauses.** Use an ellipsis instead.
+  - Wrong: "It works. It's also wrong — at least by your team's standards."
+  - Right: "It works. It's also wrong... at least by your team's standards."
+- **Introducing a grammatically complete clause.** If the text after the dash has a subject and a verb and could stand as its own sentence, start a new sentence instead. This applies even when the follow-up is short or rhetorical.
+  - Wrong: "This makes queries composable — you can layer on new operators."
+  - Right: "This makes queries composable. You can layer on new operators."
+  - Wrong: "The description says 'use when writing LINQ queries' — is that too broad?"
+  - Right: "The description says 'use when writing LINQ queries.' Is that too broad?"
+
 ## Terminology
 
 - **Assistant**, not **agent**, when referring to an LLM-based coding environment (Claude Code, Copilot, Cursor, etc.). The reader tells the assistant what to do; the assistant produces output.
@@ -37,6 +55,12 @@ Apply this skill when writing or editing tutorial articles, particularly the Bui
 - Include a `.chat.yaml` animation that illustrates the key exchange. Place it at the top of the article so it floats beside the opening prose.
 - Keep the animation to the essential beats — the initial prompt, one or two corrections, and the capture or payoff prompt. Do not reproduce every code block from the article.
 - Target 15 seconds or less for the animation.
+
+## Cross-article links
+
+- Never create a link to an article that does not yet exist. Broken links erode trust and break builds.
+- When referencing an upcoming article, mention it by name as plain text: "In the next article, *Test It in a Clean Room*, we validate..."
+- When publishing a new article, search earlier articles for plain-text references to it and convert them to proper links.
 
 ## References
 
