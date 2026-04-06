@@ -22,8 +22,8 @@ async function capture(htmlPath, config, outDir) {
   });
 
   // Expose completion flag BEFORE navigation so animationComplete cannot race.
-  await page.exposeFunction('__markComplete', () => { completed = true; });
   let completed = false;
+  await page.exposeFunction('__markComplete', () => { completed = true; });
 
   await page.evaluateOnNewDocument(() => {
     window.addEventListener('animationComplete', () => {
@@ -37,6 +37,7 @@ async function capture(htmlPath, config, outDir) {
 
   const frameIntervalMs = 1000 / config.fps;
   const extraFrames = Math.round((config.pause_on_last_ms / 1000) * config.fps);
+  const maxCaptureMs = config.max_capture_ms || 60000;
 
   let frameIndex = 0;
   const captureFrame = async () => {
@@ -46,7 +47,14 @@ async function capture(htmlPath, config, outDir) {
   };
 
   // Main loop: capture until animationComplete fires.
+  const captureStart = Date.now();
   while (!completed) {
+    if (Date.now() - captureStart >= maxCaptureMs) {
+      throw new Error(
+        `Timed out after ${maxCaptureMs}ms waiting for animationComplete while rendering ${htmlPath}. ` +
+        `Captured ${frameIndex} frames. Check the template/YAML that produced this HTML.`
+      );
+    }
     const t0 = Date.now();
     await captureFrame();
     const elapsed = Date.now() - t0;

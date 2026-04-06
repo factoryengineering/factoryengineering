@@ -18,10 +18,11 @@ tools/chat-anim/
   defaults.js        # visual constants aligned to factoryengineering.dev
   package.json
 
-src/content/articles/
+src/content/docs/articles/
   some-article.mdx             # content page (MDX, can import the ChatAnim component)
+  some-article.chat.yaml       # conversation source co-located with article
 chat-anims/
-  ask-plan-agent.chat.yaml     # conversation source file
+  ask-plan-agent.chat.yaml     # standalone conversation source file
 
 public/animations/
   ask-plan-agent.gif           # build output: served at /animations/ask-plan-agent.gif
@@ -30,9 +31,9 @@ src/components/user-components/
   ChatAnim.astro               # presentational embed component
 ```
 
-YAML sources live at the repo-root `chat-anims/` directory, outside
-`src/content/` so Astro's content-collection loaders cannot accidentally parse
-them as pages. GIFs are written to `public/animations/` because Astro serves
+YAML sources can live in the repo-root `chat-anims/` directory or co-located
+with content pages under `src/content/docs/`. The build glob covers both
+locations. GIFs are written to `public/animations/` because Astro serves
 `public/` at the site root.
 
 ---
@@ -88,7 +89,7 @@ All defaults are derived from the factoryengineering.dev visual identity. Develo
 ```js
 module.exports = {
   // Canvas
-  width:              720,
+  width:              360,
   height:             420,
   fps:                15,
 
@@ -144,7 +145,7 @@ The HTML template is a self-contained, single-file animation page:
 - Receives `config` and `exchanges` as injected template variables.
 - Renders a fixed-height chat viewport (`config.height`). Content aligns to the bottom; as new bubbles appear, older content scrolls upward out of the viewport — the viewport never grows.
 - Runs the typewriter animation automatically on `DOMContentLoaded`.
-- On completion of the final message, waits `config.pause_on_last_ms` milliseconds, then dispatches `window.dispatchEvent(new Event('animationComplete'))`.
+- On completion of the final message, dispatches `window.dispatchEvent(new Event('animationComplete'))` immediately. The trailing pause is implemented in `capture.js` by repeating the final frame.
 - Does **not** loop internally — looping is a GIF property set at encode time.
 
 **Scroll behavior:** The chat messages container has `overflow: hidden` and fixed `height`. A CSS `scroll-behavior: smooth` transition moves the scroll position as each new bubble is appended, so text enters from the bottom and older content exits through the top.
@@ -164,7 +165,7 @@ launch browser
 → write frames to /tmp/chat-anim-frames/<timestamp>/frame_%04d.png
 ```
 
-Frame capture uses `page.screenshot({ type: 'png', omitBackground: false })`. The loop runs on a `setInterval` driven by `1000 / config.fps`.
+Frame capture uses `page.screenshot({ type: 'png', omitBackground: false })`. Each frame is captured with per-frame elapsed-time measurement and `setTimeout` to hit the target fps. A safety timeout (default 60s) aborts the capture if `animationComplete` never fires.
 
 ### Stage 4 — Encode GIF
 
@@ -217,7 +218,7 @@ not commit `dist/`.
 ```json
 {
   "scripts": {
-    "build:anims": "node tools/chat-anim/render.js --glob 'chat-anims/**/*.chat.yaml'",
+    "build:anims": "node tools/chat-anim/render.js --glob '{chat-anims,src/content/docs}/**/*.chat.yaml'",
     "build":       "yarn build:anims && astro build && node scripts/export-markdown.mjs"
   }
 }
@@ -309,8 +310,7 @@ const { src, alt = 'Chat animation' } = Astro.props;
 ```
 
 The component is responsible for the wrapper element; the float/responsive
-styles live in `src/styles/chat-embed.css` (imported from `global.css`) or in
-a scoped `<style>` block on the component itself.
+styles live in a scoped `<style>` block on the component.
 
 **Usage in MDX:**
 ```mdx
@@ -325,7 +325,7 @@ Plain Markdown (`.md`) pages cannot import components. Articles that embed
 animations must use `.mdx` or migrate their frontmatter to a collection that
 allows MDX.
 
-### Embed CSS (`src/styles/chat-embed.css`)
+### Embed CSS (scoped in `ChatAnim.astro`)
 
 ```css
 /*
@@ -381,9 +381,8 @@ allows MDX.
 | `tools/chat-anim/template.html` | Handlebars animation template |
 | `tools/chat-anim/capture.js` | Puppeteer frame capture |
 | `tools/chat-anim/defaults.js` | Visual/timing constants |
-| `tools/chat-anim/package.json` | Dependencies: puppeteer, handlebars, js-yaml, glob |
-| `src/components/user-components/ChatAnim.astro` | Presentational embed component |
-| `src/styles/chat-embed.css` | Float/responsive embed styles |
+| `package.json` | Repo-root dependencies, including puppeteer, handlebars, js-yaml, glob |
+| `src/components/user-components/ChatAnim.astro` | Presentational embed component, including scoped float/responsive embed styles |
 | `.github/workflows/build.yml` | CI configuration (Azure Static Web Apps) |
 | `chat-anims/**/*.chat.yaml` | Authored conversation files |
 | `public/animations/*.gif` | Build artifacts (gitignored) |

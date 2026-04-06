@@ -7,7 +7,7 @@
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { execSync } = require('child_process');
+const { execFileSync } = require('child_process');
 const yaml = require('js-yaml');
 const Handlebars = require('handlebars');
 const { globSync } = require('glob');
@@ -54,21 +54,24 @@ function renderHtml(templatePath, config, exchanges) {
 }
 
 function encodeGif(framesDir, fps, outGif, encoder) {
+  const framePat = path.join(framesDir, 'frame_%04d.png');
   if (encoder === 'gifski') {
-    execSync(
-      `gifski --fps ${fps} --quality 90 -o "${outGif}" "${framesDir}"/frame_*.png`,
+    const frameGlob = path.join(framesDir, 'frame_*.png');
+    const frames = globSync(frameGlob).sort();
+    execFileSync(
+      'gifski', ['--fps', String(fps), '--quality', '90', '-o', outGif, ...frames],
       { stdio: 'inherit' }
     );
   } else {
     const palette = path.join(framesDir, 'palette.png');
-    execSync(
-      `ffmpeg -y -framerate ${fps} -i "${framesDir}/frame_%04d.png" ` +
-      `-vf "palettegen=stats_mode=full" "${palette}"`,
+    execFileSync(
+      'ffmpeg', ['-y', '-framerate', String(fps), '-i', framePat,
+        '-vf', 'palettegen=stats_mode=full', palette],
       { stdio: 'inherit' }
     );
-    execSync(
-      `ffmpeg -y -framerate ${fps} -i "${framesDir}/frame_%04d.png" -i "${palette}" ` +
-      `-lavfi "paletteuse=dither=bayer:bayer_scale=5" -loop 0 "${outGif}"`,
+    execFileSync(
+      'ffmpeg', ['-y', '-framerate', String(fps), '-i', framePat, '-i', palette,
+        '-lavfi', 'paletteuse=dither=bayer:bayer_scale=5', '-loop', '0', outGif],
       { stdio: 'inherit' }
     );
   }

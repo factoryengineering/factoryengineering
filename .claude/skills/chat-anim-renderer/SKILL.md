@@ -17,7 +17,7 @@ content/foo/conversation.chat.yaml
   → template.html (Handlebars): typewriter animation in a fixed viewport
   → capture.js (Puppeteer): screenshot at fps, await animationComplete event
   → ffmpeg/gifski: palette-optimized GIF with baked-in trailing pause
-  → content/foo/conversation.gif
+  → public/animations/conversation.gif
 ```
 
 Five stages, one contract (`animationComplete`), one output per YAML file.
@@ -34,8 +34,8 @@ repo at `tools/chat-anim/`. The pieces are interdependent — `render.js` requir
 | `assets/capture.js` | `tools/chat-anim/capture.js` | Puppeteer frame capture |
 | `assets/template.html` | `tools/chat-anim/template.html` | Handlebars animation template |
 | `assets/defaults.js` | `tools/chat-anim/defaults.js` | Visual + timing constants |
-| `assets/package.json` | `tools/chat-anim/package.json` | Dependencies (puppeteer, handlebars, js-yaml, glob) |
-| `assets/chat-embed.css` | `src/styles/` or component `<style>` | Float/responsive embed CSS |
+| `assets/package.json` | `tools/chat-anim/package.json` | Module type declaration (deps are in repo-root `package.json`) |
+| `assets/chat-embed.css` | Component `<style>` block | Float/responsive embed CSS |
 | `assets/example.chat.yaml` | pattern reference only | Example author input |
 
 ## Workflow: scaffolding the pipeline in a new repo
@@ -101,7 +101,7 @@ pin the Chromium revision; changing either can shift anti-aliasing output.
 
 ## Output conventions
 
-- The GIF is written next to the source YAML: `foo.chat.yaml` → `foo.gif`.
+- The GIF is written to `public/animations/<basename>.gif`.
 - GIFs are build artifacts. Gitignore them.
 - Intermediate frames go to `$TMPDIR/chat-anim-<timestamp>/frames/` and are
   deleted after encoding unless `--keep-frames` is passed.

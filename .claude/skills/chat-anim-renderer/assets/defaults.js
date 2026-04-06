@@ -4,7 +4,7 @@
 
 module.exports = {
   // Canvas
-  width:              720,
+  width:              360,
   height:             420,
   fps:                15,
 
