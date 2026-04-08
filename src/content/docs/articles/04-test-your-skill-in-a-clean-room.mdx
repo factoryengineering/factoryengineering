@@ -1,0 +1,115 @@
+---
+title: "Test Your Skill in a Clean Room"
+description: "A skill validated only during active collaboration isn't reliable. Test it in a fresh session with no prior context to find what's actually missing."
+publishDate: 2026-04-08
+author: "Factory Engineering Team"
+tags: ["tutorial", "skills", "hands-on", "series-build-your-factory"]
+draft: false
+---
+
+import ChatAnim from '~/components/user-components/ChatAnim.astro';
+
+*Build Your Software Factory — Article 2 of 20*
+
+<ChatAnim src="/animations/04-test-your-skill-in-a-clean-room.gif" alt="Developer invoking a LINQ skill in a fresh session and observing gaps in the output" />
+
+Close every tab. Close the terminal. Close the IDE and reopen it. You need a session with no conversation history, no open files, no implicit context from the last hour of work. This is a clean room.
+
+In the previous article, you captured a LINQ skill from a real correction session. It covers query syntax and separating `IQueryable` from execution. The assistant produced it with full context: it had just been corrected twice and knew exactly what you wanted. Now find out if the skill works without you in the room.
+
+## Invoke the skill with a new task
+
+Open a fresh session and give the assistant a task the skill has never seen. Do not mention the skill by name. Do not set up context. The skill's description says "use when writing LINQ queries." If the description works, the assistant will load the skill on its own.
+
+> Add a repository method that returns total order amounts per customer for a given year, including the customer name. Return a `CustomerOrderTotalDto` with `CustomerName` and `TotalAmount`.
+
+This task requires a join, a `group by`, and an aggregate. The skill from Article 1 covers none of these explicitly. That's the point.
+
+## Watch without correcting
+
+The assistant produces something like this:
+
+```csharp
+public async Task<List<CustomerOrderTotalDto>> GetOrderTotalsByCustomerAsync(int year)
+{
+    var query =
+        from o in _db.Orders
+        where o.OrderDate.Year == year
+        join c in _db.Customers
+            on o.CustomerId equals c.Id
+        group o by new { c.Id, c.Name } into g
+        select new CustomerOrderTotalDto
+        {
+            CustomerName = g.Key.Name,
+            TotalAmount = g.Sum(o => o.Amount)
+        };
+
+    return await query.ToListAsync();
+}
+```
+
+Do not correct it. Read it. Score it against your team's standards.
+
+## Score what you see
+
+Walk through each standard the skill was supposed to enforce:
+
+**Query syntax.** The output uses `from`, `where`, `group`, `select`. That's correct. The skill's first rule held.
+
+**Separated query from execution.** The query is assigned to `var query`, then executed with `ToListAsync()` on a separate line. That's correct too.
+
+**Navigation properties instead of explicit joins.** This is wrong. Your team navigates relationships through EF Core's navigation properties (`o.Customer.Name`), not explicit `join` clauses. The skill never mentioned this. The assistant defaulted to what LINQ tutorials teach: explicit joins.
+
+**Grouping pattern.** The `group by` works, but the anonymous key type and the `.Key.Name` access are brittle. Your team uses a specific pattern for grouped projections. The skill says nothing about grouping.
+
+Two rules passed. Two gaps surfaced. That's a normal result for a first-draft skill tested in a clean room.
+
+## Classify each gap
+
+Not every failure needs the same fix. Separate what you found into two categories:
+
+**Non-compliant but functional.** The explicit join produces correct SQL. EF Core translates it fine. But it violates your team's convention. The fix is a new rule in the skill: "Use navigation properties for related entities. Do not use explicit `join` unless no navigation property exists."
+
+**Missing coverage.** The skill has no guidance for `group by`, aggregates, or subqueries. The assistant improvised. The output happened to work, but it could just as easily have mixed method syntax into the grouping clause or inlined the execution. The fix is new content: examples and constraints for grouped queries.
+
+## Document the gaps
+
+Write down what you found. Be specific.
+
+```markdown
+## Clean room test — 2026-04-08
+
+**Task:** Group orders by customer, return totals for a given year.
+
+### Passed
+- Used query syntax (from/where/select)
+- Separated IQueryable from ToListAsync execution
+
+### Failed
+- Used explicit join instead of navigation property
+- No guidance for group by — assistant improvised
+- No guidance for aggregate functions (Sum, Count, Average)
+
+### Description trigger
+- Skill loaded automatically: Yes / No (check assistant logs)
+```
+
+If the skill did not load at all, that's the most important finding. A skill that never triggers is invisible. The description needs to be rewritten so the assistant matches it to LINQ-related tasks.
+
+If the skill loaded but the output was still wrong, the rules are incomplete. That's a content problem, not a trigger problem.
+
+## The skill is not broken
+
+A first-draft skill that passes two out of four checks is not a failure. It's a baseline. You now know exactly what to add: navigation property rules, grouping patterns, aggregate guidance, and possibly a sharper description. Those are concrete items, not guesses.
+
+This is step two of the cycle:
+
+Capture → **Test** → Retrospective → Refine → Optimize
+
+In the next article, we run a retrospective to turn these gaps into specific improvements.
+
+---
+
+*Next: Article 3 — Run a Retrospective on Your Skill*
+
+For background on skill structure and the iterative creation process, see the [Skills page](/skills). For the formal skill specification, see [agentskills.io](https://agentskills.io).
