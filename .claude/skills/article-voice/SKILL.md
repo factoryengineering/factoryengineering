@@ -50,20 +50,8 @@ Do not use the m-dash for:
 - **Agent** is reserved for the Factory Engineering definition: an autonomous component with a role, delegation rules, and escalation conditions. Do not use "agent" casually to mean "the thing I'm chatting with."
 - **Skill**, **command**, **workflow** — use these terms precisely as defined in the Factory Engineering model. Do not conflate them.
 
-## Chat animations
-
-- Include a `.chat.yaml` animation that illustrates the key exchange. Place it at the top of the article so it floats beside the opening prose.
-- Keep the animation to the essential beats — the initial prompt, one or two corrections, and the capture or payoff prompt. Do not reproduce every code block from the article.
-- Target 15 seconds or less for the animation.
-
 ## Cross-article links
 
 - Never create a link to an article that does not yet exist. Broken links erode trust and break builds.
 - When referencing an upcoming article, mention it by name as plain text: "In the next article, *Test It in a Clean Room*, we validate..."
-- When publishing a new article, search earlier articles for plain-text references to it and convert them to proper links.
-
-## References
-
-- Link to the [Skills page](/skills) for readers who want background on skill structure.
-- Link to [agentskills.io](https://agentskills.io) for the formal specification.
 - Do not repeat reference material in the article body. Point to it and move on.
