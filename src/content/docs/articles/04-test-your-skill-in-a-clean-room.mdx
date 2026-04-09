@@ -72,35 +72,19 @@ Not every failure needs the same fix. Separate what you found into two categorie
 
 **Missing coverage.** The skill has no guidance for `group by`, aggregates, or subqueries. The assistant improvised. The output happened to work, but it could just as easily have mixed method syntax into the grouping clause or inlined the execution. The fix is new content: examples and constraints for grouped queries.
 
-## Document the gaps
+## Jot down the gaps
 
-Write down what you found. Be specific.
+You don't need a formal report. You need a short list you can work through one at a time with the assistant in the next article. A few bullets are enough:
 
-```markdown
-## Clean room test — 2026-04-08
+- Used explicit `join` instead of navigation properties
+- No guidance for `group by` or aggregates
+- Did the skill even load? (check assistant logs)
 
-**Task:** Group orders by customer, return totals for a given year.
-
-### Passed
-- Used query syntax (from/where/select)
-- Separated IQueryable from ToListAsync execution
-
-### Failed
-- Used explicit join instead of navigation property
-- No guidance for group by — assistant improvised
-- No guidance for aggregate functions (Sum, Count, Average)
-
-### Description trigger
-- Skill loaded automatically: Yes / No (check assistant logs)
-```
-
-If the skill did not load at all, that's the most important finding. A skill that never triggers is invisible. The description needs to be rewritten so the assistant matches it to LINQ-related tasks.
-
-If the skill loaded but the output was still wrong, the rules are incomplete. That's a content problem, not a trigger problem.
+That last point matters most. If the skill never triggered, the description needs work before anything else. If the skill loaded but the output was still wrong, the rules are incomplete. Different problems, different fixes.
 
 ## The skill is not broken
 
-A first-draft skill that passes two out of four checks is not a failure. It's a baseline. You now know exactly what to add: navigation property rules, grouping patterns, aggregate guidance, and possibly a sharper description. Those are concrete items, not guesses.
+A first-draft skill that passes two checks and misses two is not a failure. It's a baseline. You have a short list of gaps and you know the difference between a convention violation and missing coverage.
 
 This is step two of the cycle:
 
