@@ -1,0 +1,29 @@
+config:
+  height: 680
+
+exchanges:
+  - role: user
+    text: "Write a repository method that returns total order amounts per customer for a given year, including the customer name."
+
+  - role: assistant
+    text: |
+      public async Task<List<CustomerOrderTotalDto>>
+        GetOrderTotalsByCustomerAsync(int year)
+      {
+          var query =
+              from o in _db.Orders
+              where o.OrderDate.Year == year
+              join c in _db.Customers
+                on o.CustomerId equals c.Id
+              group o by new { c.Id, c.Name } into g
+              select new CustomerOrderTotalDto
+              {
+                  CustomerName = g.Key.Name,
+                  TotalAmount = g.Sum(o => o.Amount)
+              };
+
+          return await query.ToListAsync();
+      }
+
+  - role: user
+    text: "It used query syntax and separated the query. But join-then-group is wrong — we navigate, not join. And the description never triggered."
