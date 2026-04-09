@@ -66,7 +66,17 @@ Two rules passed. Two gaps surfaced. That's a normal result for a first-draft sk
 
 ## Classify each gap
 
-Not every failure needs the same fix. Separate what you found into two categories:
+## Check whether the skill loaded
+
+Before you analyze the output, find out whether the assistant even used the skill. Ask it directly:
+
+> What skills did you use to complete that task?
+
+If the assistant lists your LINQ skill, the description triggered correctly. If it doesn't, nothing else matters yet. A skill that never loads is invisible. The description needs to be rewritten before you fix any rules.
+
+## Classify each gap
+
+Assuming the skill loaded, separate what you found into two categories:
 
 **Non-compliant but functional.** The explicit join produces correct SQL. EF Core translates it fine. But it violates your team's convention. The fix is a new rule in the skill: "Use navigation properties for related entities. Do not use explicit `join` unless no navigation property exists."
 
@@ -78,9 +88,7 @@ You don't need a formal report. You need a short list you can work through one a
 
 - Used explicit `join` instead of navigation properties
 - No guidance for `group by` or aggregates
-- Did the skill even load? (check assistant logs)
-
-That last point matters most. If the skill never triggered, the description needs work before anything else. If the skill loaded but the output was still wrong, the rules are incomplete. Different problems, different fixes.
+- Skill loaded: yes / no
 
 ## The skill is not broken
 
