@@ -19,14 +19,25 @@ OpenAI Codex adopted the Agent Skills open standard in December 2025, reaching p
 | User | `~/.agents/skills/` |
 | Admin | `/etc/codex/skills/` |
 
-Codex uses the shared `.agents/skills/` convention (not a Codex-specific folder) and evaluates each skill's `description` via progressive disclosure to decide when to load it. Symlinks to a canonical skills directory are supported.
+Codex uses the shared `.agents/skills/` convention (not a Codex-specific folder) and evaluates each skill's `description` via progressive disclosure to decide when to load it. Share skills from your canonical location using copy-on-change or a symlink:
 
-Create the symlink to your canonical location:
+**Copy-on-change (recommended):**
+
+```bash
+mkdir -p .agents
+cp -R .claude/skills .agents/skills
+```
+
+Automate with a Git hook or file watcher so copies stay in sync.
+
+**Symlink (macOS/Linux only):**
 
 ```bash
 mkdir -p .agents
 ln -s ../.claude/skills .agents/skills
 ```
+
+Symlinks require macOS/Linux and may not work on Windows clones. See [Skills — Managing Skills Across IDEs](/skills#managing-skills-across-ides) for details on caveats and alternatives.
 
 Codex supports the standard `user-invocable` and `disable-model-invocation` frontmatter properties for controlling when a skill is loaded automatically versus invoked by name. Inside Codex, list loaded skills with the `/skills` command and invoke a skill explicitly by name with `$skill-name`.
 

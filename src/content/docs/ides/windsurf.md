@@ -18,11 +18,23 @@ Windsurf is an AI-powered code editor featuring Cascade, a single shared AI agen
 | Project | `.windsurf/skills/` |
 | Global | `~/.windsurf/skills/` |
 
-Windsurf's Cascade agent looks for skills in `.windsurf/skills/`. A symlink to your canonical location is required:
+Windsurf's Cascade agent looks for skills in `.windsurf/skills/`. Share skills from your canonical location using copy-on-change or a symlink:
+
+**Copy-on-change (recommended):**
+
+```bash
+cp -R .claude/skills .windsurf/skills
+```
+
+Automate with a Git hook or file watcher so copies stay in sync.
+
+**Symlink (macOS/Linux only):**
 
 ```bash
 ln -s ../.claude/skills .windsurf/skills
 ```
+
+Symlinks require macOS/Linux and may not work on Windows clones. See [Skills — Managing Skills Across IDEs](/skills#managing-skills-across-ides) for details on caveats and alternatives.
 
 Cascade automatically invokes skills when your request matches a skill's description. To invoke a skill explicitly, type `@skill-name` in the Cascade input.
 
@@ -46,7 +58,15 @@ Windsurf calls them "workflows" — note that this is different from workflows i
 /write-spec @submit-sales-order
 ```
 
-Create a symlink to use your canonical commands folder:
+Share your canonical commands folder using copy-on-change or a symlink:
+
+**Copy-on-change (recommended):**
+
+```bash
+cp -R .claude/commands .windsurf/workflows
+```
+
+**Symlink (macOS/Linux only):**
 
 ```bash
 ln -s ../.claude/commands .windsurf/workflows

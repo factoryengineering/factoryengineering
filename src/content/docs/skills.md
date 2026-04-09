@@ -101,13 +101,11 @@ From here, every team member can invoke the skill by describing the task or by n
 
 ---
 
-## Managing Skills Across IDEs: The Symlink Approach
+## Managing Skills Across IDEs
 
-Different IDEs look for skills in different folders. Managing multiple copies of the same skill across multiple folders is not viable for a team—it creates drift, duplication, and maintenance burden.
+Different IDEs look for skills in different folders. Managing multiple copies of the same skill across multiple folders is not viable for a team—it creates drift, duplication, and maintenance burden. Establish one canonical skills location in your repository and use one of the strategies below to keep every IDE in sync.
 
-Establish one canonical skills location in your repository and use symlinks to point each IDE's expected folder to that location.
-
-**Canonical location (recommended):**
+**Canonical location:**
 
 ```
 .claude/skills/
@@ -115,7 +113,36 @@ Establish one canonical skills location in your repository and use symlinks to p
 
 This folder is the most widely recognized across the ecosystem. Use it as your source of truth.
 
-**Option A — Use the factory-engineering skill:** Install with `npx openskills install factoryengineering/skills`, then ask your agent to create symlinks. The skill sets up symlinks for **commands/workflows** (`.claude/commands/`) and, for IDEs that need them, **skills** (`.claude/skills/` → Windsurf, Kilo Code, Antigravity, OpenAI Codex; Cursor and Copilot read `.claude/skills/` directly). Use `--type all` (default) for both, or `--type commands` / `--type skills`. The agent can detect which IDEs you have, confirm with you, and offer to copy existing contents into the canonical folder if a target already exists. On Windows, use the skill's PowerShell script. See the [Commands](/commands) page for the full symlink approach and the skill’s SKILL.md (and symlinks.md) for script options.
+### Strategy 1 — Copy-on-Change (recommended for most teams)
+
+Keep canonical skills in `.claude/skills/` and use a watcher, Git hook, or CI step to copy them into each IDE’s expected folder when they change. This approach works on every OS, avoids symlink pitfalls, and produces real files that every IDE’s file watcher can detect reliably.
+
+```bash
+# Example: copy skills into each IDE folder after a change
+for dest in .windsurf/skills .kilocode/skills .agent/skills .agents/skills; do
+  mkdir -p "$(dirname "$dest")"
+  cp -R .claude/skills "$dest"
+done
+```
+
+Automate this with a `post-commit` or `post-merge` Git hook, a file-watcher script, or a CI step so copies never drift. Commit the copied folders so every team member gets them on clone.
+
+### Strategy 2 — IDE-Native Locations Only
+
+Store skills directly in each IDE’s folder (`.windsurf/skills/`, `.kilocode/skills/`, etc.) and skip the canonical location for IDEs that do not read `.claude/skills/`. This is the simplest option for teams that use only one or two IDEs, but it increases maintenance burden as the number of IDEs grows.
+
+### Strategy 3 — Symlinks (macOS/Linux only, with caveats)
+
+Symlinks point each IDE’s expected folder to `.claude/skills/`. This avoids file duplication but comes with significant caveats:
+
+- **Windows:** Symlinks require Developer Mode or administrator privileges. Developer Mode is often restricted in corporate environments, and `core.symlinks` must be enabled in Git. Symlinks created on macOS/Linux may not resolve correctly when cloned on Windows even with Developer Mode enabled.
+- **Cursor:** Cursor’s file watcher does not properly follow directory symlinks. If you use Cursor, prefer copy-on-change or place skills directly in `.cursor/skills/` (Cursor also reads `.claude/skills/` directly, so a symlink is unnecessary for skills).
+- **IDE inconsistencies:** Some IDEs watch the symlink target correctly; others watch the symlink itself or skip watching entirely. Test with your specific IDE versions.
+- **Cross-platform Git:** Symlinks committed on macOS/Linux may appear as plain text files containing the target path when cloned on Windows, depending on the user’s Git configuration.
+
+If your team is macOS/Linux-only and does not use Cursor, symlinks remain a viable option:
+
+**Option A — Use the factory-engineering skill:** Install with `npx openskills install factoryengineering/skills`, then ask your agent to create symlinks. The skill sets up symlinks for **commands/workflows** (`.claude/commands/`) and, for IDEs that need them, **skills** (`.claude/skills/` → Windsurf, Kilo Code, Antigravity, OpenAI Codex; Cursor and Copilot read `.claude/skills/` directly). Use `--type all` (default) for both, or `--type commands` / `--type skills`. The agent can detect which IDEs you have, confirm with you, and offer to copy existing contents into the canonical folder if a target already exists. On Windows, use the skill’s PowerShell script. See the [Commands](/commands) page for more details and the skill’s SKILL.md (and symlinks.md) for script options.
 
 **Option B — Create symlinks manually for each IDE:**
 
@@ -135,23 +162,23 @@ ln -s ../.claude/skills .agents/skills
 # Cursor and GitHub Copilot read .claude/skills directly — no symlink needed
 ```
 
-Commit the symlinks to your repository. Every team member gets the correct folder structure automatically on clone, regardless of which IDE they use.
+Commit the symlinks to your repository. Every team member on macOS/Linux gets the correct folder structure automatically on clone.
 
 ---
 
 ## IDE-by-IDE Reference
 
-Every major AI IDE supports the Agent Skills standard. The table below summarizes folder locations and symlink requirements. For full setup details, see each IDE's dedicated page.
+Every major AI IDE supports the Agent Skills standard. The table below summarizes folder locations and sharing requirements. Use copy-on-change, IDE-native locations, or symlinks (see [Managing Skills Across IDEs](#managing-skills-across-ides)) depending on your team's OS and IDE mix.
 
-| IDE | Project Folder | Symlink Needed? | Details |
-|-----|---------------|-----------------|---------|
+| IDE | Project Folder | Sharing Required? | Details |
+|-----|---------------|-------------------|---------|
 | [Claude Code](/ides/claude-code) | `.claude/skills/` | No (canonical location) | [Full setup →](/ides/claude-code#skills) |
 | [GitHub Copilot](/ides/github-copilot) | `.github/skills/` + `.claude/skills/` | No (reads `.claude/skills/` directly) | [Full setup →](/ides/github-copilot#skills) |
 | [Cursor](/ides/cursor) | `.cursor/skills/` + `.claude/skills/` | No (reads `.claude/skills/` directly) | [Full setup →](/ides/cursor#skills) |
-| [Windsurf](/ides/windsurf) | `.windsurf/skills/` | ✅ Yes | [Full setup →](/ides/windsurf#skills) |
-| [Kilo Code](/ides/kilo-code) | `.kilocode/skills/` | ✅ Yes | [Full setup →](/ides/kilo-code#skills) |
-| [Google Antigravity](/ides/google-antigravity) | `.agent/skills/` | ✅ Yes | [Full setup →](/ides/google-antigravity#skills) |
-| [OpenAI Codex](/ides/openai-codex) | `.agents/skills/` | ✅ Yes | [Full setup →](/ides/openai-codex#skills) |
+| [Windsurf](/ides/windsurf) | `.windsurf/skills/` | ✅ Yes (copy or symlink) | [Full setup →](/ides/windsurf#skills) |
+| [Kilo Code](/ides/kilo-code) | `.kilocode/skills/` | ✅ Yes (copy or symlink) | [Full setup →](/ides/kilo-code#skills) |
+| [Google Antigravity](/ides/google-antigravity) | `.agent/skills/` | ✅ Yes (copy or symlink) | [Full setup →](/ides/google-antigravity#skills) |
+| [OpenAI Codex](/ides/openai-codex) | `.agents/skills/` | ✅ Yes (copy or symlink) | [Full setup →](/ides/openai-codex#skills) |
 
 ---
 
@@ -175,23 +202,7 @@ mkdir -p .claude/skills
 
 **2. Create your first skill:** Use the **skill-creator** skill (see [Installing skill-creator and skill-optimizer](#installing-skill-creator-and-skill-optimizer)). Ask your agent to create a new skill in `.claude/skills`; it will guide you through the workflow and produce a proper SKILL.md and directory structure.
 
-**3. Create symlinks for each IDE your team uses:** Use the **factory-engineering** skill (Option A above) and ask your agent to set up symlinks—it will create command symlinks and skill symlinks for IDEs that need them (Windsurf, Kilo Code, Antigravity, OpenAI Codex). Or create them manually:
-
-```bash
-# Windsurf
-ln -s ../.claude/skills .windsurf/skills
-
-# Kilo Code
-ln -s ../.claude/skills .kilocode/skills
-
-# Antigravity
-ln -s ../.claude/skills .agent/skills
-
-# OpenAI Codex
-ln -s ../.claude/skills .agents/skills
-
-# Cursor and GitHub Copilot read .claude/skills directly — no symlink needed
-```
+**3. Share skills with each IDE your team uses:** Choose the strategy that fits your team (see [Managing Skills Across IDEs](#managing-skills-across-ides)). For most teams, **copy-on-change** is the safest default — it works on every OS and avoids symlink pitfalls. If your team is macOS/Linux-only and does not use Cursor, symlinks are also viable. You can use the **factory-engineering** skill to automate either approach, or set up sharing manually.
 
 **4. Commit everything:**
 

@@ -68,16 +68,44 @@ Use the recommended template in the [documentation-spec](../../skills/documentat
 
 From here, every team member uses **slash-command at-artifact** (e.g. `/write-spec @docs/stories/submit-sales-order.md`). For multi-step orchestration, see the Workflows page.
 
-## The Symlink Approach
+## Sharing Commands Across IDEs
 
-Both **commands** and **workflows** are stored in `.claude/commands/`. Each IDE looks in a different folder. Use symlinks so that one canonical location works everywhere.
+Both **commands** and **workflows** are stored in `.claude/commands/`. Each IDE looks in a different folder. Use one of the strategies below so that one canonical location works everywhere.
 
-**Option A - Use the factory-engineering skill:** Install with `npx openskills install factoryengineering/skills`, then ask your agent to create symlinks for your selected IDEs. The skill sets up symlinks for **commands/workflows** (`.claude/commands/`) and **skills** (`.claude/skills/`) in one go (or use `--type commands` to do only commands). The agent can **detect** which IDEs you have (e.g. run the script with `--detect`), confirm with you, then create symlinks. If a target folder already exists (e.g. `.cursor/commands`), the skill will **offer to copy** its contents into the canonical folder and then replace it with a symlink (`--copy-existing`). On **Windows**, use the skill's PowerShell script (`Setup-Symlinks.ps1`).
+### Strategy 1 — Copy-on-Change (recommended for most teams)
 
-**Option B - Create symlinks manually for each IDE:** Run these from your **repository root**. The symlink target `../.claude/commands` is resolved relative to the link's directory (e.g. `.cursor/`), so it correctly points at the repo's `.claude/commands/`.
+Keep canonical commands in `.claude/commands/` and copy them into each IDE's expected folder when they change. This works on every OS and avoids symlink caveats (see Strategy 3).
 
 ```bash
-# Cursor
+# Example: copy commands into each IDE folder after a change
+for pair in ".cursor/commands" ".windsurf/workflows" ".kilocode/workflows" ".agent/workflows"; do
+  mkdir -p "$(dirname "$pair")"
+  cp -R .claude/commands "$pair"
+done
+```
+
+Automate this with a Git hook, file watcher, or CI step so copies never drift. Commit the copied folders.
+
+### Strategy 2 — IDE-Native Locations Only
+
+Store commands directly in each IDE's folder and skip the canonical location. Simple for one or two IDEs, but maintenance grows with IDE count.
+
+### Strategy 3 — Symlinks (macOS/Linux only, with caveats)
+
+Symlinks avoid file duplication but have significant limitations:
+
+- **Windows:** Requires Developer Mode or administrator privileges (often restricted in corporate environments). Symlinks created on macOS/Linux may not resolve when cloned on Windows.
+- **Cursor:** Cursor's file watcher does not properly follow directory symlinks. Use copy-on-change or place commands directly in `.cursor/commands/`.
+- **IDE inconsistencies:** Some IDEs watch symlink targets correctly; others watch the symlink itself or skip watching entirely.
+
+If your team is macOS/Linux-only and does not use Cursor, symlinks remain viable:
+
+**Option A — Use the factory-engineering skill:** Install with `npx openskills install factoryengineering/skills`, then ask your agent to create symlinks for your selected IDEs. The skill sets up symlinks for **commands/workflows** (`.claude/commands/`) and **skills** (`.claude/skills/`) in one go (or use `--type commands` to do only commands). The agent can **detect** which IDEs you have (e.g. run the script with `--detect`), confirm with you, then create symlinks. If a target folder already exists (e.g. `.cursor/commands`), the skill will **offer to copy** its contents into the canonical folder and then replace it with a symlink (`--copy-existing`). On **Windows**, use the skill's PowerShell script (`Setup-Symlinks.ps1`).
+
+**Option B — Create symlinks manually for each IDE:** Run these from your **repository root**. The symlink target `../.claude/commands` is resolved relative to the link's directory (e.g. `.cursor/`), so it correctly points at the repo's `.claude/commands/`.
+
+```bash
+# Cursor (prefer copy-on-change — see caveats above)
 mkdir -p .cursor
 ln -s ../.claude/commands .cursor/commands
 
@@ -94,23 +122,23 @@ mkdir -p .agent
 ln -s ../.claude/commands .agent/workflows
 ```
 
-Commit the symlinks so every team member gets the correct structure on clone.
+Commit the symlinks so every team member on macOS/Linux gets the correct structure on clone.
 
-**GitHub Copilot (VS Code)** uses prompt files (`.prompt.md`) with different naming and optional frontmatter, so commands cannot be shared via symlinks. Use a **sync** step instead; the **factory-engineering** skill includes sync instructions and a batch script (see [GitHub Copilot (VS Code)](#github-copilot-vs-code) below).
+**GitHub Copilot (VS Code)** uses prompt files (`.prompt.md`) with different naming and optional frontmatter, so commands cannot be shared via symlinks or simple copies. Use a **sync** step instead; the **factory-engineering** skill includes sync instructions and a batch script (see [GitHub Copilot (VS Code)](#github-copilot-vs-code) below).
 
-Stored in `.claude/commands/`, this file is available as `/write-design` in Claude Code and Cursor; with symlinks, the same file is used by Windsurf, Kilo Code, and Antigravity. Invoke with **slash-command at-artifact** (e.g. `/write-design @docs/user-stories/billing-email.md`).
+Stored in `.claude/commands/`, this file is available as `/write-design` in Claude Code and Cursor; with copy-on-change or symlinks, the same file is used by Windsurf, Kilo Code, and Antigravity. Invoke with **slash-command at-artifact** (e.g. `/write-design @docs/user-stories/billing-email.md`).
 
 ## IDE-by-IDE Reference
 
 All IDEs support commands, but they use different folder locations, invocation patterns, and terminology. The table below summarizes the key differences. For full setup details, see each IDE's dedicated page.
 
-| IDE | Folder | Invocation | Symlink Needed? | Details |
-|-----|--------|------------|-----------------|---------|
+| IDE | Folder | Invocation | Sharing Required? | Details |
+|-----|--------|------------|-------------------|---------|
 | [Claude Code](/ides/claude-code) | `.claude/commands/` | `/command-name` | No (canonical location) | [Full setup →](/ides/claude-code#commands) |
-| [Cursor](/ides/cursor) | `.cursor/commands/` | `/command-name` | ✅ Yes | [Full setup →](/ides/cursor#commands) |
-| [Windsurf](/ides/windsurf) | `.windsurf/workflows/` | `/workflow-name` | ✅ Yes | [Full setup →](/ides/windsurf#commands) |
-| [Kilo Code](/ides/kilo-code) | `.kilocode/workflows/` | `/workflow-name` | ✅ Yes | [Full setup →](/ides/kilo-code#commands) |
-| [Google Antigravity](/ides/google-antigravity) | `.agent/workflows/` | `/workflow-name` | ✅ Yes | [Full setup →](/ides/google-antigravity#commands) |
+| [Cursor](/ides/cursor) | `.cursor/commands/` | `/command-name` | ✅ Yes (copy or symlink) | [Full setup →](/ides/cursor#commands) |
+| [Windsurf](/ides/windsurf) | `.windsurf/workflows/` | `/workflow-name` | ✅ Yes (copy or symlink) | [Full setup →](/ides/windsurf#commands) |
+| [Kilo Code](/ides/kilo-code) | `.kilocode/workflows/` | `/workflow-name` | ✅ Yes (copy or symlink) | [Full setup →](/ides/kilo-code#commands) |
+| [Google Antigravity](/ides/google-antigravity) | `.agent/workflows/` | `/workflow-name` | ✅ Yes (copy or symlink) | [Full setup →](/ides/google-antigravity#commands) |
 | [GitHub Copilot](/ides/github-copilot) | `.github/prompts/` | `/prompt-name` | Sync (not symlink) | [Full setup →](/ides/github-copilot#commands) |
 | [OpenAI Codex](/ides/openai-codex) | `.agents/skills/` (via skills) | `$skill-name` | ⚠️ Needs investigation (use skills) | [Full setup →](/ides/openai-codex#commands) |
 

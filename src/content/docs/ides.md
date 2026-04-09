@@ -18,10 +18,10 @@ Choose your IDE below for a dedicated guide covering everything you need to set 
 | [Claude Code](/ides/claude-code) | ✅ Native | ✅ `/command` | ✅ Sub-agents | ✅ Full orchestration | [→ Guide](/ides/claude-code) |
 | [GitHub Copilot](/ides/github-copilot) | ✅ Native | ✅ `/command` | ✅ Custom agents | ⚠️ Partial (Fleet mode) | [→ Guide](/ides/github-copilot) |
 | [Cursor](/ides/cursor) | ✅ Native | ✅ `/command` | ✅ Subagents | ⚠️ Partial (subagent delegation) | [→ Guide](/ides/cursor) |
-| [Windsurf](/ides/windsurf) | ✅ Via symlink | ✅ `/workflow` | ❌ No | ❌ No | [→ Guide](/ides/windsurf) |
+| [Windsurf](/ides/windsurf) | ✅ Via copy or symlink | ✅ `/workflow` | ❌ No | ❌ No | [→ Guide](/ides/windsurf) |
 | [Kilo Code](/ides/kilo-code) | ✅ Native | ✅ `/workflow` | ✅ Modes | ✅ Orchestrator Mode | [→ Guide](/ides/kilo-code) |
-| [Google Antigravity](/ides/google-antigravity) | ✅ Via symlink | ✅ `/workflow` | ✅ AgentKit 2.0 | ⚠️ Partial (Manager View) | [→ Guide](/ides/google-antigravity) |
-| [OpenAI Codex](/ides/openai-codex) | ✅ Via symlink | ⚠️ Needs investigation (`$skill-name`) | ⚠️ Custom agents (TOML) | ⚠️ Partial (sub-agent delegation) | [→ Guide](/ides/openai-codex) |
+| [Google Antigravity](/ides/google-antigravity) | ✅ Via copy or symlink | ✅ `/workflow` | ✅ AgentKit 2.0 | ⚠️ Partial (Manager View) | [→ Guide](/ides/google-antigravity) |
+| [OpenAI Codex](/ides/openai-codex) | ✅ Via copy or symlink | ⚠️ Needs investigation (`$skill-name`) | ⚠️ Custom agents (TOML) | ⚠️ Partial (sub-agent delegation) | [→ Guide](/ides/openai-codex) |
 
 ---
 
@@ -30,7 +30,7 @@ Choose your IDE below for a dedicated guide covering everything you need to set 
 Each IDE guide is structured with the same sections:
 
 - **Overview** — what the IDE is and how it fits into factory engineering
-- **Skills** — folder locations, setup, symlink needs
+- **Skills** — folder locations, setup, sharing strategies (copy-on-change, symlinks)
 - **Commands** — folder location, invocation pattern, format notes
 - **Agents** — support status, feature name, storage, memory capability
 - **Workflows** — orchestration support and notes
