@@ -42,11 +42,27 @@ For more about how skills work in factory engineering, see [Skills](/skills).
 /write-spec @submit-sales-order
 ```
 
-Since Cursor uses `.cursor/commands/` and the canonical commands live in `.claude/commands/`, create a symlink:
+Since Cursor uses `.cursor/commands/` and the canonical commands live in `.claude/commands/`, you need to share them. **Copy-on-change is recommended** — Cursor's file watcher does not properly follow directory symlinks, which can cause commands to appear stale or missing until you restart the editor.
+
+**Rsync (recommended):**
+
+```bash
+# Gather any local changes back to canonical, then mirror
+mkdir -p .claude/commands
+[ -d .cursor/commands ] && rsync -a .cursor/commands/ .claude/commands/
+mkdir -p .cursor/commands
+rsync -a --delete .claude/commands/ .cursor/commands/
+```
+
+Automate this with a Git hook or file watcher so copies stay in sync. See [Commands — Sync with rsync](/commands#strategy-1--sync-with-rsync-recommended-for-most-teams) for the full two-step pattern covering all IDEs.
+
+**Symlink (not recommended for Cursor):**
 
 ```bash
 ln -s ../.claude/commands .cursor/commands
 ```
+
+If you use a symlink, be aware that Cursor may not detect changes to files inside the symlinked directory. You may need to restart Cursor or reload the window after modifying commands.
 
 **Built-in commands (v3.0):** Cursor 3 added `/worktree` (creates an isolated git worktree so agents work without conflicts) and `/best-of-n` (runs the same prompt across multiple models in parallel worktrees and compares results). These are built-in commands, not user-defined — your custom commands in `.cursor/commands/` continue to work alongside them.
 

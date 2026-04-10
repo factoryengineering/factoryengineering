@@ -20,11 +20,26 @@ Google Antigravity is an AI-native IDE powered by Gemini. It uses progressive di
 
 Antigravity uses progressive disclosure for skills — each skill sits dormant until a request matches its description, at which point it is loaded into the agent's context. **AgentKit 2.0** (March 2026) added multi-agent orchestration via Manager View but did not change skills loading: skills still live in `.agent/skills/` and are loaded on-demand by whichever specialized agent is handling the task.
 
-Antigravity uses `.agent/skills/` at the project level. A symlink to your canonical location is required:
+Antigravity uses `.agent/skills/` at the project level. Share skills from your canonical location using copy-on-change or a symlink:
+
+**Rsync (recommended):**
+
+```bash
+# Gather any local changes back to canonical, then mirror
+[ -d .agent/skills ] && rsync -a .agent/skills/ .claude/skills/
+mkdir -p .agent/skills
+rsync -a --delete .claude/skills/ .agent/skills/
+```
+
+Automate with a Git hook or file watcher so copies stay in sync. See [Skills — Sync with rsync](/skills#strategy-1--sync-with-rsync-recommended-for-most-teams) for the full two-step pattern covering all IDEs.
+
+**Symlink (macOS/Linux only):**
 
 ```bash
 ln -s ../.claude/skills .agent/skills
 ```
+
+Symlinks require macOS/Linux and may not work on Windows clones. See [Skills — Managing Skills Across IDEs](/skills#managing-skills-across-ides) for details on caveats and alternatives.
 
 📖 [Google Antigravity Skills Documentation](https://antigravity.google/docs/skills)
 
@@ -36,16 +51,26 @@ For more about how skills work in factory engineering, see [Skills](/skills).
 
 **Folder location:** `.agent/workflows/` (project)
 
-**Invocation:** `/workflow-name` — Antigravity treats files in `.agent/workflows/` as workflows. With the symlink, your `.claude/commands/` files appear there. Use **slash-command at-artifact** (e.g. `/write-spec @submit-sales-order`).
+**Invocation:** `/workflow-name` — Antigravity treats files in `.agent/workflows/` as workflows. With sharing (rsync or symlink), your `.claude/commands/` files appear there. Use **slash-command at-artifact** (e.g. `/write-spec @submit-sales-order`).
 
-Create the symlink:
+Share your canonical commands folder using copy-on-change or a symlink:
+
+**Rsync (recommended):**
+
+```bash
+[ -d .agent/workflows ] && rsync -a .agent/workflows/ .claude/commands/
+mkdir -p .agent/workflows
+rsync -a --delete .claude/commands/ .agent/workflows/
+```
+
+**Symlink (macOS/Linux only):**
 
 ```bash
 mkdir -p .agent
 ln -s ../.claude/commands .agent/workflows
 ```
 
-Without the symlink, you would have to maintain a separate copy of commands in `.agent/workflows/`.
+Without sharing, you would have to maintain a separate copy of commands in `.agent/workflows/`.
 
 For more about how commands work in factory engineering, see [Commands](/commands).
 
