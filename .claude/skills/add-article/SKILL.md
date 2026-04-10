@@ -58,7 +58,14 @@ import ChatAnim from '~/components/user-components/ChatAnim.astro';
 <ChatAnim src="/animations/NN-title-in-kebab-case.gif" alt="Description of the exchange" />
 ```
 
-Keep the animation to the essential beats: the initial prompt, one or two corrections, and the payoff. Do not reproduce every code block from the article. Target 15 seconds or less.
+Keep the animation to the essential beats: the initial prompt, one or two corrections, and the payoff. Do not reproduce every code block from the article. Target 15 seconds or less — note that `pause_on_last_ms` defaults to 4000, so budget about 11 seconds for the typing itself.
+
+The default viewport height (`config.height`) is 210 px, which only fits about two short bubbles before older content scrolls out. Multi-exchange animations should override it in the YAML — article 03 and 04 use `height: 340`, for example:
+
+```yaml
+config:
+  height: 340
+```
 
 ## 5. References footer
 

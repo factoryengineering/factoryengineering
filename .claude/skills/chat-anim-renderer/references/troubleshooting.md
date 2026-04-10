@@ -55,7 +55,7 @@ Cause: the extra-frames calculation rounded to zero, or
 `pause_on_last_ms` was not merged from defaults.
 
 Fix: confirm `config.pause_on_last_ms` is > 0 in the merged config. At `fps=15`
-and `pause_on_last_ms=2000`, expect 30 trailing identical frames.
+and `pause_on_last_ms=4000`, expect 60 trailing identical frames.
 
 ## Output is placed in the wrong directory
 

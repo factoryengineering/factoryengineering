@@ -47,7 +47,7 @@ YAML file. Requires gifski to be installed (`cargo install gifski` or
 
 ## File size targets
 
-For web embedding at 720×420:
+For web embedding at the default 360×210 canvas:
 
 | Duration | FFmpeg (default) | gifski q=90 |
 |---|---|---|

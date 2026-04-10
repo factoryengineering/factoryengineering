@@ -12,7 +12,7 @@ module.exports = {
   char_delay_user_ms: 28,
   char_delay_ai_ms:   18,
   think_delay_ms:     900,
-  pause_on_last_ms:   2000,
+  pause_on_last_ms:   4000,
 
   // Theme
   theme:              'dark',
