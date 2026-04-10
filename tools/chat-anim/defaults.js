@@ -5,7 +5,7 @@
 module.exports = {
   // Canvas
   width:              360,
-  height:             420,
+  height:             210,
   fps:                15,
 
   // Timing (milliseconds)

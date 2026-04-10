@@ -1,6 +1,6 @@
 config:
   width: 360
-  height: 420
+  height: 210
 
 exchanges:
   - role: user

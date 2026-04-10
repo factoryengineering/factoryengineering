@@ -7,7 +7,7 @@ Source of truth for the conversation input format.
 ```yaml
 config:        # optional — any key overrides defaults.js
   width: 720
-  height: 420
+  height: 210
   fps: 15
   char_delay_user_ms: 28
   char_delay_ai_ms: 18

@@ -1,5 +1,5 @@
 config:
-  height: 680
+  height: 340
 
 exchanges:
   - role: user
