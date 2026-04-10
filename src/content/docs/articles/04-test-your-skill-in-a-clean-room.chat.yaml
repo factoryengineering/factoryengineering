@@ -26,4 +26,4 @@ exchanges:
       }
 
   - role: user
-    text: "It used query syntax and separated the query. But join-then-group is wrong — we navigate, not join. And the description never triggered."
+    text: "You used query syntax and separated the query. But join-then-group is wrong — we navigate, not join. And the description never triggered."
