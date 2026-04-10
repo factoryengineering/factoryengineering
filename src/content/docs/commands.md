@@ -17,7 +17,7 @@ Like skills, commands must live in your project repository and evolve with your 
 
 ## Example command file
 
-Commands are markdown files. The slash name is the filename without `.md` (e.g. `write-design.md` → `/write-design`). This is a convention shared across IDEs; folder locations vary (see table below). Because commands are shared via symlinks, keep them **IDE-agnostic**: do not rely on `$ARGUMENTS` or other placeholders, since not all IDEs support them. Instead, write the command so it **states what the user will supply** (e.g. a user story or design document, by link or by name) and **instructs the LLM to stop and prompt the user** if that input is missing. That pattern works consistently in every IDE. Below is an example showing this pattern plus location, purpose, structure, and a short checklist.
+Commands are markdown files. The slash name is the filename without `.md` (e.g. `write-design.md` → `/write-design`). This is a convention shared across IDEs; folder locations vary (see table below). Because commands are shared across IDEs (via rsync or symlinks), keep them **IDE-agnostic**: do not rely on `$ARGUMENTS` or other placeholders, since not all IDEs support them. Instead, write the command so it **states what the user will supply** (e.g. a user story or design document, by link or by name) and **instructs the LLM to stop and prompt the user** if that input is missing. That pattern works consistently in every IDE. Below is an example showing this pattern plus location, purpose, structure, and a short checklist.
 
 **Example (`.claude/commands/write-design.md`):**
 
@@ -82,6 +82,9 @@ Keep canonical commands in `.claude/commands/` and use a two-step `rsync` to kee
 
 IDE_COMMANDS=(.cursor/commands .windsurf/workflows .kilocode/workflows .agent/workflows)
 
+# Ensure canonical directory exists (first-time setup)
+mkdir -p .claude/commands
+
 # Step 1: reverse-sync — gather changes from any IDE location back to canonical
 for src in "${IDE_COMMANDS[@]}"; do
   [ -d "$src" ] && rsync -a "$src/" .claude/commands/
@@ -136,9 +139,9 @@ ln -s ../.claude/commands .agent/workflows
 
 Commit the symlinks so every team member on macOS/Linux gets the correct structure on clone.
 
-**GitHub Copilot (VS Code)** uses prompt files (`.prompt.md`) with different naming and optional frontmatter, so commands cannot be shared via symlinks or simple copies. Use a **sync** step instead; the **factory-engineering** skill includes sync instructions and a batch script (see [GitHub Copilot (VS Code)](#github-copilot-vs-code) below).
+**GitHub Copilot (VS Code)** uses prompt files (`.prompt.md`) with different naming and optional frontmatter, so commands cannot be shared via rsync or symlinks. Use a **format-aware sync** step instead; the **factory-engineering** skill includes sync instructions and a batch script (see [GitHub Copilot (VS Code)](#github-copilot-vs-code) below).
 
-Stored in `.claude/commands/`, this file is available as `/write-design` in Claude Code and Cursor; with copy-on-change or symlinks, the same file is used by Windsurf, Kilo Code, and Antigravity. Invoke with **slash-command at-artifact** (e.g. `/write-design @docs/user-stories/billing-email.md`).
+Stored in `.claude/commands/`, this file is available as `/write-design` in Claude Code and Cursor; with rsync or symlinks, the same file is used by Windsurf, Kilo Code, and Antigravity. Invoke with **slash-command at-artifact** (e.g. `/write-design @docs/user-stories/billing-email.md`).
 
 ## IDE-by-IDE Reference
 

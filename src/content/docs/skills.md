@@ -125,6 +125,9 @@ The two-step pattern handles the case where a developer edits a skill in a non-c
 
 IDE_SKILLS=(.windsurf/skills .kilocode/skills .agent/skills .agents/skills)
 
+# Ensure canonical directory exists (first-time setup)
+mkdir -p .claude/skills
+
 # Step 1: reverse-sync — gather changes from any IDE location back to canonical
 for src in "${IDE_SKILLS[@]}"; do
   [ -d "$src" ] && rsync -a "$src/" .claude/skills/

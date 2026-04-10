@@ -48,7 +48,8 @@ Since Cursor uses `.cursor/commands/` and the canonical commands live in `.claud
 
 ```bash
 # Gather any local changes back to canonical, then mirror
-rsync -a .cursor/commands/ .claude/commands/
+mkdir -p .claude/commands
+[ -d .cursor/commands ] && rsync -a .cursor/commands/ .claude/commands/
 mkdir -p .cursor/commands
 rsync -a --delete .claude/commands/ .cursor/commands/
 ```
