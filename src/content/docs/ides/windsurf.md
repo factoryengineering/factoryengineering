@@ -20,14 +20,16 @@ Windsurf is an AI-powered code editor featuring Cascade, a single shared AI agen
 
 Windsurf's Cascade agent looks for skills in `.windsurf/skills/`. Share skills from your canonical location using copy-on-change or a symlink:
 
-**Copy-on-change (recommended):**
+**Rsync (recommended):**
 
 ```bash
+# Gather any local changes back to canonical, then mirror
+[ -d .windsurf/skills ] && rsync -a .windsurf/skills/ .claude/skills/
 mkdir -p .windsurf/skills
-cp -R .claude/skills/. .windsurf/skills/
+rsync -a --delete .claude/skills/ .windsurf/skills/
 ```
 
-Automate with a Git hook or file watcher so copies stay in sync.
+Automate with a Git hook or file watcher so copies stay in sync. See [Skills — Sync with rsync](/skills#strategy-1--sync-with-rsync-recommended-for-most-teams) for the full two-step pattern covering all IDEs.
 
 **Symlink (macOS/Linux only):**
 
@@ -61,11 +63,12 @@ Windsurf calls them "workflows" — note that this is different from workflows i
 
 Share your canonical commands folder using copy-on-change or a symlink:
 
-**Copy-on-change (recommended):**
+**Rsync (recommended):**
 
 ```bash
+[ -d .windsurf/workflows ] && rsync -a .windsurf/workflows/ .claude/commands/
 mkdir -p .windsurf/workflows
-cp -R .claude/commands/. .windsurf/workflows/
+rsync -a --delete .claude/commands/ .windsurf/workflows/
 ```
 
 **Symlink (macOS/Linux only):**

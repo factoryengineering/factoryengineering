@@ -44,14 +44,16 @@ For more about how skills work in factory engineering, see [Skills](/skills).
 
 Since Cursor uses `.cursor/commands/` and the canonical commands live in `.claude/commands/`, you need to share them. **Copy-on-change is recommended** — Cursor's file watcher does not properly follow directory symlinks, which can cause commands to appear stale or missing until you restart the editor.
 
-**Copy-on-change (recommended):**
+**Rsync (recommended):**
 
 ```bash
+# Gather any local changes back to canonical, then mirror
+rsync -a .cursor/commands/ .claude/commands/
 mkdir -p .cursor/commands
-cp -R .claude/commands/. .cursor/commands/
+rsync -a --delete .claude/commands/ .cursor/commands/
 ```
 
-Automate this with a Git hook or file watcher so copies stay in sync.
+Automate this with a Git hook or file watcher so copies stay in sync. See [Commands — Sync with rsync](/commands#strategy-1--sync-with-rsync-recommended-for-most-teams) for the full two-step pattern covering all IDEs.
 
 **Symlink (not recommended for Cursor):**
 

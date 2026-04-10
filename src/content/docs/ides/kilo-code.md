@@ -20,14 +20,16 @@ Kilo Code is an open-source VS Code extension with a model aggregator backend th
 
 Kilo Code loads skills from `.kilocode/skills/`. Share skills from your canonical location using copy-on-change or a symlink:
 
-**Copy-on-change (recommended):**
+**Rsync (recommended):**
 
 ```bash
+# Gather any local changes back to canonical, then mirror
+[ -d .kilocode/skills ] && rsync -a .kilocode/skills/ .claude/skills/
 mkdir -p .kilocode/skills
-cp -R .claude/skills/. .kilocode/skills/
+rsync -a --delete .claude/skills/ .kilocode/skills/
 ```
 
-Automate with a Git hook or file watcher so copies stay in sync.
+Automate with a Git hook or file watcher so copies stay in sync. See [Skills — Sync with rsync](/skills#strategy-1--sync-with-rsync-recommended-for-most-teams) for the full two-step pattern covering all IDEs.
 
 **Symlink (macOS/Linux only):**
 
@@ -63,11 +65,12 @@ Kilo Code calls them "workflows" — this is Kilo Code's storage mechanism for c
 
 Share your canonical commands folder using copy-on-change or a symlink:
 
-**Copy-on-change (recommended):**
+**Rsync (recommended):**
 
 ```bash
+[ -d .kilocode/workflows ] && rsync -a .kilocode/workflows/ .claude/commands/
 mkdir -p .kilocode/workflows
-cp -R .claude/commands/. .kilocode/workflows/
+rsync -a --delete .claude/commands/ .kilocode/workflows/
 ```
 
 **Symlink (macOS/Linux only):**

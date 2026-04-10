@@ -113,19 +113,33 @@ Different IDEs look for skills in different folders. Managing multiple copies of
 
 This folder is the most widely recognized across the ecosystem. Use it as your source of truth.
 
-### Strategy 1 — Copy-on-Change (recommended for most teams)
+### Strategy 1 — Sync with rsync (recommended for most teams)
 
-Keep canonical skills in `.claude/skills/` and use a watcher, Git hook, or CI step to copy them into each IDE’s expected folder when they change. This approach works on every OS, avoids symlink pitfalls, and produces real files that every IDE’s file watcher can detect reliably.
+Keep canonical skills in `.claude/skills/` and use a two-step `rsync` to keep every IDE folder in sync. This approach works on every OS (rsync is pre-installed on macOS and Linux, and available on Windows via Git Bash/MSYS2), avoids symlink pitfalls, and produces real files that every IDE’s file watcher can detect reliably.
+
+The two-step pattern handles the case where a developer edits a skill in a non-canonical location (e.g., `.kilocode/skills/`) rather than in `.claude/skills/`. Step 1 gathers those changes back to canonical before step 2 mirrors canonical everywhere, so no work is lost.
 
 ```bash
-# Example: copy skills into each IDE folder after a change
-for dest in .windsurf/skills .kilocode/skills .agent/skills .agents/skills; do
+#!/usr/bin/env bash
+# sync-skills.sh — run from repo root
+
+IDE_SKILLS=(.windsurf/skills .kilocode/skills .agent/skills .agents/skills)
+
+# Step 1: reverse-sync — gather changes from any IDE location back to canonical
+for src in "${IDE_SKILLS[@]}"; do
+  [ -d "$src" ] && rsync -a "$src/" .claude/skills/
+done
+
+# Step 2: forward-sync — mirror canonical to all IDE locations
+for dest in "${IDE_SKILLS[@]}"; do
   mkdir -p "$dest"
-  cp -R .claude/skills/. "$dest"/
+  rsync -a --delete .claude/skills/ "$dest"/
 done
 ```
 
-Automate this with a `post-commit` or `post-merge` Git hook, a file-watcher script, or a CI step so copies never drift. Commit the copied folders so every team member gets them on clone.
+**Step 1** is additive (no `--delete`): new or modified files in any IDE folder are copied back to `.claude/skills/` without removing anything. **Step 2** uses `--delete` so each destination becomes an exact mirror of canonical — stale files that were removed from `.claude/skills/` are cleaned up.
+
+Automate this with a `post-commit` or `post-merge` Git hook, a file-watcher script, or a CI step so copies never drift. Commit the synced folders so every team member gets them on clone.
 
 ### Strategy 2 — IDE-Native Locations Only
 

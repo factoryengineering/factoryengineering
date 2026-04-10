@@ -72,19 +72,31 @@ From here, every team member uses **slash-command at-artifact** (e.g. `/write-sp
 
 Both **commands** and **workflows** are stored in `.claude/commands/`. Each IDE looks in a different folder. Use one of the strategies below so that one canonical location works everywhere.
 
-### Strategy 1 — Copy-on-Change (recommended for most teams)
+### Strategy 1 — Sync with rsync (recommended for most teams)
 
-Keep canonical commands in `.claude/commands/` and copy them into each IDE's expected folder when they change. This works on every OS and avoids symlink caveats (see Strategy 3).
+Keep canonical commands in `.claude/commands/` and use a two-step `rsync` to keep every IDE folder in sync. This works on every OS and avoids symlink caveats (see Strategy 3). The two-step pattern gathers changes from non-canonical locations first, so a developer who edits in `.kilocode/workflows/` does not lose work when the sync runs.
 
 ```bash
-# Example: copy commands into each IDE folder after a change
-for dest in ".cursor/commands" ".windsurf/workflows" ".kilocode/workflows" ".agent/workflows"; do
+#!/usr/bin/env bash
+# sync-commands.sh — run from repo root
+
+IDE_COMMANDS=(.cursor/commands .windsurf/workflows .kilocode/workflows .agent/workflows)
+
+# Step 1: reverse-sync — gather changes from any IDE location back to canonical
+for src in "${IDE_COMMANDS[@]}"; do
+  [ -d "$src" ] && rsync -a "$src/" .claude/commands/
+done
+
+# Step 2: forward-sync — mirror canonical to all IDE locations
+for dest in "${IDE_COMMANDS[@]}"; do
   mkdir -p "$dest"
-  cp -R .claude/commands/. "$dest"/
+  rsync -a --delete .claude/commands/ "$dest"/
 done
 ```
 
-Automate this with a Git hook, file watcher, or CI step so copies never drift. Commit the copied folders.
+**Step 1** is additive (no `--delete`): new or modified files in any IDE folder are copied back to `.claude/commands/`. **Step 2** uses `--delete` so each destination becomes an exact mirror of canonical.
+
+Automate this with a Git hook, file watcher, or CI step so copies never drift. Commit the synced folders.
 
 ### Strategy 2 — IDE-Native Locations Only
 

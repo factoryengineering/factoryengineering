@@ -21,14 +21,16 @@ OpenAI Codex adopted the Agent Skills open standard in December 2025, reaching p
 
 Codex uses the shared `.agents/skills/` convention (not a Codex-specific folder) and evaluates each skill's `description` via progressive disclosure to decide when to load it. Share skills from your canonical location using copy-on-change or a symlink:
 
-**Copy-on-change (recommended):**
+**Rsync (recommended):**
 
 ```bash
+# Gather any local changes back to canonical, then mirror
+[ -d .agents/skills ] && rsync -a .agents/skills/ .claude/skills/
 mkdir -p .agents/skills
-cp -R .claude/skills/. .agents/skills/
+rsync -a --delete .claude/skills/ .agents/skills/
 ```
 
-Automate with a Git hook or file watcher so copies stay in sync.
+Automate with a Git hook or file watcher so copies stay in sync. See [Skills — Sync with rsync](/skills#strategy-1--sync-with-rsync-recommended-for-most-teams) for the full two-step pattern covering all IDEs.
 
 **Symlink (macOS/Linux only):**
 

@@ -22,14 +22,16 @@ Antigravity uses progressive disclosure for skills — each skill sits dormant u
 
 Antigravity uses `.agent/skills/` at the project level. Share skills from your canonical location using copy-on-change or a symlink:
 
-**Copy-on-change (recommended):**
+**Rsync (recommended):**
 
 ```bash
+# Gather any local changes back to canonical, then mirror
+[ -d .agent/skills ] && rsync -a .agent/skills/ .claude/skills/
 mkdir -p .agent/skills
-cp -R .claude/skills/. .agent/skills/
+rsync -a --delete .claude/skills/ .agent/skills/
 ```
 
-Automate with a Git hook or file watcher so copies stay in sync.
+Automate with a Git hook or file watcher so copies stay in sync. See [Skills — Sync with rsync](/skills#strategy-1--sync-with-rsync-recommended-for-most-teams) for the full two-step pattern covering all IDEs.
 
 **Symlink (macOS/Linux only):**
 
@@ -53,11 +55,12 @@ For more about how skills work in factory engineering, see [Skills](/skills).
 
 Share your canonical commands folder using copy-on-change or a symlink:
 
-**Copy-on-change (recommended):**
+**Rsync (recommended):**
 
 ```bash
+[ -d .agent/workflows ] && rsync -a .agent/workflows/ .claude/commands/
 mkdir -p .agent/workflows
-cp -R .claude/commands/. .agent/workflows/
+rsync -a --delete .claude/commands/ .agent/workflows/
 ```
 
 **Symlink (macOS/Linux only):**
