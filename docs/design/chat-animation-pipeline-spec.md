@@ -45,14 +45,14 @@ The `config` section is optional. All visual and timing parameters have defaults
 ```yaml
 # Optional — override any default
 config:
-  width: 720
-  height: 420
+  width: 360
+  height: 210
   fps: 15
   theme: dark
   char_delay_user_ms: 28
   char_delay_ai_ms: 18
   think_delay_ms: 900
-  pause_on_last_ms: 2000
+  pause_on_last_ms: 4000
   font_mono: "JetBrainsMono-Regular.ttf"
 
 exchanges:
@@ -90,14 +90,14 @@ All defaults are derived from the factoryengineering.dev visual identity. Develo
 module.exports = {
   // Canvas
   width:              360,
-  height:             420,
+  height:             210,
   fps:                15,
 
   // Timing (milliseconds)
   char_delay_user_ms: 28,
   char_delay_ai_ms:   18,
   think_delay_ms:     900,
-  pause_on_last_ms:   2000,   // hold on final frame before loop
+  pause_on_last_ms:   4000,   // hold on final frame before loop
 
   // Theme — dark, matching factoryengineering.dev
   theme:              'dark',

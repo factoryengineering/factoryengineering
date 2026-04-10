@@ -6,13 +6,13 @@ Source of truth for the conversation input format.
 
 ```yaml
 config:        # optional — any key overrides defaults.js
-  width: 720
-  height: 420
+  width: 360
+  height: 210
   fps: 15
   char_delay_user_ms: 28
   char_delay_ai_ms: 18
   think_delay_ms: 900
-  pause_on_last_ms: 2000
+  pause_on_last_ms: 4000
   encoder: ffmpeg    # or 'gifski'
 
 exchanges:     # required, non-empty
