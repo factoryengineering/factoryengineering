@@ -120,8 +120,8 @@ Keep canonical skills in `.claude/skills/` and use a watcher, Git hook, or CI st
 ```bash
 # Example: copy skills into each IDE folder after a change
 for dest in .windsurf/skills .kilocode/skills .agent/skills .agents/skills; do
-  mkdir -p "$(dirname "$dest")"
-  cp -R .claude/skills "$dest"
+  mkdir -p "$dest"
+  cp -R .claude/skills/. "$dest"/
 done
 ```
 

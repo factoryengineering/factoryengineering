@@ -24,8 +24,8 @@ Codex uses the shared `.agents/skills/` convention (not a Codex-specific folder)
 **Copy-on-change (recommended):**
 
 ```bash
-mkdir -p .agents
-cp -R .claude/skills .agents/skills
+mkdir -p .agents/skills
+cp -R .claude/skills/. .agents/skills/
 ```
 
 Automate with a Git hook or file watcher so copies stay in sync.

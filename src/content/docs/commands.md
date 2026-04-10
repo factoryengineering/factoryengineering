@@ -78,9 +78,9 @@ Keep canonical commands in `.claude/commands/` and copy them into each IDE's exp
 
 ```bash
 # Example: copy commands into each IDE folder after a change
-for pair in ".cursor/commands" ".windsurf/workflows" ".kilocode/workflows" ".agent/workflows"; do
-  mkdir -p "$(dirname "$pair")"
-  cp -R .claude/commands "$pair"
+for dest in ".cursor/commands" ".windsurf/workflows" ".kilocode/workflows" ".agent/workflows"; do
+  mkdir -p "$dest"
+  cp -R .claude/commands/. "$dest"/
 done
 ```
 

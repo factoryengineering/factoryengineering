@@ -25,7 +25,8 @@ Antigravity uses `.agent/skills/` at the project level. Share skills from your c
 **Copy-on-change (recommended):**
 
 ```bash
-cp -R .claude/skills .agent/skills
+mkdir -p .agent/skills
+cp -R .claude/skills/. .agent/skills/
 ```
 
 Automate with a Git hook or file watcher so copies stay in sync.
@@ -55,8 +56,8 @@ Share your canonical commands folder using copy-on-change or a symlink:
 **Copy-on-change (recommended):**
 
 ```bash
-mkdir -p .agent
-cp -R .claude/commands .agent/workflows
+mkdir -p .agent/workflows
+cp -R .claude/commands/. .agent/workflows/
 ```
 
 **Symlink (macOS/Linux only):**

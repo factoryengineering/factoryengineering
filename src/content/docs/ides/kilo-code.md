@@ -23,7 +23,8 @@ Kilo Code loads skills from `.kilocode/skills/`. Share skills from your canonica
 **Copy-on-change (recommended):**
 
 ```bash
-cp -R .claude/skills .kilocode/skills
+mkdir -p .kilocode/skills
+cp -R .claude/skills/. .kilocode/skills/
 ```
 
 Automate with a Git hook or file watcher so copies stay in sync.
@@ -65,7 +66,8 @@ Share your canonical commands folder using copy-on-change or a symlink:
 **Copy-on-change (recommended):**
 
 ```bash
-cp -R .claude/commands .kilocode/workflows
+mkdir -p .kilocode/workflows
+cp -R .claude/commands/. .kilocode/workflows/
 ```
 
 **Symlink (macOS/Linux only):**

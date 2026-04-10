@@ -47,7 +47,8 @@ Since Cursor uses `.cursor/commands/` and the canonical commands live in `.claud
 **Copy-on-change (recommended):**
 
 ```bash
-cp -R .claude/commands .cursor/commands
+mkdir -p .cursor/commands
+cp -R .claude/commands/. .cursor/commands/
 ```
 
 Automate this with a Git hook or file watcher so copies stay in sync.

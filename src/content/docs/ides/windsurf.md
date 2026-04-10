@@ -23,7 +23,8 @@ Windsurf's Cascade agent looks for skills in `.windsurf/skills/`. Share skills f
 **Copy-on-change (recommended):**
 
 ```bash
-cp -R .claude/skills .windsurf/skills
+mkdir -p .windsurf/skills
+cp -R .claude/skills/. .windsurf/skills/
 ```
 
 Automate with a Git hook or file watcher so copies stay in sync.
@@ -63,7 +64,8 @@ Share your canonical commands folder using copy-on-change or a symlink:
 **Copy-on-change (recommended):**
 
 ```bash
-cp -R .claude/commands .windsurf/workflows
+mkdir -p .windsurf/workflows
+cp -R .claude/commands/. .windsurf/workflows/
 ```
 
 **Symlink (macOS/Linux only):**
