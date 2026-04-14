@@ -3,7 +3,7 @@ config:
 
 exchanges:
   - role: user
-    text: "Did you use any skills to write that query? If yes, which ones."
+    text: "Did you use any skills to write that query? If yes, which ones? If no, why not?"
 
   - role: assistant
     text: |
