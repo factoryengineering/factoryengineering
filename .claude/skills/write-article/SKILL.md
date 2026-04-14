@@ -68,4 +68,15 @@ Create one or more focused commits on the current feature branch:
 - The new article and its `.chat.yaml` in one commit.
 - Cross-article link updates and the homepage card update in a separate commit if the changes are substantial, otherwise fold them in.
 
-Push the branch. Do not open a pull request unless the user explicitly asks for one.
+Push the branch.
+
+## 7. Open a pull request
+
+After the branch is pushed, open a pull request for the new article. Use the GitHub MCP tools (do not use `gh`).
+
+- **Title:** `Article N: <Article Title>` — match the article's series position and title.
+- **Body:** a short summary of what the article teaches, a reference to the source issue (e.g. `Closes #30`), and a brief list of the files touched (new `.mdx`, new `.chat.yaml`, homepage card update, previous-article link conversion).
+- **Base branch:** `main`.
+- **Head branch:** the feature branch you just pushed.
+
+Return the PR URL in your final message so the user can review it.
