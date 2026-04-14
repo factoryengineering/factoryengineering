@@ -1,0 +1,33 @@
+config:
+  height: 340
+
+exchanges:
+  - role: user
+    text: "Did you use any skills to write that query? If yes, which ones."
+
+  - role: assistant
+    text: |
+      No. I did not load `linq-standards`. Its
+      description says "use when writing LINQ
+      queries." Your task asked for a "repository
+      method returning order totals per customer,"
+      which didn't obviously match.
+
+  - role: user
+    text: "Then the description is the first fix. Then add a rule for navigation properties and an example for group by."
+
+  - role: assistant
+    text: |
+      Updated SKILL.md:
+
+      - description: EF Core queries, repository
+        methods, aggregations, and projections...
+
+      ## Prefer navigation properties
+      Do not write explicit `join` when a
+      navigation property exists.
+
+      from o in context.Orders
+      group o by new { o.Customer.Id, o.Customer.Name }
+        into g
+      select new CustomerOrderTotalDto { ... };
