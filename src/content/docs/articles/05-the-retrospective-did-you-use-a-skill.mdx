@@ -96,21 +96,6 @@ var totals = await totalsSpec.ToListAsync();
 
 Two observations, two concrete edits. No "improve grouping coverage" tickets. Every new line corresponds to something that actually went wrong in the clean room.
 
-## Keep a refinement log
-
-At the bottom of the skill, add a one-line note:
-
-```markdown
-## Refinement log
-
-- 2026-04-11: Added navigation properties rule and
-  grouping example after a clean room test produced
-  an explicit join. Rewrote the description to trigger
-  on repository methods and aggregations.
-```
-
-The log costs nothing to write. Six months later, when somebody wonders why a rule is phrased so narrowly, the log answers without a code archaeology session.
-
 ## Re-test in a clean room
 
 Close everything. Open a fresh session. Give the assistant a new repository task that exercises grouping and a navigation property — ideally one you have not seen before. Watch it name the skill when you ask what it loaded. Watch the output follow the new rule.
