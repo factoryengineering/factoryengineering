@@ -38,12 +38,15 @@ Draft the article following `article-voice` and `add-article`. Work the teaching
 - **End with the next-article hook.** Name the next article as plain text (no link, since it does not exist yet) and state what it covers.
 - **Add the references footer** per `add-article`: horizontal rule, `Next: Article N+1 — Title` line, and a short pointer to the [Skills page](/skills) and [agentskills.io](https://agentskills.io).
 
-## 4. Update related articles
+## 4. Update related articles and navigation
 
-Now that the new article exists, wire it into the rest of the site.
+Now that the new article exists, wire it into every surface that lists articles. Missing one of these is the most common write-article bug.
 
 - **Convert cross-article references.** Search earlier articles for plain-text mentions of the new article's title. Convert each one to a proper link. Only convert references that match the new article — do not touch references to articles that still do not exist.
 - **Update the homepage Articles card.** In `src/content/docs/index.mdx`, add the new article to the `<ListCard title="Articles">` bullet list and increment the `number` prop. Confirm the link path matches the file's slug.
+- **Update the /articles index page.** In `src/content/docs/articles.md`, add the new article as a bullet under the `## Build Your Software Factory` section. Use the same one-line description tone as the existing entries.
+- **Update the top navigation dropdown.** In `src/config/menu.en.json`, add the new article to the `Articles` entry's `children` array. The Articles entry is a `hasChildren: true` dropdown — keep `All articles` as the first child and append each article in series order. Use trailing slashes on URLs to match the existing pattern.
+- **Update the sidebar.** In `src/config/sidebar.json`, add the new article to the `Articles` group's `items` array, after `Browse Articles`. Use a slug like `articles/NN-title-in-kebab-case` (no leading slash, no `.mdx`).
 - **Verify the previous article's "Next" line.** If the previous article's hook referenced this article as plain text, convert it to a link.
 
 ## 5. Review against the rules
@@ -59,6 +62,9 @@ Before committing, walk through this checklist:
 - [ ] Terminology matches `article-voice` (assistant vs. agent, skill vs. command vs. workflow).
 - [ ] No links point to articles that do not yet exist.
 - [ ] Homepage Articles card has been updated (link added, count incremented).
+- [ ] `/articles` index page (`src/content/docs/articles.md`) has the new article under `## Build Your Software Factory`.
+- [ ] Top navigation dropdown (`src/config/menu.en.json`) lists the new article under `Articles`.
+- [ ] Sidebar (`src/config/sidebar.json`) lists the new article under `Articles`, after `Browse Articles`.
 - [ ] Previous article's cross-article reference has been converted to a link if applicable.
 
 ## 6. Commit and push
@@ -68,4 +74,15 @@ Create one or more focused commits on the current feature branch:
 - The new article and its `.chat.yaml` in one commit.
 - Cross-article link updates and the homepage card update in a separate commit if the changes are substantial, otherwise fold them in.
 
-Push the branch. Do not open a pull request unless the user explicitly asks for one.
+Push the branch.
+
+## 7. Open a pull request
+
+After the branch is pushed, open a pull request for the new article. Use the GitHub MCP tools (do not use `gh`).
+
+- **Title:** `Article N: <Article Title>` — match the article's series position and title.
+- **Body:** a short summary of what the article teaches, a reference to the source issue (e.g. `Closes #30`), and a brief list of the files touched (new `.mdx`, new `.chat.yaml`, homepage card update, previous-article link conversion).
+- **Base branch:** `main`.
+- **Head branch:** the feature branch you just pushed.
+
+Return the PR URL in your final message so the user can review it.

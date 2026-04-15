@@ -29,7 +29,26 @@
     },
     {
       "name": "Articles",
-      "url": "/articles/"
+      "url": "",
+      "hasChildren": true,
+      "children": [
+        {
+          "name": "All articles",
+          "url": "/articles/"
+        },
+        {
+          "name": "Do the Work, Then Capture It",
+          "url": "/articles/03-do-the-work-then-capture-it/"
+        },
+        {
+          "name": "Test Your Skill in a Clean Room",
+          "url": "/articles/04-test-your-skill-in-a-clean-room/"
+        },
+        {
+          "name": "The Retrospective: \"Did You Use a Skill?\"",
+          "url": "/articles/05-the-retrospective-did-you-use-a-skill/"
+        }
+      ]
     },
     {
       "name": "Examples",

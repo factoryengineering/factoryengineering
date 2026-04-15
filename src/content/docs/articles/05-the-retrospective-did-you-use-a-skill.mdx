@@ -1,0 +1,113 @@
+---
+title: 'The Retrospective: "Did You Use a Skill?"'
+description: "A clean-room test leaves a list of gaps. A retrospective turns them into specific skill edits, starting with one question: did the skill even load?"
+publishDate: 2026-04-11
+author: "Factory Engineering Team"
+tags: ["tutorial", "skills", "hands-on", "series-build-your-factory"]
+draft: false
+---
+
+import ChatAnim from '~/components/user-components/ChatAnim.astro';
+
+*Build Your Software Factory — Article 3 of 20*
+
+<ChatAnim src="/animations/05-the-retrospective-did-you-use-a-skill.gif" alt="Developer asking the assistant whether it loaded the LINQ skill, then refining the description and adding a navigation properties rule" />
+
+You have a gap list from the clean room test. Explicit joins where navigation properties should go. No coverage for grouping or aggregates. And a sticky question at the top of the notes: did the assistant even load the skill?
+
+That list is evidence, not a plan. A retrospective turns it into specific edits.
+
+## Ask first: did you use a skill?
+
+Reopen the clean-room session. Before you critique any output, find out whether the skill loaded at all. Ask the assistant directly:
+
+> Did you use any skills to write that query? If yes, which ones? If no, why not?
+
+The assistant answers honestly:
+
+> I did not load the `linq-standards` skill. Its description says "use when writing LINQ queries." The task asked for a "repository method that returns total order amounts per customer," which didn't obviously match that trigger.
+
+That is a different failure from a loaded-but-weak skill. Treat them separately.
+
+**Loaded but weak** means the rules are incomplete or ambiguous. The fix lives in the body of the skill.
+
+**Never triggered** means the description is wrong. The fix lives in the frontmatter. You can write the best rules in the world. If the description does not match the task, none of them run.
+
+In this skill, both are broken. Fix the description first.
+
+## Fix the description
+
+Rewrite the trigger using the failure as evidence:
+
+> Rewrite `linq-standards`'s description so it triggers on repository methods, queries, aggregations, and projections. Not only the phrase "LINQ query."
+
+The assistant edits `.claude/skills/linq-standards/SKILL.md`:
+
+```diff
+- description: Guidelines for writing LINQ queries using
+-   Entity Framework Core. Use when writing LINQ queries.
++ description: Guidelines for writing EF Core queries,
++   repository methods, projections, and aggregations.
++   Use whenever composing LINQ against a DbContext,
++   including group-by, joins, and DTO projection,
++   regardless of whether the user says "LINQ."
+```
+
+That edit is the first concrete output of the retrospective. Nothing else in the skill matters until the description matches the tasks that should load it.
+
+## Categorize the rest of the gaps
+
+Now sort the remaining observations into two buckets.
+
+**Convention violations.** The query used `join c in _db.Customers on o.CustomerId equals c.Id` instead of `o.Customer.Name`. The SQL would have worked. It just wasn't your team's style. This is a missing rule.
+
+**Missing coverage.** The skill said nothing about `group by`, aggregates, or projections over grouped sets. The assistant improvised. Improvisation is the signal. Anywhere the skill is silent, the assistant fills in whatever the training data suggests.
+
+One bucket gets new rules. The other gets new examples.
+
+## Refine with precision
+
+Hand the list back to the assistant as specific instructions, not vague goals:
+
+> Add two things to `linq-standards`. First, a rule: "Use navigation properties for related entities. Do not write explicit `join` clauses unless no navigation property exists." Second, a worked example for grouping with an aggregate, using navigation properties.
+
+The assistant appends:
+
+````markdown
+## Prefer navigation properties
+
+Do not write explicit `join` clauses when EF Core
+exposes a navigation property. The navigation reads
+clearly and survives schema changes.
+
+```csharp
+var totalsSpec =
+    from o in context.Orders
+    where o.OrderDate.Year == year
+    group o by new { o.Customer.Id, o.Customer.Name } into g
+    select new CustomerOrderTotalDto
+    {
+        CustomerName = g.Key.Name,
+        TotalAmount = g.Sum(x => x.Amount)
+    };
+var totals = await totalsSpec.ToListAsync();
+```
+````
+
+Two observations, two concrete edits. No "improve grouping coverage" tickets. Every new line corresponds to something that actually went wrong in the clean room.
+
+## Re-test in a clean room
+
+Close everything. Open a fresh session. Give the assistant a new repository task that exercises grouping and a navigation property — ideally one you have not seen before. Watch it name the skill when you ask what it loaded. Watch the output follow the new rule.
+
+You are now one full loop into the cycle:
+
+Capture → Test → **Retrospective** → Refine → Optimize
+
+The skill went from a raw capture to something that holds its ground on tasks it has never seen. One step remains before it is ready for real pressure. In the next article, *Sharpen Your Skill with /skill-optimizer*, we hand the refined skill to a dedicated optimization command and watch it tighten every line.
+
+---
+
+*Next: Article 4 — Sharpen Your Skill with /skill-optimizer*
+
+For background on skill structure and the iterative creation process, see the [Skills page](/skills). For the formal skill specification, see [agentskills.io](https://agentskills.io).

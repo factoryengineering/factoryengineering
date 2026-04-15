@@ -24,7 +24,12 @@
     },
     {
       "label": "Articles",
-      "items": [{"label": "Browse Articles", "slug": "articles"}]
+      "items": [
+        {"label": "Browse Articles", "slug": "articles"},
+        {"label": "Do the Work, Then Capture It", "slug": "articles/03-do-the-work-then-capture-it"},
+        {"label": "Test Your Skill in a Clean Room", "slug": "articles/04-test-your-skill-in-a-clean-room"},
+        {"label": "The Retrospective: \"Did You Use a Skill?\"", "slug": "articles/05-the-retrospective-did-you-use-a-skill"}
+      ]
     },
     {
       "label": "Examples",
