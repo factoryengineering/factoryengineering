@@ -1,0 +1,32 @@
+config:
+  height: 340
+
+exchanges:
+  - role: user
+    text: |
+      /skill-optimizer linq-standards. Goals:
+      trigger on every query task, pair rules
+      with anti-examples, drop anything we
+      haven't actually asserted.
+
+  - role: assistant
+    text: |
+      Proposed diff:
+
+      - description: Guidelines for writing...
+      + description: EF Core query conventions.
+      +   Use when writing any IQueryable
+      +   against a DbContext.
+
+      + ## Prefer expression trees for
+      +   complex predicates...
+
+  - role: user
+    text: "Accept the description. Drop the expression-tree section. Not a team convention."
+
+  - role: assistant
+    text: |
+      Applied. Every rule now has a paired
+      Do/Don't. Added "When not to load"
+      scope list. Changelog updated. Ready
+      to re-validate in a clean room.
