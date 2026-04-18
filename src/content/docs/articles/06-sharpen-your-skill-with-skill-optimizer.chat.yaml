@@ -26,7 +26,7 @@ exchanges:
 
   - role: assistant
     text: |
-      Applied. Every rule now has a paired
-      Do/Don't. Added "When not to load"
-      scope list. Changelog updated. Ready
-      to re-validate in a clean room.
+      Applied. The description is accepted
+      and the expression-tree section has
+      been removed. Ready to re-validate in
+      a clean room.
