@@ -26,6 +26,8 @@ if (theme.fonts.font_family.secondary) {
 
 {head.map(({ tag: Tag, attrs, content }) => <Tag {...attrs} set:html={content} />)}
 
+<link rel="alternate" type="application/rss+xml" title="Factory Engineering" href="/rss.xml" />
+
 <!-- google font css -->
     <AstroFont
       config={[
