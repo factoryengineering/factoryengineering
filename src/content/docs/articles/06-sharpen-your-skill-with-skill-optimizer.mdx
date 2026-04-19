@@ -1,6 +1,6 @@
 ---
 title: "Sharpen Your Skill with /skill-optimizer"
-description: "A refined skill from a retrospective is good, not tight. /skill-optimizer reads it against the canonical best practices, proposes edits, and you accept only the ones that sharpen it."
+description: "A refined skill from a retrospective is good, not tight. /skill-optimizer reads it against Anthropic's published authoring best practices and returns concrete edits."
 publishDate: 2026-04-18
 author: "Factory Engineering Team"
 tags: ["tutorial", "skills", "hands-on", "series-build-your-factory"]
@@ -11,27 +11,43 @@ import ChatAnim from '~/components/user-components/ChatAnim.astro';
 
 *Build Your Software Factory — Article 4 of 20*
 
-<ChatAnim src="/animations/06-sharpen-your-skill-with-skill-optimizer.gif" alt="Developer running /skill-optimizer on the LINQ skill, accepting two sharpening edits, rejecting one overfitting edit, and updating the changelog" />
+<ChatAnim src="/animations/06-sharpen-your-skill-with-skill-optimizer.gif" alt="Developer installing skill-optimizer, invoking /skill-optimizer optimize /linq-standards, reviewing the proposed diff, and accepting the sharpening edits" />
 
 You closed the retrospective with a refined LINQ skill. The description triggers on more than the phrase "LINQ query." A navigation-property rule pushes the assistant off explicit joins. A grouping example shows a worked aggregate. That is a good skill. It is not yet a tight one.
 
-A tight skill survives neglect. Another teammate opens it, skims it, and writes what you would write. Getting there means reading every line against a checklist and cutting what does not earn its space.
+Tight means the skill matches the published authoring standard: a single, specific description; rules sized for their fragility; examples that do the teaching; no tokens that don't earn their space. Anthropic maintains that standard as a living document at [Agent Skills best practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices). You could walk it by hand. A dedicated skill walks it for you.
 
-`/skill-optimizer` exists for that pass. It reads your SKILL.md against the canonical [Agent Skills best practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices), proposes edits, and waits for you to decide. You accept the ones that sharpen the skill. You reject the ones that flatten it.
+## Install skill-optimizer
 
-## Name the optimization goals first
+`skill-optimizer` is a published skill from `factoryengineering/skills`. Install it once per repo:
 
-Before you invoke the command, write down what "sharper" means for this skill and hand the list to the assistant:
+```bash
+npx openskills install factoryengineering/skills
+```
 
-> Run /skill-optimizer on linq-standards. Focus on three things: the description triggers on every query task, every rule has a paired anti-example, and anything the skill doesn't actually assert is either removed or called out as out of scope.
+The installer places `.claude/skills/skill-optimizer/` in your project, including a bundled copy of the best-practices reference so the skill works offline. Commit the install. Every teammate who clones the repo gets the same optimizer.
 
-Without goals, the optimizer tends to rewrite prose for smoothness. That is not what you want. You want determinism.
+## What "best practices" actually means
 
-## Read the diff hunk by hunk
+Before you run the optimizer, know what it is checking. The published guide is long; the working set is short:
 
-> /skill-optimizer linq-standards
+- **Concise over complete.** SKILL.md shares the context window with everything else the assistant needs. Every line should answer "does the assistant already know this?" If yes, delete.
+- **A specific description, written in third person.** The description is how the assistant picks your skill out of dozens. It must name what the skill does and when to load it.
+- **Appropriate degrees of freedom.** Fragile operations get exact scripts. Open-ended judgment gets heuristics. Do not write prose for a task that needs a command.
+- **Progressive disclosure.** Keep SKILL.md under 500 lines. Move long reference material into sibling files linked one level deep.
+- **Examples, not explanations.** Pair each rule with a worked example. For style-sensitive rules, add an anti-example.
+- **Consistent terminology.** Pick one term for each concept and use it everywhere.
+- **Testable, not decorative.** A skill without a validation task set is a guess.
 
-The assistant walks the checklist and returns a diff. A typical first pass:
+That is what the optimizer is grading against.
+
+## Run it
+
+From the project root, with `linq-standards` already in `.claude/skills/`:
+
+> /skill-optimizer optimize /linq-standards
+
+That is the whole invocation. No goals, no flags. The skill reads `.claude/skills/linq-standards/SKILL.md`, walks its bundled checklist, and returns a diff grouped by concern:
 
 ```diff
 - description: Guidelines for writing EF Core queries,
@@ -39,33 +55,26 @@ The assistant walks the checklist and returns a diff. A typical first pass:
 -   Use whenever composing LINQ against a DbContext,
 -   including group-by, joins, and DTO projection,
 -   regardless of whether the user says "LINQ."
-+ description: EF Core query conventions for repository
-+   methods, projections, and aggregations. Use when
-+   writing any IQueryable against a DbContext,
++ description: Enforces EF Core query conventions for
++   repository methods, projections, and aggregations.
++   Use when writing any IQueryable against a DbContext,
 +   including group-by, joins, and DTO projections.
 
-- ## Separate specification from execution
-- Always use query syntax (`from...select`) and separate
-- IQueryable definition from async execution:
-+ ## Specification and execution are separate
-+ Build the IQueryable as a local variable. Execute
-+ it on the next line with a terminal operator.
+  ## Prefer navigation properties
+  Do not write explicit `join` clauses when EF Core
+  exposes a navigation property.
 +
-+ Do: `var totalsSpec = ...` then
-+      `await totalsSpec.ToListAsync();`
-+ Don't: chain filtering and `.ToListAsync()`
-+        in a single expression.
++ Do:    `from o in context.Orders
++         select new { o.Customer.Name }`
++ Don't: `from o in context.Orders
++         join c in context.Customers on ...`
 ```
 
-Read each hunk on its own. Do not batch-accept.
+The description now leads with a verb in third person. The navigation-property rule is paired with a named Do/Don't. Both are straight out of the published guide.
 
 ## Accept what sharpens, reject what flattens
 
-The description edit is good. The old one was a run-on that buried the trigger phrase. The new one fronts it. Accept.
-
-The Do/Don't edit is good. A rule paired with an anti-example is harder to miss than a rule alone. The best-practices guide calls this out directly: examples teach style more clearly than descriptions. Accept.
-
-Then read this one carefully:
+The optimizer is not infallible. It infers from categories and sometimes proposes rules you never set. A typical over-reach:
 
 ```diff
 + ## Prefer expression trees for complex predicates
@@ -73,38 +82,30 @@ Then read this one carefully:
 + compose with `Expression<Func<T, bool>>`.
 ```
 
-You never said that. The optimizer inferred it from the category. Accepting would bake a convention into the skill your team has not adopted. Reject:
+You never said that. Reject it:
 
 > Drop the expression-tree section. Not a team convention. Do not add rules that weren't in the source material.
 
-This is the judgment part. The tool accelerates iteration. It does not inherit your authority over what the skill asserts.
+Judgment stays with you. The optimizer accelerates the pass. It does not inherit your authority over what the skill asserts.
 
-## Strengthen examples and scope
+## Validate the result
 
-With the safe edits applied, pick two more targets from the checklist: anti-examples on every rule and an explicit "when not to load" section. Ask for both in one pass:
+A sharpening pass needs proof. Build a small task set: three jobs the skill should handle, two it should decline, one that looks close but falls outside scope. Run each in a fresh session:
 
-> Pair the navigation-property rule with an anti-example showing the rejected `join` clause. Then add a "When not to load" section listing three tasks that should not trigger this skill: raw SQL migrations, stored-procedure calls, and Dapper queries.
+> Run the validation tasks against linq-standards. For each, report: did the skill load, did the output match the rules, any rule that should have applied and didn't.
 
-The optimizer returns targeted edits. Every rule now has a paired anti-example. The skill declares its boundaries, not just its content. Skills that say where they do not apply are easier for the assistant to select correctly.
-
-## Validate against a task set
-
-One sharpening pass does not prove anything. Build a small set: three tasks the skill should handle, two it should decline, one that looks close but falls outside scope. Run each in a fresh session:
-
-> Run the validation tasks against linq-standards. For each, report: did the skill load, did the output match the rules, and was there any rule that should have applied and didn't.
-
-Anything that fails goes into the next optimization round. The cycle is tight: observe, edit, re-validate. You are not chasing a perfect skill. You are closing every known failure on its declared scope.
+Anything that fails goes into the next optimization round. The cycle is tight: observe, optimize, re-validate.
 
 ## Keep a changelog
 
-Append a `## Changelog` section to the skill. One line per accepted edit, one line per rejected suggestion and why. This is the history you will want in six months when you wonder why a rule reads the way it does.
+Append a `## Changelog` section to the skill. One line per accepted edit, one line per rejected suggestion and why. You will want this history in six months when you wonder why a rule reads the way it does.
 
 ```markdown
 ## Changelog
 
-- 2026-04-18: Tightened description to lead with trigger.
-- 2026-04-18: Paired every rule with Do/Don't examples.
-- 2026-04-18: Added "When not to load" scope list.
+- 2026-04-18: Ran /skill-optimizer. Description
+  rewritten in third person, leading with verb.
+- 2026-04-18: Paired every rule with a Do/Don't.
 - 2026-04-18: Rejected expression-tree section
   (not a team convention).
 ```
@@ -113,10 +114,10 @@ The skill now holds its ground. You have closed the loop:
 
 Capture → Test → Retrospective → Refine → **Optimize**
 
-This is the end of the skills act. You have a workflow for turning real corrections into a durable skill and a way to sharpen it against a canonical standard. In the next article, *Watch the LLM Work, Then Write the Command*, we shift to commands. We watch the assistant execute a repetitive migration sequence, then capture the exact steps as a slash command the whole team can invoke.
+This is the end of the skills act. You have a workflow for turning real corrections into a durable skill and a published standard you can apply to any skill in the repo with one command. In the next article, *Watch the LLM Work, Then Write the Command*, we shift from skills to commands. We watch the assistant execute a repetitive migration sequence, then capture the exact steps as a slash command the whole team can invoke.
 
 ---
 
 *Next: Article 5 — Watch the LLM Work, Then Write the Command*
 
-For background on skill structure and iteration, see the [Skills page](/skills). For the formal skill specification, see [agentskills.io](https://agentskills.io). The authoring checklist this article applies comes from the canonical [Agent Skills best practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices).
+For background on skill structure and iteration, see the [Skills page](/skills). For the formal skill specification, see [agentskills.io](https://agentskills.io). The authoring standard `/skill-optimizer` applies is Anthropic's [Agent Skills best practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices).

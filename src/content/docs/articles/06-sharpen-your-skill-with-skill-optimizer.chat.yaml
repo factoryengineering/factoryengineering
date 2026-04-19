@@ -3,20 +3,27 @@ config:
 
 exchanges:
   - role: user
-    text: |
-      /skill-optimizer linq-standards. Goals:
-      trigger on every query task, pair rules
-      with anti-examples, drop anything we
-      haven't actually asserted.
+    text: "npx openskills install factoryengineering/skills"
 
   - role: assistant
     text: |
-      Proposed diff:
+      Installed skill-optimizer into
+      .claude/skills/skill-optimizer/.
+
+  - role: user
+    text: "/skill-optimizer optimize /linq-standards"
+
+  - role: assistant
+    text: |
+      Diff against best practices:
 
       - description: Guidelines for writing...
-      + description: EF Core query conventions.
-      +   Use when writing any IQueryable
-      +   against a DbContext.
+      + description: Enforces EF Core query
+      +   conventions. Use when writing any
+      +   IQueryable against a DbContext.
+
+      + Do:    o.Customer.Name
+      + Don't: join c in context.Customers...
 
       + ## Prefer expression trees for
       +   complex predicates...
