@@ -3,37 +3,13 @@ config:
 
 exchanges:
   - role: user
-    text: "npx openskills install factoryengineering/skills"
-
-  - role: assistant
-    text: |
-      Installed skill-optimizer into
-      .claude/skills/skill-optimizer/.
-
-  - role: user
     text: "/skill-optimizer optimize /linq-standards"
 
   - role: assistant
     text: |
-      Diff against best practices:
+      Updating description to follow best practices:
 
       - description: Guidelines for writing...
       + description: Enforces EF Core query
       +   conventions. Use when writing any
       +   IQueryable against a DbContext.
-
-      + Do:    o.Customer.Name
-      + Don't: join c in context.Customers...
-
-      + ## Prefer expression trees for
-      +   complex predicates...
-
-  - role: user
-    text: "Accept the description. Drop the expression-tree section. Not a team convention."
-
-  - role: assistant
-    text: |
-      Applied. The description is accepted
-      and the expression-tree section has
-      been removed. Ready to re-validate in
-      a clean room.
