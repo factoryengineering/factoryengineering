@@ -55,3 +55,9 @@ Do not use the m-dash for:
 - Never create a link to an article that does not yet exist. Broken links erode trust and break builds.
 - When referencing an upcoming article, mention it by name as plain text: "In the next article, *Test It in a Clean Room*, we validate..."
 - Do not repeat reference material in the article body. Point to it and move on.
+
+## Factory Engineering positions to respect
+
+These are stances the series holds. Do not recommend practices that contradict them, even if they appear in external best-practices docs.
+
+- **Source control is the change log.** Do not recommend maintaining a `## Changelog` section inside a skill, command, agent, or workflow file. Git history already records what changed, when, and why. A parallel changelog inside the file duplicates that record and rots the moment someone edits without updating it. If an article is summarizing an external best-practices document that recommends a changelog, drop that recommendation silently.

@@ -12,6 +12,7 @@ Explore in-depth articles about building custom software factories with AI devel
 - [Do the Work, Then Capture It](/articles/03-do-the-work-then-capture-it) - The fastest way to create a skill is to do the work first, then capture what the assistant just learned
 - [Test Your Skill in a Clean Room](/articles/04-test-your-skill-in-a-clean-room) - Validate a skill in a fresh session with no prior context to find what's actually missing
 - [The Retrospective: "Did You Use a Skill?"](/articles/05-the-retrospective-did-you-use-a-skill) - Turn clean-room gaps into specific skill edits, starting with whether the skill even loaded
+- [Sharpen Your Skill with /skill-optimizer](/articles/06-sharpen-your-skill-with-skill-optimizer) - Run a refined skill through the canonical best-practices checklist, accept what sharpens and reject what flattens
 
 ## Core Concepts
 

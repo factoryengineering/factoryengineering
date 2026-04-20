@@ -1,0 +1,15 @@
+config:
+  height: 340
+
+exchanges:
+  - role: user
+    text: "/skill-optimizer optimize /linq-standards"
+
+  - role: assistant
+    text: |
+      Updating description to follow best practices:
+
+      - description: Guidelines for writing...
+      + description: Enforces EF Core query
+      +   conventions. Use when writing any
+      +   IQueryable against a DbContext.
