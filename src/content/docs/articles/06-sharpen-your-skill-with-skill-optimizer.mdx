@@ -96,19 +96,7 @@ A sharpening pass needs proof. Build a small task set: three jobs the skill shou
 
 Anything that fails goes into the next optimization round. The cycle is tight: observe, optimize, re-validate.
 
-## Keep a changelog
-
-Append a `## Changelog` section to the skill. One line per accepted edit, one line per rejected suggestion and why. You will want this history in six months when you wonder why a rule reads the way it does.
-
-```markdown
-## Changelog
-
-- 2026-04-18: Ran /skill-optimizer. Description
-  rewritten in third person, leading with verb.
-- 2026-04-18: Paired every rule with a Do/Don't.
-- 2026-04-18: Rejected expression-tree section
-  (not a team convention).
-```
+Commit each accepted edit as its own change with a message that names the rule and why you accepted it. Git is the skill's history. A reviewer in six months reads `git log .claude/skills/linq-standards/SKILL.md` and sees every optimizer pass, every rejected suggestion, and the reasoning.
 
 The skill now holds its ground. You have closed the loop:
 
