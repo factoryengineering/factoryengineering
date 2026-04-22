@@ -1,0 +1,29 @@
+config:
+  height: 340
+
+exchanges:
+  - role: user
+    text: "Stream has 3% malformed JSON. Process the batch without halting."
+
+  - role: assistant
+    text: |
+      @KafkaListener("orders.v1")
+      public void onEvent(Order e, Ack ack) {
+        try { process(e); ack.acknowledge(); }
+        catch (DeserializationEx ex) {
+          dltRecoverer.accept(record, ex);
+          ack.acknowledge();
+        }
+      }
+
+  - role: user
+    text: "Now v2 arrives with a null where the new contract forbids one."
+
+  - role: assistant
+    text: |
+      Skill doesn't cover that. Adding a
+      'When to stop' section:
+
+      - Route to DLT with
+        failure-reason: schema-version-mismatch
+      - Report the version delta to the user
