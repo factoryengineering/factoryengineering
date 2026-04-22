@@ -1,0 +1,118 @@
+---
+title: "A Skill That Holds Up Under Pressure"
+description: "The skills capstone. Take the Capture → Test → Retrospective → Optimize workflow from a forgiving LINQ problem to a Java/Kafka consumer at production load, and harden the result against backpressure, poison pills, and conflicting requirements."
+publishDate: 2026-04-22
+author: "Factory Engineering Team"
+tags: ["tutorial", "skills", "hands-on", "series-build-your-factory"]
+draft: false
+---
+
+import ChatAnim from '~/components/user-components/ChatAnim.astro';
+
+*Build Your Software Factory — Article 5 of 20 (Skills Capstone)*
+
+<ChatAnim src="/animations/07-a-skill-that-holds-up-under-pressure.gif" alt="Developer stress-testing a Kafka consumer skill against poison pills and schema mismatches, then adding a When to stop section to the skill" />
+
+You closed Article 4 with a tight LINQ skill. It survived the clean room. `/skill-optimizer` trimmed every line against the published standard. That skill is done for the surface area you tested.
+
+The project shifts. You are now on a Java consumer that ingests order events off a Kafka topic at production load. No LINQ in sight. This capstone answers the question the first four articles could not: does the workflow hold up when the domain gets harder, the inputs get messier, and the clock is running?
+
+You will apply the full cycle — Capture → Test → Retrospective → Optimize — to a new `kafka-consumer` skill, compressed. Then you will put it through pressure tests the LINQ work never touched.
+
+## Capture once, fast
+
+Write the first consumer the same way you wrote the first LINQ method. Give the assistant a real job, correct it, capture what it learned.
+
+> Implement an `OrderEventListener` for the `orders.v1` topic. Manual acks. Route deserialization failures to `orders.v1.DLT` with a `failure-reason` header.
+
+The first pass rethrows on bad payloads and acks only on the happy path. You correct both:
+
+> Never rethrow from the consumer loop. Route to the DLT topic using `DeadLetterPublishingRecoverer`. Ack after the DLT send completes, not before.
+
+After the second correction, the output matches your team's pattern. Ask the assistant to capture it:
+
+> Use skill-creator to capture the conventions we just walked through. Name it `kafka-consumer`.
+
+That is Article 1 of this series, in ten minutes.
+
+## Compress the middle
+
+Close the session. Open a fresh one. Hand the assistant a spec for a different topic, `payments.v1`, and watch it write a listener cold. The skill loads; the ack cadence is right; but the first output handles a schema version bump by throwing `IllegalStateException`. Your team routes version mismatches to the DLT too, with a distinct header.
+
+The retrospective question comes first — the same question from Article 3:
+
+> Did you use any skills? Which rule covered schema mismatches?
+
+> I loaded `kafka-consumer`. It covers deserialization failures but does not address schema version mismatches as a separate case.
+
+Two edits: a rule, and a worked example that sets `failure-reason: schema-version-mismatch`. Run `/skill-optimizer optimize /kafka-consumer` to tighten the description and collapse two overlapping paragraphs. The skill now has the same shape as the LINQ one: a tight trigger, explicit rules, Do/Don't examples.
+
+That is Articles 2 through 4, compressed. The skill looks done. It is not.
+
+## Escalate
+
+A clean room is a friendly room. One task, one topic, no deadline. Production is not that. Push the skill into scenarios that mirror real operational pressure.
+
+**Backpressure.** Give the assistant a consumer that must hold throughput when the downstream database falls behind by ten seconds. The skill has a rule on commit cadence. Does it cover pausing the partition versus raising `max.poll.interval.ms`? Probably not. Log the gap.
+
+**Poison pills at volume.** Malformed JSON arrives in 3% of records on an otherwise healthy stream. Ask the assistant to process the batch without halting the partition. The skill should name the DLT topic, the header pattern, and the reprocessing contract, and it should refuse to retry a payload that failed deserialization. The bytes will never change.
+
+**Schema evolution.** A field is nullable in v1 and required in v2. The producer upgraded first. The consumer sees a null where the new Avro schema forbids one. The skill either handles this case by name or it does not.
+
+**Time-boxed task.** "Ship a consumer for `fraud-events.v1` by 4pm. Team standards only. No invention." The skill should make the assistant faster, not slower. If the assistant starts debating architectural alternatives, a scope rule is missing.
+
+**Partial context.** The assistant receives the topic name and a sample payload. No spec. No SLA. Watch for improvisation. The skill must tell the assistant where to halt and ask.
+
+**Conflicting requirements.** Two rules collide: "Use exactly-once semantics across the write" and "Never block the consumer thread." The skill should surface the trade-off out loud and escalate, not choose silently.
+
+For each scenario, log three states: where the skill held, where it drifted, where it needed a new guardrail.
+
+## Add the failure modes
+
+A hardened skill includes failure modes, not only happy paths. Every gap the pressure tests exposed becomes one explicit section:
+
+```markdown
+## When to stop and escalate
+
+- A payload's schema does not match the declared contract.
+  Do not coerce. Route to DLT with
+  `failure-reason: schema-version-mismatch` and report the
+  version delta to the user.
+- Two standards conflict for the same operation. Do not
+  pick silently. Report both, name the trade-off, and ask.
+- The task requires state outside the consumer boundary
+  (DB writes, external API calls). Halt and request the
+  transaction contract before generating code.
+- Throughput targets cannot be met under the declared
+  commit cadence. Surface the conflict; do not quietly
+  relax the cadence.
+```
+
+Articles 1 through 4 taught you to add Do/Don't examples. The capstone adds *When to stop*. A skill that only tells the assistant what to build is half a skill. The other half tells the assistant when to refuse.
+
+Commit each new section as its own change. A reviewer in six months opens `git log .claude/skills/kafka-consumer/SKILL.md` and sees exactly which production lesson produced each rule.
+
+## Validate under the same pressure
+
+Do one more clean-room pass: fresh session, new topic spec, a hard 45-minute deadline. Watch the assistant.
+
+- Name the skill unprompted when asked what it loaded.
+- Route both poison pills and schema mismatches to the DLT with the right headers.
+- Stop on the transactional-write question and ask for the contract.
+- Refuse to silently resolve the commit-cadence conflict.
+
+If those four hold, the skill is ready for the team. If one drifts, one more optimization pass. The cycle does not end. It gets longer between iterations.
+
+## What you built
+
+Capture → Test → Retrospective → Optimize → **Pressure**.
+
+Five steps. One durable artifact. The workflow applies to any stack that lands on your desk — LINQ yesterday, Kafka today, whatever arrives next quarter. You now know what a skill looks like when it is done: a trigger that matches the job, rules that enforce the standards, examples that teach, and a *When to stop* section that turns the skill's boundaries into instructions.
+
+This is the end of the Skills act. In the next article, *Watch the LLM Work, Then Write the Command*, we shift from skills to commands. Skills encode judgment; commands encode procedure — the exact sequence of steps for a repetitive job. We watch the assistant execute a FluentMigrator migration sequence against PostgreSQL, then capture those steps as a slash command the whole team can invoke.
+
+---
+
+*Next: Article 6 — Watch the LLM Work, Then Write the Command*
+
+For background on skill structure and iteration, see the [Skills page](/skills). For the formal skill specification, see [agentskills.io](https://agentskills.io).

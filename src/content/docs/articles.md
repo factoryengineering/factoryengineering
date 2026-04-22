@@ -13,6 +13,7 @@ Explore in-depth articles about building custom software factories with AI devel
 - [Test Your Skill in a Clean Room](/articles/04-test-your-skill-in-a-clean-room) - Validate a skill in a fresh session with no prior context to find what's actually missing
 - [The Retrospective: "Did You Use a Skill?"](/articles/05-the-retrospective-did-you-use-a-skill) - Turn clean-room gaps into specific skill edits, starting with whether the skill even loaded
 - [Sharpen Your Skill with /skill-optimizer](/articles/06-sharpen-your-skill-with-skill-optimizer) - Run a refined skill through the canonical best-practices checklist, accept what sharpens and reject what flattens
+- [A Skill That Holds Up Under Pressure](/articles/07-a-skill-that-holds-up-under-pressure) - The skills capstone: apply the full workflow to a Java/Kafka consumer and harden it against backpressure, poison pills, and conflicting requirements
 
 ## Core Concepts
 
