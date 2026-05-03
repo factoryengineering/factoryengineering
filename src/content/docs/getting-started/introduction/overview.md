@@ -57,4 +57,4 @@ See the full comparison on the [IDEs](/ides) page.
 
 The fastest way to understand factory engineering is to build a skill yourself. The next page walks through it in five minutes — no installs, no setup, just your existing AI IDE and a task you already do often.
 
-Continue to [Your First Skill in 5 Minutes →](/getting-started/quick-start/)
+Continue to [Your First Skill in 5 Minutes →](/getting-started/quick-start)

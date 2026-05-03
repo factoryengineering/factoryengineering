@@ -13,11 +13,11 @@ You built a skill. Here is the path most teams follow from there.
 
 The Build Your Software Factory articles go deeper into the practices you just touched on. They are short, hands-on, and build on each other.
 
-- [Article 1 — Do the Work, Then Capture It](/articles/03-do-the-work-then-capture-it/) — The full version of the loop you just ran, with worked corrections.
-- [Article 2 — Test Your Skill in a Clean Room](/articles/04-test-your-skill-in-a-clean-room/) — How to verify a skill works without leaning on context the assistant should not have.
-- [Article 3 — The Retrospective: "Did You Use a Skill?"](/articles/05-the-retrospective-did-you-use-a-skill/) — The single team habit that turns one-off prompts into durable factory components.
-- [Article 4 — Sharpen Your Skill with /skill-optimizer](/articles/06-sharpen-your-skill-with-skill-optimizer/) — Apply authoring best practices to a skill you already have.
-- [Article 5 — A Skill That Holds Up Under Pressure](/articles/07-a-skill-that-holds-up-under-pressure/) — What it looks like when a skill graduates from "works on my machine" to a team standard.
+- [Article 1 — Do the Work, Then Capture It](/articles/03-do-the-work-then-capture-it) — The full version of the loop you just ran, with worked corrections.
+- [Article 2 — Test Your Skill in a Clean Room](/articles/04-test-your-skill-in-a-clean-room) — How to verify a skill works without leaning on context the assistant should not have.
+- [Article 3 — The Retrospective: "Did You Use a Skill?"](/articles/05-the-retrospective-did-you-use-a-skill) — The single team habit that turns one-off prompts into durable factory components.
+- [Article 4 — Sharpen Your Skill with /skill-optimizer](/articles/06-sharpen-your-skill-with-skill-optimizer) — Apply authoring best practices to a skill you already have.
+- [Article 5 — A Skill That Holds Up Under Pressure](/articles/07-a-skill-that-holds-up-under-pressure) — What it looks like when a skill graduates from "works on my machine" to a team standard.
 
 Browse the full list on the [Articles](/articles) page.
 

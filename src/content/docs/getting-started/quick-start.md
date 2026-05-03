@@ -7,7 +7,7 @@ description: A no-setup walkthrough — pick a task you already do, get the assi
 
 You already have an AI IDE. You already have a task you do often. That is everything you need to build your first factory component.
 
-This walkthrough mirrors the **Do the Work, Then Capture It** pattern from [Article 1](/articles/03-do-the-work-then-capture-it/), distilled to the shortest possible loop. Five minutes from now, you will have a working skill saved in your repository.
+This walkthrough mirrors the **Do the Work, Then Capture It** pattern from [Article 1](/articles/03-do-the-work-then-capture-it), distilled to the shortest possible loop. Five minutes from now, you will have a working skill saved in your repository.
 
 ---
 
@@ -17,7 +17,9 @@ This walkthrough mirrors the **Do the Work, Then Capture It** pattern from [Arti
 - A repeatable task you do often. Anything works: writing a unit test, drafting a PR description, formatting a config file, generating release notes from commits.
 - A repository to save the skill into.
 
-No installs. No configuration.
+No installs needed for this exercise.
+
+> **A note on IDE folders.** This guide saves the skill to `.claude/skills/`, the de facto canonical location across the ecosystem. Claude Code, Cursor, and GitHub Copilot read it directly. Windsurf, Kilo Code, Google Antigravity, and OpenAI Codex look in their own folders and need a one-time copy or symlink before they will load the skill — see the [sharing strategies on the Skills page](/skills#managing-skills-across-ides), or your [IDE guide](/ides), once you finish the exercise.
 
 ---
 
@@ -72,7 +74,10 @@ Start a new session in the same IDE. Give the assistant a similar task — a dif
 
 If the description is good, the assistant will load the skill on its own and follow your standards without further prompting.
 
-If it does not, the description is not specific enough. Edit the `description:` line in `SKILL.md` so it names the *trigger*: when this skill should fire. Test again.
+If it does not, there are two possible reasons:
+
+- **The description is not specific enough.** Edit the `description:` line in `SKILL.md` so it names the *trigger*: when this skill should fire. Test again.
+- **Your IDE does not read `.claude/skills/`.** If you use Windsurf, Kilo Code, Antigravity, or Codex, mirror the skill into your IDE's folder using one of the [sharing strategies on the Skills page](/skills#managing-skills-across-ides), then test again.
 
 ### 7. Celebrate
 
@@ -84,10 +89,10 @@ You just built your first factory component. The next teammate to clone this rep
 
 A `SKILL.md` is a tiny file with YAML frontmatter and a body. The frontmatter declares when the skill should load; the body explains what to do. The assistant reads the description before every task and loads the skill when relevant — that is what makes the standards consistent across the team.
 
-For the deeper version of this loop, with worked corrections and the full reasoning behind each one, read [Article 1: Do the Work, Then Capture It](/articles/03-do-the-work-then-capture-it/).
+For the deeper version of this loop, with worked corrections and the full reasoning behind each one, read [Article 1: Do the Work, Then Capture It](/articles/03-do-the-work-then-capture-it).
 
 ---
 
 ## Where to go next
 
-Continue to [Where to Go Next →](/getting-started/next-steps/) for the recommended path through the rest of the site.
+Continue to [Where to Go Next →](/getting-started/next-steps) for the recommended path through the rest of the site.
