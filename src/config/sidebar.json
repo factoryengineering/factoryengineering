@@ -1,6 +1,14 @@
 {
   "main": [
     {
+      "label": "Getting started",
+      "items": [
+        {"label": "What is a Software Factory?", "slug": "getting-started/introduction/overview"},
+        {"label": "Your First Skill in 5 Minutes", "slug": "getting-started/quick-start"},
+        {"label": "Where to Go Next", "slug": "getting-started/next-steps"}
+      ]
+    },
+    {
       "label": "Factory components",
       "items": [
         {"label": "Skills", "slug": "skills"},
