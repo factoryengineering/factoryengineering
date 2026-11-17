@@ -7,7 +7,7 @@ description: Reusable task instructions—skills you invoke explicitly with a sl
 
 Commands encode repeatable instructions for specific tasks. You invoke a command explicitly, by name, to execute a predefined sequence of steps against an artifact. A skill loads when the agent decides it is relevant. A command runs when you ask for it.
 
-Every IDE covered here has converged on one mechanism for commands: **a command is a skill that the model does not load on its own.** Claude Code merged custom commands into skills. Cursor ships `/migrate-to-skills` to convert commands. GitHub Copilot's default harness no longer loads prompt files. Kilo Code and Google Antigravity expose every skill as a slash command. OpenAI Codex has no command files at all, only skills. Author commands as skills, and one file works in every IDE.
+Every IDE covered here has converged on one mechanism for commands: **a command is a skill you invoke by name.** Claude Code merged custom commands into skills. Cursor ships `/migrate-to-skills` to convert commands. GitHub Copilot's default harness no longer loads prompt files. Kilo Code and Google Antigravity expose every skill as a slash command. OpenAI Codex has no command files at all, only skills. Author commands as skills, and one file works in every IDE. Claude Code, Cursor, GitHub Copilot, and OpenAI Codex also let you mark a skill explicit-only, so the model never loads it on its own; the other IDEs can still load a command when a request matches its description (see [Example command](#example-command)).
 
 In factory engineering, artifacts such as user stories, specifications, product requirements documents, and user journeys move through the software factory. Commands define how to process those artifacts. The power move is **slash-command at-artifact**: e.g. `/write-spec @docs/user-stories/submit-sales-order.md` runs the write-spec command against that user story. The command provides the instructions, the artifact provides the target, and the agent does the work.
 
@@ -15,7 +15,7 @@ In factory engineering, artifacts such as user stories, specifications, product 
 
 Like skills, commands must live in your project repository and evolve with your codebase. When commands are stored at the project level, they are versioned with your code, reviewed in pull requests, and automatically available to every team member on clone.
 
-**Invocation rule:** The slash name is the **skill name** (the directory name and the `name` field). For example, `.agents/skills/write-spec/SKILL.md` → `/write-spec`. Always use **slash-command at-artifact** to run a command against a specific artifact.
+**Invocation rule:** The command name is the **skill name** (the directory name and the `name` field). For example, `.agents/skills/write-spec/SKILL.md` → `/write-spec`. The prefix depends on the IDE: `/write-spec` in most IDEs, `$write-spec` in OpenAI Codex, and `@write-spec` in Windsurf (see the [IDE-by-IDE Reference](#ide-by-ide-reference)). Always use **slash-command at-artifact** to run a command against a specific artifact.
 
 ## Example command
 
@@ -23,6 +23,8 @@ A command is a skill directory in the canonical `.agents/skills/` folder (see [S
 
 - **`disable-model-invocation: true`** prevents the model from loading it automatically, so it runs only when invoked. Claude Code, Cursor, and GitHub Copilot honor this property.
 - **An `agents/openai.yaml` file** with `allow_implicit_invocation: false` sets the same policy for OpenAI Codex, which ignores the frontmatter property.
+
+Windsurf (Devin Desktop), Kilo Code, and Google Antigravity do not document an explicit-only control. They can load a command whenever a request matches its description. Write every command's description so it says when to run and when not to (e.g. "Run only when the user invokes /write-design explicitly"), and keep the description specific to the artifact the command processes. That limits implicit loading in those IDEs.
 
 Keep commands **IDE-agnostic**: do not rely on `$ARGUMENTS` or other placeholders, since not all IDEs support them. Instead, write the command so it **states what the user will supply** (e.g. a user story or design document, by link or by name) and **instructs the LLM to stop and prompt the user** if that input is missing. That pattern works consistently in every IDE.
 
@@ -47,7 +49,7 @@ policy:
 ```markdown
 ---
 name: write-design
-description: Write or update a design document from a user story. Run only when explicitly invoked.
+description: Write or update a design document from a user story. Run only when the user invokes /write-design explicitly.
 disable-model-invocation: true
 ---
 
