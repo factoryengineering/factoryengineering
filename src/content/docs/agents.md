@@ -110,6 +110,6 @@ For full setup details on defining, configuring, and invoking agents in each IDE
 - **[GitHub Copilot](/ides/github-copilot#agents)** — Custom agents + sub-agents; defined in `.github/agents/`; Copilot Memory stores repository facts, not per-agent memory
 - **[Kilo Code](/ides/kilo-code#agents)** — Markdown agents (formerly modes) in `.kilo/agents/`; `mode: subagent` for delegated roles
 - **[Cursor](/ides/cursor#agents)** — Subagents; defined in `.cursor/agents/` (also reads `.claude/agents/`); async delegation (v2.5+); Agents Window (v3.0)
-- **[Windsurf (Devin Desktop)](/ides/windsurf#agents)** — Subagents in preview with Devin Local, which replaced Cascade; defined in `.devin/agents/`
+- **[Windsurf (Devin Desktop)](/ides/windsurf#agents)** — Subagents in preview with Devin Local, the newer local agent alongside Cascade; defined in `.devin/agents/`
 - **[Antigravity](/ides/google-antigravity#agents)** — Custom subagents in `.agents/agents/`, invoked by name with `invoke_subagent`
 - **[OpenAI Codex](/ides/openai-codex#agents)** — Custom agents via TOML role profiles in `.codex/agents/`; built-in `default`/`worker`/`explorer` roles; native memories are global, not per agent, so use the markdown-instruction pattern
