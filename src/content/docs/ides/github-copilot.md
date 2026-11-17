@@ -5,7 +5,7 @@ description: Complete factory engineering guide for GitHub Copilot — skills, c
 
 # GitHub Copilot
 
-GitHub Copilot is GitHub's AI coding assistant, available across VS Code, JetBrains IDEs, Eclipse, Xcode, and the Copilot CLI. It provides native Agent Skills support, custom agents with sub-agent delegation, and partial workflow orchestration via Fleet mode.
+GitHub Copilot is GitHub's AI coding assistant, available in VS Code, Visual Studio, JetBrains IDEs, Eclipse, Xcode, the Copilot CLI, the GitHub Copilot app, and the Copilot cloud agent on GitHub.com (formerly the coding agent). It provides native Agent Skills support and custom agents with sub-agent delegation.
 
 ---
 
@@ -22,9 +22,9 @@ GitHub Copilot is GitHub's AI coding assistant, available across VS Code, JetBra
 
 GitHub Copilot reads from both `.github/skills/` and `.claude/skills/` at the project level, which means **no symlink is needed** if you use `.claude/skills/` as your canonical location. Copilot will find your skills automatically.
 
-Agent Skills work across the Copilot coding agent, Copilot CLI, and VS Code. Enable the `chat.useAgentSkills` setting in VS Code to activate the feature.
+Agent Skills work across the Copilot cloud agent, Copilot code review, Copilot CLI, the Copilot app, and agent mode in VS Code, Visual Studio, and JetBrains IDEs. Skills are on by default in VS Code since version 1.109 (February 2026); no setting is required.
 
-📖 [GitHub Copilot Agent Skills Documentation](https://docs.github.com/en/copilot/how-tos/use-copilot-agents/coding-agent/create-skills)
+📖 [GitHub Copilot Agent Skills Documentation](https://docs.github.com/en/copilot/concepts/customizations/agent-skills)
 
 For more about how skills work in factory engineering, see [Skills](/skills).
 
@@ -36,7 +36,7 @@ For more about how skills work in factory engineering, see [Skills](/skills).
 
 **Invocation:** Type `/` in the Chat view, then the prompt name (filename without `.prompt.md`). For example, `write-spec.prompt.md` → `/write-spec`. You can then add an artifact with `@artifact-name` (e.g. `/write-spec @submit-sales-order`).
 
-**Format:** Prompt files use the `.prompt.md` extension (not plain `.md`). They support optional YAML frontmatter (`description`, `agent`, `tools`, etc.). See [Use prompt files in VS Code](https://code.visualstudio.com/docs/copilot/customization/prompt-files) (VS Code 1.100+, April 2025).
+**Format:** Prompt files use the `.prompt.md` extension (not plain `.md`). They support optional YAML frontmatter (`description`, `agent`, `tools`, etc.). See [Use prompt files in VS Code](https://code.visualstudio.com/docs/agent-customization/prompt-files) (VS Code 1.100+, April 2025).
 
 **Syncing commands for Copilot:** Copilot expects `.prompt.md` files and optional frontmatter, so the same `.claude/commands/*.md` files cannot be used directly via symlink. Keep canonical commands in `.claude/commands/*.md` and **sync** them into `.github/prompts/` when you add or change commands.
 
@@ -63,11 +63,11 @@ For more about how commands work in factory engineering, see [Commands](/command
 
 **Feature name:** Custom agents + sub-agents
 
-**Storage location:** Repository: `.github/agents/{agent-name}.md`. Organization or enterprise: `/agents/{agent-name}.md` in a `.github-private` repository.
+**Storage location:** Repository: `.github/agents/{agent-name}.agent.md`. Personal: `~/.copilot/agents/`. Organization: `/agents/` in the organization's `.github` or `.github-private` repository. Enterprise: `/agents/` in the designated `.github-private` repository. Copilot in VS Code and the Copilot CLI also read Claude Code agents from `.claude/agents/`.
 
-**Note:** Memory support requires Copilot Pro or Pro+ plan.
+**Copilot Memory** is available on all paid Copilot plans. It stores repository facts and user preferences, not per-agent memory, so use the markdown-instruction pattern below for factory engineering agents.
 
-Custom agents are specialized versions of the Copilot coding agent that you tailor to your workflows, conventions, and use cases. You define them once with **agent profiles**: Markdown files with YAML frontmatter that specify name, description, prompt, and optionally tools or MCP servers. Custom agents, sub-agents, and the plan agent are GA across VS Code, JetBrains IDEs, Eclipse, and Xcode (announced March 11, 2026 via [GitHub Changelog](https://github.blog/changelog/)).
+Custom agents are specialized versions of the Copilot coding agent that you tailor to your workflows, conventions, and use cases. You define them once with **agent profiles**: Markdown files with YAML frontmatter that specify name, description, prompt, and optionally tools or MCP servers. Custom agents are supported in VS Code, Visual Studio, the Copilot CLI, and the cloud agent on GitHub.com, and are in preview in JetBrains IDEs, Eclipse, and Xcode. Sub-agents are supported in VS Code and the Copilot CLI, and are in preview in JetBrains IDEs, Eclipse, and Xcode (per GitHub's customization support matrix).
 
 **Sub-agents:** Custom agents can spawn sub-agents to handle discrete subtasks within a session. A parent agent delegates work to a sub-agent, which runs in its own context with its own tool access, then returns results to the parent.
 
@@ -80,11 +80,11 @@ For factory-engineering-style persistent memory, include explicit instructions i
 3. In the body, write the **prompt**: custom instructions that define the agent's behavior and expertise.
 4. Optionally specify **tools** the agent can use.
 5. For persistent memory, add instructions such as: "At the start of each session, read `path/to/memory.md`. At the end of each session, append your learnings to that file."
-6. Save the file as `.github/agents/{agent-name}.md`.
+6. Save the file as `.github/agents/{agent-name}.agent.md`.
 
-**Invoking an agent:** After you create agent profiles, they appear in the Copilot coding agent on GitHub.com, Copilot coding agent in IDEs (VS Code, JetBrains, Eclipse, Xcode), and GitHub Copilot CLI.
+**Invoking an agent:** After you create agent profiles, they appear in the agent picker in VS Code and JetBrains IDEs, in the Copilot cloud agent on GitHub.com, and in the Copilot CLI (`/agent`).
 
-📖 [GitHub Copilot Custom Agents Documentation](https://docs.github.com/en/copilot/concepts/agents/coding-agent/about-custom-agents)
+📖 [GitHub Copilot Custom Agents Documentation](https://docs.github.com/en/copilot/concepts/customizations/custom-agents)
 
 For more about how agents work in factory engineering, see [Agents](/agents).
 
@@ -94,11 +94,11 @@ For more about how agents work in factory engineering, see [Agents](/agents).
 
 **Orchestration support:** ⚠️ Partial (in-session sub-agent orchestration, but no workflow-document consumption)
 
-**Fleet mode (`/fleet`):** The Copilot CLI reached GA on February 25, 2026 ([GitHub Changelog](https://github.blog/changelog/)) and introduced Fleet mode — in-session orchestration through parallel sub-agent spawning. Invoke `/fleet` to start a Fleet session where the orchestrator breaks down a task, spawns parallel sub-agents, and coordinates their work. Fleet mode runs in the Copilot CLI and operates within a single session. Note that Fleet mode provides task decomposition and parallel sub-agent coordination, but does not read a structured workflow document the way Claude Code or Kilo Code's orchestrators do — the orchestration is driven by the model's interpretation of the task, not by a workflow file.
+**`/fleet`:** The Copilot CLI reached GA on February 25, 2026. Its `/fleet` slash command (also the `--fleet` flag) breaks a task down, spawns parallel sub-agents, and coordinates their work within a single session. It runs in the Copilot CLI and the Copilot app. Note that `/fleet` provides task decomposition and parallel sub-agent coordination, but does not read a structured workflow document the way Claude Code or Kilo Code's orchestrators do — the orchestration is driven by the model's interpretation of the task, not by a workflow file.
 
-**Agent HQ:** GitHub Agent HQ (Feb 2026) lets developers assign tasks to different agents and monitor progress in a single dashboard. Agent HQ is cross-agent task assignment — you route work between agents and review their output. Fleet mode and Agent HQ are complementary: Fleet mode handles in-session orchestration (one task, multiple parallel sub-agents), while Agent HQ handles cross-session coordination (multiple tasks, multiple agents, dashboard monitoring).
+**Agent HQ and third-party agents:** GitHub announced Agent HQ at Universe in October 2025. Since February 4, 2026, you can assign tasks on GitHub to third-party coding agents such as Claude and Codex (public preview) alongside Copilot and review their output in one place. This is cross-session task assignment, not orchestration within a session.
 
-📖 [GitHub Copilot CLI Documentation](https://docs.github.com/en/copilot/copilot-cli) · [GitHub Agent HQ](https://github.com/features/copilot/agents)
+📖 [GitHub Copilot CLI Documentation](https://docs.github.com/en/copilot/how-tos/copilot-cli) · [Third-party coding agents](https://docs.github.com/en/copilot/concepts/agent-capabilities/about-agents/about-third-party-coding-agents)
 
 For more about how workflows work in factory engineering, see [Workflows](/workflows).
 
@@ -106,8 +106,8 @@ For more about how workflows work in factory engineering, see [Workflows](/workf
 
 ## External Docs
 
-- [GitHub Copilot Agent Skills Documentation](https://docs.github.com/en/copilot/how-tos/use-copilot-agents/coding-agent/create-skills)
-- [GitHub Copilot Custom Agents Documentation](https://docs.github.com/en/copilot/concepts/agents/coding-agent/about-custom-agents)
-- [GitHub Copilot CLI Documentation](https://docs.github.com/en/copilot/copilot-cli)
-- [GitHub Agent HQ](https://github.com/features/copilot/agents)
-- [Use prompt files in VS Code](https://code.visualstudio.com/docs/copilot/customization/prompt-files)
+- [GitHub Copilot Agent Skills Documentation](https://docs.github.com/en/copilot/concepts/customizations/agent-skills)
+- [GitHub Copilot Custom Agents Documentation](https://docs.github.com/en/copilot/concepts/customizations/custom-agents)
+- [GitHub Copilot CLI Documentation](https://docs.github.com/en/copilot/how-tos/copilot-cli)
+- [Third-party coding agents](https://docs.github.com/en/copilot/concepts/agent-capabilities/about-agents/about-third-party-coding-agents)
+- [Use prompt files in VS Code](https://code.visualstudio.com/docs/agent-customization/prompt-files)

@@ -5,7 +5,7 @@ description: Complete factory engineering guide for Claude Code — skills, comm
 
 # Claude Code
 
-Claude Code is Anthropic's AI-native coding agent and the origin of many factory engineering conventions. It pioneered the Agent Skills open standard, native sub-agents, and workflow orchestration via the Task tool. Claude Code is the canonical reference implementation for factory engineering — the `.claude/` folder structure is the recommended canonical location for skills and commands across all IDEs.
+Claude Code is Anthropic's AI-native coding agent and the origin of many factory engineering conventions. It pioneered the Agent Skills open standard, native sub-agents, and workflow orchestration via the Agent tool (named the Task tool before v2.1.63). Claude Code is the canonical reference implementation for factory engineering — the `.claude/` folder structure is the recommended canonical location for skills and commands across all IDEs.
 
 ---
 
@@ -20,13 +20,13 @@ Claude Code is Anthropic's AI-native coding agent and the origin of many factory
 
 Claude Code automatically detects skills in `.claude/skills/` and loads them into context when relevant to your request. Skills can also be invoked explicitly using the skill name in your prompt.
 
-Claude Code extends the base standard with additional features including invocation controls and dynamic context injection. The `anthropics/skills` repository on GitHub provides a growing collection of community and official skills ready to use.
+Claude Code extends the base standard with frontmatter that other IDEs do not read: invocation control (`disable-model-invocation`, `user-invocable`), forked execution (`context: fork` with `agent:` to pick the subagent type), path scoping (`paths`), and dynamic context injection (a line starting with `` !`command` `` runs the command and replaces itself with the output before the skill reaches the model). The `anthropics/skills` repository on GitHub provides official skills ready to use.
 
 **Getting started:** Use the **skill-creator** skill to create new skills (see [Installing skill-creator and skill-optimizer](/skills#installing-skill-creator-and-skill-optimizer)). It guides you through the workflow and produces a proper skill directory and SKILL.md.
 
 **Symlinks:** Claude Code's `.claude/skills/` is the recommended canonical location. No symlink needed — other IDEs symlink *to* this folder.
 
-📖 [Claude Code Skills Documentation](https://code.claude.com/docs/en/slash-commands)
+📖 [Claude Code Skills Documentation](https://code.claude.com/docs/en/skills)
 
 For more about how skills work in factory engineering, see [Skills](/skills).
 
@@ -64,14 +64,15 @@ For more about how commands work in factory engineering, see [Commands](/command
 
 Claude Code provides native support for agents as defined in factory engineering. Each sub-agent operates in its own independent context window. The sub-agent has a role definition, reads persistent memory at the start of its session, and writes back to that memory after it completes its work.
 
+**Native memory:** Set `memory: project` in the agent's frontmatter. Claude Code stores the agent's memory in `.claude/agent-memory/{agent-name}/MEMORY.md` and injects the first 200 lines (up to 25 KB) into the agent's prompt at the start of each invocation. Commit that folder so the whole team shares what the agent learns. (`memory: user` stores it in `~/.claude/agent-memory/`; `memory: local` stores it in `.claude/agent-memory-local/` for uncommitted use.)
+
 **Defining an agent:**
 
-1. In Claude Code, use the `/agents` command to create a new agent.
-2. Select to create a new project-level agent with Claude.
-3. In the description, give the name of the agent, what it will expect, and the specific role you want it to play.
-4. Be specific about the expected behavior and operating rules.
-5. Select the model, color, and memory location.
-6. Review the agent definition and confirm.
+1. Ask Claude Code to create a project-level subagent in `.claude/agents/{agent-name}.md`.
+2. In the request, give the name of the agent, what it will expect, and the specific role you want it to play.
+3. Be specific about the expected behavior and operating rules.
+4. Specify the frontmatter: `name`, `description`, `model` (`sonnet`, `opus`, `haiku`, a full model ID, or `inherit`), `color`, and `memory: project`. Restrict `tools` when the role does not need them.
+5. Review the agent definition and commit it.
 
 **Invoking an agent:**
 
@@ -91,9 +92,9 @@ For more about how agents work in factory engineering, see [Agents](/agents).
 
 **Orchestration support:** ✅ Full
 
-Invoke with **slash-workflow at-artifact** (e.g. `/tdd-cycle @path/to/design.md`). The main agent reads the workflow from `.claude/commands/` and the artifact you supplied, then uses the Task tool to delegate work to named subagents. The orchestrator reads the workflow, assesses the situation, and dynamically routes work based on what it discovers. It loops, branches, and coordinates parallel work according to the workflow.
+Invoke with **slash-workflow at-artifact** (e.g. `/tdd-cycle @path/to/design.md`). The main agent reads the workflow from `.claude/commands/` and the artifact you supplied, then uses the Agent tool to delegate work to named subagents. The orchestrator reads the workflow, assesses the situation, and dynamically routes work based on what it discovers. It loops, branches, and coordinates parallel work according to the workflow.
 
-Subagents cannot spawn other subagents. Only the main orchestrator can delegate. The workflow sits at the orchestrator level, coordinating specialists below it.
+By default, a subagent can spawn subagents of its own, up to three levels below the main conversation. Keep delegation at the orchestrator level: the workflow coordinates specialists, and specialists do their own work. Remove `Agent` from a specialist's `tools` list (or add it to `disallowedTools`) so it cannot delegate further.
 
 **Where workflows live:** In `.claude/commands/`, one file per workflow (e.g. `tdd-cycle.md`). Invoke with `/tdd-cycle @path/to/design.md`.
 
@@ -108,6 +109,6 @@ For more about how workflows work in factory engineering, see [Workflows](/workf
 
 ## External Docs
 
-- [Claude Code Skills Documentation](https://code.claude.com/docs/en/slash-commands)
+- [Claude Code Skills Documentation](https://code.claude.com/docs/en/skills)
 - [Claude Code Sub-agents Documentation](https://code.claude.com/docs/en/sub-agents)
 - [Claude Code Agent Teams Documentation](https://code.claude.com/docs/en/agent-teams)

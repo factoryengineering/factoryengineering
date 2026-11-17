@@ -92,13 +92,13 @@ Only a few IDEs provide true agent support as defined above:
 
 | IDE | True Agent Support | Feature Name | Storage | Memory via markdown instruction |
 |-----|-------------------|--------------|---------|----------------------------------|
-| Claude Code | ✅ Yes | Sub-agents | `.claude/agents/` | Native (read/write at session start/end) |
-| GitHub Copilot | ✅ Yes | Custom agents + sub-agents | Project-level (memory requires Pro+) | Yes (instruct agent to read/append a file) |
+| Claude Code | ✅ Yes | Sub-agents | `.claude/agents/` | Native (`memory: project` → `.claude/agent-memory/{name}/MEMORY.md`) |
+| GitHub Copilot | ✅ Yes | Custom agents + sub-agents | `.github/agents/*.agent.md` (also reads `.claude/agents/`) | Yes (instruct agent to read/append a file) |
 | Kilo Code | ✅ Yes | Modes | Project: `.kilocodemodes`; rules: `.kilo/rules-{slug}/` | Yes (instruct mode to load from markdown; use `.kilo/rules-{slug}/` or `.kilorules-{slug}`) |
-| Cursor | ✅ Yes | Subagents + Plugins | `.cursor/agents/` (project); `~/.cursor/agents/` (global) | Yes (instruct agent via `.cursor/rules` or `AGENTS.md`) |
+| Cursor | ✅ Yes | Subagents | `.cursor/agents/` (also reads `.claude/agents/`) | Yes (instruct agent via its definition, `.cursor/rules`, or `AGENTS.md`) |
 | Windsurf | ❌ No | Cascade (singular) | N/A | N/A |
 | Antigravity | ✅ Yes | AgentKit 2.0 (specialized agents) | IDE-managed profiles (Manager View) | Yes (instruct agents via `AGENTS.md`, `GEMINI.md`, or `SKILL.md`) |
-| OpenAI Codex | ⚠️ Partial | Custom agents (sub-agents with TOML roles) | Project: `.codex/agents/`; User: `~/.codex/agents/` | Yes (instruct agent via role definition or `AGENTS.md` to read/append a markdown file) |
+| OpenAI Codex | ✅ Yes | Custom agents (TOML roles) | `.codex/agents/*.toml` | Yes (instruct agent in `developer_instructions` to read/append a markdown file) |
 
 **Memory via markdown instruction:** Even without native agent memory, you can get the same behavior by instructing the assistant via that IDE's instruction mechanism (see table) to read from a markdown file at the start of work and append learnings at the end. Kilo Code modes used this way function as true agents.
 
@@ -107,9 +107,9 @@ Only a few IDEs provide true agent support as defined above:
 For full setup details on defining, configuring, and invoking agents in each IDE, see the dedicated IDE pages:
 
 - **[Claude Code](/ides/claude-code#agents)** — Native sub-agents with persistent memory; defined in `.claude/agents/`
-- **[GitHub Copilot](/ides/github-copilot#agents)** — Custom agents + sub-agents; defined in `.github/agents/`; memory requires Pro+
+- **[GitHub Copilot](/ides/github-copilot#agents)** — Custom agents + sub-agents; defined in `.github/agents/`; Copilot Memory stores repository facts, not per-agent memory
 - **[Kilo Code](/ides/kilo-code#agents)** — Modes as true agents; defined in `.kilocodemodes` (YAML); rules in `.kilo/rules-{slug}/`
-- **[Cursor](/ides/cursor#agents)** — Subagents + Plugins; defined in `.cursor/agents/`; async delegation (v2.5+); Agents Window (v3.0)
+- **[Cursor](/ides/cursor#agents)** — Subagents; defined in `.cursor/agents/` (also reads `.claude/agents/`); async delegation (v2.5+); Agents Window (v3.0)
 - **[Windsurf](/ides/windsurf#agents)** — No true agent support; Cascade is a single shared agent
 - **[Antigravity](/ides/google-antigravity#agents)** — AgentKit 2.0 with 16 specialized agents; Manager View orchestration
-- **[OpenAI Codex](/ides/openai-codex#agents)** — Custom agents via TOML role profiles (March 2026) in `.codex/agents/`; built-in `default`/`worker`/`explorer` agents; no native persistent memory — use markdown-instruction pattern
+- **[OpenAI Codex](/ides/openai-codex#agents)** — Custom agents via TOML role profiles in `.codex/agents/`; built-in `default`/`worker`/`explorer` roles; native memories are global, not per agent, so use the markdown-instruction pattern
