@@ -11,7 +11,7 @@ An agent is not a prompt template. It is not a set of instructions injected into
 
 In practice, you give an agent a role like "technical specification writer" or "code reviewer." That agent reads from a memory file at the beginning of its session. That file holds everything it learned last time. It executes a task or sequence of tasks. Then, before closing, it writes back new learnings, decisions, and context to that memory file. The next time that agent starts, it reads those accumulated memories and builds on them.
 
-**For factory engineering, use project-level agents.** Define agents in the project (e.g. `.claude/agents/`, `.kilocodemodes`) so roles and memory live with the repo and the whole team shares the same agent setup.
+**For factory engineering, use project-level agents.** Define agents in the project (e.g. `.claude/agents/`, `.kilo/agents/`) so roles and memory live with the repo and the whole team shares the same agent setup.
 
 ## Word of Caution: "Agent" is Overused
 
@@ -94,13 +94,13 @@ Only a few IDEs provide true agent support as defined above:
 |-----|-------------------|--------------|---------|----------------------------------|
 | Claude Code | ✅ Yes | Sub-agents | `.claude/agents/` | Native (`memory: project` → `.claude/agent-memory/{name}/MEMORY.md`) |
 | GitHub Copilot | ✅ Yes | Custom agents + sub-agents | `.github/agents/*.agent.md` (also reads `.claude/agents/`) | Yes (instruct agent to read/append a file) |
-| Kilo Code | ✅ Yes | Modes | Project: `.kilocodemodes`; rules: `.kilo/rules-{slug}/` | Yes (instruct mode to load from markdown; use `.kilo/rules-{slug}/` or `.kilorules-{slug}`) |
+| Kilo Code | ✅ Yes | Agents (formerly modes) | `.kilo/agents/*.md` | Yes (instruct agent in its prompt to read/append a markdown file) |
 | Cursor | ✅ Yes | Subagents | `.cursor/agents/` (also reads `.claude/agents/`) | Yes (instruct agent via its definition, `.cursor/rules`, or `AGENTS.md`) |
-| Windsurf | ❌ No | Cascade (singular) | N/A | N/A |
-| Antigravity | ✅ Yes | AgentKit 2.0 (specialized agents) | IDE-managed profiles (Manager View) | Yes (instruct agents via `AGENTS.md`, `GEMINI.md`, or `SKILL.md`) |
+| Windsurf (Devin Desktop) | ⚠️ Preview | Subagents (Devin Local) | `.devin/agents/*.md` | Yes (instruct subagent in its definition to read/append a markdown file) |
+| Antigravity | ✅ Yes | Custom subagents | `.agents/agents/*.md` | Yes (instruct subagent in its role definition to read/append a markdown file) |
 | OpenAI Codex | ✅ Yes | Custom agents (TOML roles) | `.codex/agents/*.toml` | Yes (instruct agent in `developer_instructions` to read/append a markdown file) |
 
-**Memory via markdown instruction:** Even without native agent memory, you can get the same behavior by instructing the assistant via that IDE's instruction mechanism (see table) to read from a markdown file at the start of work and append learnings at the end. Kilo Code modes used this way function as true agents.
+**Memory via markdown instruction:** Even without native agent memory, you can get the same behavior by instructing the assistant via that IDE's instruction mechanism (see table) to read from a markdown file at the start of work and append learnings at the end. Kilo Code agents used this way function as true agents.
 
 ---
 
@@ -108,8 +108,8 @@ For full setup details on defining, configuring, and invoking agents in each IDE
 
 - **[Claude Code](/ides/claude-code#agents)** — Native sub-agents with persistent memory; defined in `.claude/agents/`
 - **[GitHub Copilot](/ides/github-copilot#agents)** — Custom agents + sub-agents; defined in `.github/agents/`; Copilot Memory stores repository facts, not per-agent memory
-- **[Kilo Code](/ides/kilo-code#agents)** — Modes as true agents; defined in `.kilocodemodes` (YAML); rules in `.kilo/rules-{slug}/`
+- **[Kilo Code](/ides/kilo-code#agents)** — Markdown agents (formerly modes) in `.kilo/agents/`; `mode: subagent` for delegated roles
 - **[Cursor](/ides/cursor#agents)** — Subagents; defined in `.cursor/agents/` (also reads `.claude/agents/`); async delegation (v2.5+); Agents Window (v3.0)
-- **[Windsurf](/ides/windsurf#agents)** — No true agent support; Cascade is a single shared agent
-- **[Antigravity](/ides/google-antigravity#agents)** — AgentKit 2.0 with 16 specialized agents; Manager View orchestration
+- **[Windsurf (Devin Desktop)](/ides/windsurf#agents)** — Subagents in preview with Devin Local, which replaced Cascade; defined in `.devin/agents/`
+- **[Antigravity](/ides/google-antigravity#agents)** — Custom subagents in `.agents/agents/`, invoked by name with `invoke_subagent`
 - **[OpenAI Codex](/ides/openai-codex#agents)** — Custom agents via TOML role profiles in `.codex/agents/`; built-in `default`/`worker`/`explorer` roles; native memories are global, not per agent, so use the markdown-instruction pattern
