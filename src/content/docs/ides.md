@@ -21,7 +21,7 @@ Choose your IDE below for a dedicated guide covering everything you need to set 
 | [Windsurf (Devin Desktop)](/ides/windsurf) | ✅ Native (`.agents/skills/`) | ✅ `/workflow` | ✅ Devin Local; subagents (preview) | ⚠️ Preview | [→ Guide](/ides/windsurf) |
 | [Kilo Code](/ides/kilo-code) | ✅ Native | ✅ `/command` | ✅ Agents | ✅ Subagent delegation | [→ Guide](/ides/kilo-code) |
 | [Google Antigravity](/ides/google-antigravity) | ✅ Native (`.agents/skills/`) | ✅ `/skill` | ✅ Custom subagents | ✅ Subagent delegation | [→ Guide](/ides/google-antigravity) |
-| [OpenAI Codex](/ides/openai-codex) | ✅ Via copy or symlink | ⚠️ Needs investigation (`$skill-name`) | ✅ Custom agents (TOML) | ⚠️ Partial (sub-agent delegation) | [→ Guide](/ides/openai-codex) |
+| [OpenAI Codex](/ides/openai-codex) | ✅ Native (`.agents/skills/`) | ⚠️ Needs investigation (`$skill-name`) | ✅ Custom agents (TOML) | ⚠️ Partial (sub-agent delegation) | [→ Guide](/ides/openai-codex) |
 
 ---
 
@@ -30,7 +30,7 @@ Choose your IDE below for a dedicated guide covering everything you need to set 
 Each IDE guide is structured with the same sections:
 
 - **Overview** — what the IDE is and how it fits into factory engineering
-- **Skills** — folder locations, setup, sharing strategies (copy-on-change, symlinks)
+- **Skills** — folder locations, setup, and the Claude Code mirror
 - **Commands** — folder location, invocation pattern, format notes
 - **Agents** — support status, feature name, storage, memory capability
 - **Workflows** — orchestration support and notes

@@ -17,16 +17,6 @@ You closed the retrospective with a refined LINQ skill. The description triggers
 
 Tight means the skill matches the published authoring standard: a single, specific description; rules sized for their fragility; examples that do the teaching; no tokens that don't earn their space. Anthropic maintains that standard as a living document at [Agent Skills best practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices). You could walk it by hand. A dedicated skill walks it for you.
 
-## Install skill-optimizer
-
-`skill-optimizer` is a published skill from `factoryengineering/skills`. Install it once per repo:
-
-```bash
-npx openskills install factoryengineering/skills
-```
-
-The installer places `.claude/skills/skill-optimizer/` in your project, including a bundled copy of the best-practices reference so the skill works offline. Commit the install. Every teammate who clones the repo gets the same optimizer.
-
 ## What "best practices" actually means
 
 Before you run the optimizer, know what it is checking. The published guide is long; the working set is short:

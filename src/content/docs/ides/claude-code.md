@@ -5,7 +5,7 @@ description: Complete factory engineering guide for Claude Code — skills, comm
 
 # Claude Code
 
-Claude Code is Anthropic's AI-native coding agent and the origin of many factory engineering conventions. It pioneered the Agent Skills open standard, native sub-agents, and workflow orchestration via the Agent tool (named the Task tool before v2.1.63). Claude Code is the canonical reference implementation for factory engineering — the `.claude/` folder structure is the recommended canonical location for skills and commands across all IDEs.
+Claude Code is Anthropic's AI-native coding agent and the origin of many factory engineering conventions. It pioneered the Agent Skills open standard, native sub-agents, and workflow orchestration via the Agent tool (named the Task tool before v2.1.63). Claude Code is the reference implementation for many factory engineering patterns. It is also the one IDE that does not read the cross-tool `.agents/skills/` folder, so it needs a mirror of your canonical skills.
 
 ---
 
@@ -22,9 +22,18 @@ Claude Code automatically detects skills in `.claude/skills/` and loads them int
 
 Claude Code extends the base standard with frontmatter that other IDEs do not read: invocation control (`disable-model-invocation`, `user-invocable`), forked execution (`context: fork` with `agent:` to pick the subagent type), path scoping (`paths`), and dynamic context injection (a line starting with `` !`command` `` runs the command and replaces itself with the output before the skill reaches the model). The `anthropics/skills` repository on GitHub provides official skills ready to use.
 
-**Getting started:** Use the **skill-creator** skill to create new skills (see [Installing skill-creator and skill-optimizer](/skills#installing-skill-creator-and-skill-optimizer)). It guides you through the workflow and produces a proper skill directory and SKILL.md.
+**Getting started:** Use the **skill-creator** skill to create new skills (see [Authoring Skills with skill-creator and skill-optimizer](/skills#authoring-skills-with-skill-creator-and-skill-optimizer)). It guides you through the workflow and produces a proper skill directory and SKILL.md.
 
-**Symlinks:** Claude Code's `.claude/skills/` is the recommended canonical location. No symlink needed — other IDEs symlink *to* this folder.
+**Sharing:** Claude Code does not read `.agents/skills/`, the canonical location. Generate `.claude/skills/` from it with a one-way rsync:
+
+```bash
+mkdir -p .agents/skills .claude/skills
+rsync -a --delete .agents/skills/ .claude/skills/
+```
+
+Edit skills only in `.agents/skills/`, including when you work in Claude Code. Treat `.claude/skills/` as generated output, and do not keep Claude-specific skills there: `--delete` removes anything that is not in `.agents/skills/`. In an existing repository, migrate `.claude/skills/` first.
+
+Automate this with a Git hook or a CI check so the copies stay in sync, and commit both folders. See [Mirror for Claude Code](/skills#mirror-for-claude-code) for the migration steps.
 
 📖 [Claude Code Skills Documentation](https://code.claude.com/docs/en/skills)
 
@@ -38,15 +47,13 @@ For more about how skills work in factory engineering, see [Skills](/skills).
 
 **Invocation:** `/command-name` — the filename without `.md` is the slash command (e.g. `write-spec.md` → `/write-spec`). Prefer `/command-name` for the command; the `@` symbol in **slash-command at-artifact** refers to the *artifact*, not the command.
 
-Claude Code stores commands as markdown files; each file becomes a slash command. Use the recommended pattern: state in the command what the user will supply and instruct the LLM to stop and prompt if it's missing. Do not rely on `$ARGUMENTS` — commands are shared via symlinks and not all IDEs support it.
+Claude Code stores commands as markdown files; each file becomes a slash command. Use the recommended pattern: state in the command what the user will supply and instruct the LLM to stop and prompt if it's missing. Do not rely on `$ARGUMENTS` — commands are shared across IDEs and not all IDEs support it.
 
 **Usage:**
 
 ```
 /write-spec @submit-sales-order
 ```
-
-**Symlinks:** Claude Code's `.claude/commands/` is the canonical location. Other IDEs symlink *to* this folder.
 
 📖 [Claude Code Slash Commands Documentation](https://code.claude.com/docs/en/slash-commands)
 

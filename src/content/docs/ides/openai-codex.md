@@ -21,27 +21,7 @@ OpenAI Codex implements the Agent Skills open standard, reaching parity with the
 
 Codex scans `.agents/skills/` in every directory from the current working directory up to the repository root. It still loads the older `~/.codex/skills/` user location for backward compatibility; do not add new skills there.
 
-Codex uses the shared `.agents/skills/` convention (not a Codex-specific folder) and evaluates each skill's `description` via progressive disclosure to decide when to load it. Share skills from your canonical location using copy-on-change or a symlink:
-
-**Rsync (recommended):**
-
-```bash
-# Gather any local changes back to canonical, then mirror
-[ -d .agents/skills ] && rsync -a .agents/skills/ .claude/skills/
-mkdir -p .agents/skills
-rsync -a --delete .claude/skills/ .agents/skills/
-```
-
-Automate with a Git hook or file watcher so copies stay in sync. See [Skills — Sync with rsync](/skills#strategy-1--sync-with-rsync-recommended-for-most-teams) for the full two-step pattern covering all IDEs.
-
-**Symlink (macOS/Linux only):**
-
-```bash
-mkdir -p .agents
-ln -s ../.claude/skills .agents/skills
-```
-
-Symlinks require macOS/Linux and may not work on Windows clones. See [Skills — Managing Skills Across IDEs](/skills#managing-skills-across-ides) for details on caveats and alternatives.
+Codex uses the shared `.agents/skills/` convention, the canonical factory engineering location, so **no copy is needed**. Codex does not read `.claude/skills/`. Codex evaluates each skill's `description` via progressive disclosure to decide when to load it.
 
 Codex reads only `name` and `description` (plus `metadata.short-description`) from `SKILL.md`. It ignores Claude Code's `disable-model-invocation` and `user-invocable` properties. To reserve a skill for explicit invocation, add an `agents/openai.yaml` file inside the skill directory:
 

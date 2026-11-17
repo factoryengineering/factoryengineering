@@ -11,18 +11,18 @@ Cursor is an AI-native code editor built on VS Code. It supports the Agent Skill
 
 ## Skills
 
-**Supports Agent Skills standard:** ✅ Yes — primary `.cursor/skills/`, compatibility `.claude/skills/`
+**Supports Agent Skills standard:** ✅ Yes — reads `.agents/skills/`, `.cursor/skills/`, and compatibility folders
 
 | Scope | Path |
 |-------|------|
-| Project (primary) | `.cursor/skills/` |
-| Project (compatibility) | `.claude/skills/` |
-| Global (primary) | `~/.cursor/skills/` |
-| Global (compatibility) | `~/.claude/skills/` |
+| Project | `.agents/skills/`, `.cursor/skills/` |
+| Project (compatibility) | `.claude/skills/`, `.codex/skills/` |
+| Global | `~/.agents/skills/`, `~/.cursor/skills/` |
+| Global (compatibility) | `~/.claude/skills/`, `~/.codex/skills/` |
 
-Cursor looks for skills in `.cursor/skills/` first, then in `.claude/skills/` for compatibility — similar to GitHub Copilot. If you use `.claude/skills/` as your canonical location, **no symlink is needed**; Cursor will find your skills automatically. Skills are loaded when they match your request, based on the `description` field in each `SKILL.md` frontmatter.
+Cursor reads `.agents/skills/` directly, so **no copy is needed** for the canonical location. Cursor also reads the `.claude/skills/` mirror kept for Claude Code; keep that mirror exact so both copies match. Skills are loaded when they match your request, based on the `description` field in each `SKILL.md` frontmatter. Skills in nested folders (for example `apps/web/.cursor/skills/`) surface only when the agent works in that folder.
 
-**Plugins (v2.5, February 2026):** Cursor's Plugins system integrates skills as first-class plugin components. The [Cursor Marketplace](https://cursor.com/marketplace) distributes plugin packages that bundle skills alongside subagents, MCP servers, hooks, and rules into one-click installs (browse the marketplace or run `/add-plugin`). Skills installed via plugins follow the same `SKILL.md` format and discovery mechanism — the plugin system supplements the folder convention, it does not replace it. Project-scoped skills committed to `.claude/skills/` continue to work unchanged alongside plugin-delivered skills.
+**Plugins (v2.5, February 2026):** Cursor's Plugins system integrates skills as first-class plugin components. The [Cursor Marketplace](https://cursor.com/marketplace) distributes plugin packages that bundle skills alongside subagents, MCP servers, hooks, and rules into one-click installs (browse the marketplace or run `/add-plugin`). Skills installed via plugins follow the same `SKILL.md` format and discovery mechanism — the plugin system supplements the folder convention, it does not replace it. Project-scoped skills committed to `.agents/skills/` continue to work unchanged alongside plugin-delivered skills.
 
 📖 [Cursor Agent Skills Documentation](https://cursor.com/docs/skills) · [Cursor Marketplace](https://cursor.com/marketplace)
 
@@ -34,7 +34,7 @@ For more about how skills work in factory engineering, see [Skills](/skills).
 
 **Folder location:** `.cursor/commands/` (project) or `~/.cursor/commands/` (global)
 
-**Invocation:** `/command-name` — filename without `.md` becomes the slash command. Use **slash-command at-artifact** (e.g. `/write-spec @submit-sales-order`). Follow the recommended pattern (state what the user supplies; stop and prompt if missing). Do not rely on `$ARGUMENTS` — commands are shared via symlinks and not all IDEs support it.
+**Invocation:** `/command-name` — filename without `.md` becomes the slash command. Use **slash-command at-artifact** (e.g. `/write-spec @submit-sales-order`). Follow the recommended pattern (state what the user supplies; stop and prompt if missing). Do not rely on `$ARGUMENTS` — commands are shared across IDEs and not all IDEs support it.
 
 **Usage:**
 
@@ -42,7 +42,7 @@ For more about how skills work in factory engineering, see [Skills](/skills).
 /write-spec @submit-sales-order
 ```
 
-Since Cursor uses `.cursor/commands/` and the canonical commands live in `.claude/commands/`, you need to share them. **Copy-on-change is recommended** — Cursor's file watcher does not properly follow directory symlinks, which can cause commands to appear stale or missing until you restart the editor.
+Since Cursor uses `.cursor/commands/` and the canonical commands live in `.claude/commands/`, you need to share them. Copy them with rsync.
 
 **Rsync (recommended):**
 
@@ -55,14 +55,6 @@ rsync -a --delete .claude/commands/ .cursor/commands/
 ```
 
 Automate this with a Git hook or file watcher so copies stay in sync. See [Commands — Sync with rsync](/commands#strategy-1--sync-with-rsync-recommended-for-most-teams) for the full two-step pattern covering all IDEs.
-
-**Symlink (not recommended for Cursor):**
-
-```bash
-ln -s ../.claude/commands .cursor/commands
-```
-
-If you use a symlink, be aware that Cursor may not detect changes to files inside the symlinked directory. You may need to restart Cursor or reload the window after modifying commands.
 
 **Built-in commands (v3.0):** Cursor 3 added `/worktree` (creates an isolated git worktree so agents work without conflicts) and `/best-of-n` (runs the same prompt across multiple models in parallel worktrees and compares results). These are built-in commands, not user-defined — your custom commands in `.cursor/commands/` continue to work alongside them.
 
