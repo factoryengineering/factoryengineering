@@ -82,15 +82,18 @@ For more about how agents work in factory engineering, see [Agents](/agents).
 
 ## Workflows
 
-**Orchestration support:** ⚠️ Partial
+**Orchestration support:** ✅ Yes
 
-Cursor's Agents Window (v3.0, April 2026) lets you run many agents in parallel across repos, worktrees, and cloud environments. A parent agent can delegate work to custom subagents defined in `.cursor/agents/`, and subagents can spawn their own subagents (v2.5+), creating a tree of coordinated work.
+Invoke a workflow with **slash-workflow at-artifact** (e.g. `/tdd-cycle @docs/specs/order-validation.md`). Store the workflow as a command skill in `.agents/skills/`. The parent agent reads it and delegates each step to the named subagents in `.cursor/agents/` (or `.claude/agents/`). Cursor delegates when a prompt names a subagent by `/name` or in plain language, and subagents can run asynchronously and spawn their own subagents (v2.5+).
 
-However, Cursor does not have a dedicated orchestrator that reads a workflow document and delegates to named specialists based on its contents. The delegation is ad-hoc — the parent agent decides how to split work based on its prompt, not by following a structured workflow file. You can approximate workflow-driven orchestration by writing detailed instructions in a command file and relying on the parent agent to follow them, but there is no enforcement layer.
+**Test delegation.** Forum reports show the parent agent sometimes ignores an explicit subagent request and does the work itself. Add an orchestration rule to every workflow ("Never write tests yourself; always delegate to tdd-test-writer") and verify in a clean session that each step reaches the named subagent.
 
-**Closest pattern:** Write a workflow as a command skill in `.agents/skills/` that describes phases and specialist subagents. Invoke it with `/command-name @artifact`. The parent agent reads the command and delegates to subagents, but routing logic depends on the model's interpretation rather than a built-in orchestration engine.
+**Other ways Cursor runs agents in parallel:**
 
-📖 [Cursor Subagents Documentation](https://cursor.com/docs/subagents) · [Cursor Agents Window](https://cursor.com/changelog/3-0)
+- The **Agents Window** (v3.0, April 2026) runs many agents in parallel across repos, worktrees, cloud environments, and SSH hosts.
+- **Projects** (beta, September 2026) add a coordinator agent that plans long-running work and hands tasks to parallel agents, running on Cloud Agents by default.
+
+📖 [Cursor Subagents Documentation](https://cursor.com/docs/subagents) · [Cursor Agents Window](https://cursor.com/changelog/3-0) · [Cursor Projects](https://cursor.com/changelog/projects)
 
 For more about how workflows work in factory engineering, see [Workflows](/workflows).
 

@@ -15,13 +15,15 @@ Choose your IDE below for a dedicated guide covering everything you need to set 
 
 | IDE | Skills | Commands | Agents | Workflows | Guide |
 |-----|--------|----------|--------|-----------|-------|
-| [Claude Code](/ides/claude-code) | ✅ Native (`.claude/skills/` mirror) | ✅ As skills (`/skill` in CLI and IDE extensions) | ✅ Sub-agents | ✅ Full orchestration | [→ Guide](/ides/claude-code) |
-| [GitHub Copilot](/ides/github-copilot) | ✅ Native (`.agents/skills/`) | ✅ As skills (`/skill` in VS Code chat and Copilot CLI) | ✅ Custom agents | ⚠️ Partial (`/fleet`) | [→ Guide](/ides/github-copilot) |
-| [Cursor](/ides/cursor) | ✅ Native (`.agents/skills/`) | ✅ As skills (`/skill` in editor and Agents Window) | ✅ Subagents | ⚠️ Partial (subagent delegation) | [→ Guide](/ides/cursor) |
+| [Claude Code](/ides/claude-code) | ✅ Native (`.claude/skills/` mirror) | ✅ As skills (`/skill` in CLI and IDE extensions) | ✅ Sub-agents | ✅ Subagent delegation | [→ Guide](/ides/claude-code) |
+| [GitHub Copilot](/ides/github-copilot) | ✅ Native (`.agents/skills/`) | ✅ As skills (`/skill` in VS Code chat and Copilot CLI) | ✅ Custom agents | ✅ Subagent delegation | [→ Guide](/ides/github-copilot) |
+| [Cursor](/ides/cursor) | ✅ Native (`.agents/skills/`) | ✅ As skills (`/skill` in editor and Agents Window) | ✅ Subagents | ✅ Subagent delegation | [→ Guide](/ides/cursor) |
 | [Windsurf (Devin Desktop)](/ides/windsurf) | ✅ Native (`.agents/skills/`) | ✅ As skills (`@skill` in Devin Desktop) | ✅ Devin Local; subagents (preview) | ⚠️ Preview | [→ Guide](/ides/windsurf) |
 | [Kilo Code](/ides/kilo-code) | ✅ Native (`.agents/skills/`) | ✅ As skills (`/skill` in VS Code extension and Kilo CLI) | ✅ Agents | ✅ Subagent delegation | [→ Guide](/ides/kilo-code) |
 | [Google Antigravity](/ides/google-antigravity) | ✅ Native (`.agents/skills/`) | ✅ As skills (`/skill` in App, CLI, and IDE) | ✅ Custom subagents | ✅ Subagent delegation | [→ Guide](/ides/google-antigravity) |
-| [OpenAI Codex](/ides/openai-codex) | ✅ Native (`.agents/skills/`) | ✅ As skills (`$skill-name` in Codex CLI) | ✅ Custom agents (TOML) | ⚠️ Partial (sub-agent delegation) | [→ Guide](/ides/openai-codex) |
+| [OpenAI Codex](/ides/openai-codex) | ✅ Native (`.agents/skills/`) | ✅ As skills (`$skill-name` in Codex CLI) | ✅ Custom agents (TOML) | ✅ Subagent delegation | [→ Guide](/ides/openai-codex) |
+
+**Workflows column:** "Subagent delegation" means the main agent can hand steps to named, project-defined agents. The model decides at run time whether to delegate, so delegation is not guaranteed, and none of these IDEs enforces a workflow document's order, checkpoints, or approval gates. See [IDE Support for Workflow Orchestration](/workflows#ide-support-for-workflow-orchestration) and [Comparing execution guarantees](/workflows#comparing-execution-guarantees).
 
 ---
 

@@ -105,10 +105,14 @@ By default, a subagent can spawn subagents of its own, up to three levels below 
 
 **Where workflows live:** As command skills in `.agents/skills/`, mirrored into `.claude/skills/` (e.g. `.claude/skills/tdd-cycle/SKILL.md`). Invoke with `/tdd-cycle @path/to/design.md`.
 
-Define an orchestrator subagent that is restricted to specific tools and subagents, and that is instructed to read a given workflow file before starting. That makes the orchestrator a reusable, named agent the team can invoke by name.
+**Other ways Claude Code runs agents in parallel:**
 
-📖 [Claude Code Subagents Documentation](https://code.claude.com/docs/en/sub-agents)
-📖 [Claude Code Agent Teams Documentation](https://code.claude.com/docs/en/agent-teams)
+- **Dynamic workflows** have Claude write a JavaScript script that a runtime uses to run many subagents and cross-check their results. Monitor them with `/workflows`, and save a reusable one to `.claude/workflows/` to run it as `/{name}`. Use them for broad, uniform work; keep judgment-heavy workflows as skills (see [Script-Driven Workflows](/workflows#script-driven-workflows)).
+- **Agent teams** run a lead session that assigns work to teammate sessions over a shared task list and direct messaging. Teammates can reuse definitions from `.claude/agents/`. Agent teams are experimental and disabled by default (set `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`).
+- **Agent view** (`claude agents`) dispatches and monitors independent background sessions. It is for work you coordinate yourself, not for workflow orchestration.
+
+📖 [Claude Code Subagents Documentation](https://code.claude.com/docs/en/sub-agents) · [Run agents in parallel](https://code.claude.com/docs/en/agents)
+📖 [Dynamic Workflows](https://code.claude.com/docs/en/workflows) · [Agent Teams](https://code.claude.com/docs/en/agent-teams)
 
 For more about how workflows work in factory engineering, see [Workflows](/workflows).
 

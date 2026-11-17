@@ -87,13 +87,23 @@ For more about how agents work in factory engineering, see [Agents](/agents).
 
 ## Workflows
 
-**Orchestration support:** ⚠️ Partial (in-session sub-agent orchestration, but no workflow-document consumption)
+**Orchestration support:** ✅ Yes
 
-**`/fleet`:** The Copilot CLI reached GA on February 25, 2026. Its `/fleet` slash command (also the `--fleet` flag) breaks a task down, spawns parallel sub-agents, and coordinates their work within a single session. It runs in the Copilot CLI and the Copilot app. Note that `/fleet` provides task decomposition and parallel sub-agent coordination, but does not read a structured workflow document the way Claude Code or Kilo Code's orchestrators do — the orchestration is driven by the model's interpretation of the task, not by a workflow file.
+Invoke a workflow with **slash-workflow at-artifact** (e.g. `/tdd-cycle @docs/specs/order-validation.md`). The Copilot harness, the default in VS Code since 1.143 and the harness behind the Copilot CLI and app, can delegate to built-in and custom agents with its `task` tool. Delegation is model-selected: Copilot may choose the named subagent or do the step itself, so naming an agent makes delegation likely, not guaranteed. Write the workflow in plain, harness-neutral language that names each agent ("Delegate the failing test to the tdd-test-writer agent"), add an orchestration rule for steps that must be done by a separate agent, and check the session transcript to confirm the handoff happened. Do not rely on `agents:` or `handoffs` frontmatter; only the deprecated Local harness reads them.
+
+**`/fleet`:** The Copilot CLI reached GA on February 25, 2026. Its `/fleet` slash command (also the `--fleet` flag) encourages Copilot to delegate parts of a task to parallel sub-agents within a single session. It is not deterministic orchestration: Copilot decides each time how to divide the work and which agents to use. It runs in the Copilot CLI and the Copilot app. Use it for parallel fan-out of one task; use a workflow skill when the steps follow a plan with conditions and loops, and a dynamic workflow when that plan must be enforced.
+
+**Dynamic workflows:** A dynamic workflow is a program, defined in a Copilot extension, that sets the steps, conditions, and handoffs; agents handle the steps that need judgment. Runs can pause at a checkpoint for review and resume later, and you can limit concurrent agents, total agents, active running time, and AI credits.
+
+- **Status:** public preview.
+- **Where:** the Copilot CLI (including `copilot workflow run {name}` from the shell), the GitHub Copilot app, and the Copilot SDK. Not VS Code chat or the Copilot cloud agent.
+- **Who:** all Copilot plans except Pro and Pro+ subscribers on existing annual plans who remain on legacy premium-request billing.
+
+These are script-driven, not document-driven (see [Script-Driven Workflows](/workflows#script-driven-workflows)).
 
 **Agent HQ and third-party agents:** GitHub announced Agent HQ at Universe in October 2025. Since February 4, 2026, you can assign tasks on GitHub to third-party coding agents such as Claude and Codex (public preview) alongside Copilot and review their output in one place. This is cross-session task assignment, not orchestration within a session.
 
-📖 [GitHub Copilot CLI Documentation](https://docs.github.com/en/copilot/how-tos/copilot-cli) · [Third-party coding agents](https://docs.github.com/en/copilot/concepts/agent-capabilities/about-agents/about-third-party-coding-agents)
+📖 [Subagents in VS Code](https://code.visualstudio.com/docs/agents/run/subagents) · [Dynamic workflows](https://docs.github.com/en/copilot/concepts/agent-capabilities/agent-powered-workflows-and-operations/dynamic-workflows) · [GitHub Copilot CLI Documentation](https://docs.github.com/en/copilot/how-tos/copilot-cli) · [Third-party coding agents](https://docs.github.com/en/copilot/concepts/agent-capabilities/about-agents/about-third-party-coding-agents)
 
 For more about how workflows work in factory engineering, see [Workflows](/workflows).
 

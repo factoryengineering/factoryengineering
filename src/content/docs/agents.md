@@ -100,6 +100,8 @@ The table separates three things that are easy to conflate: whether you can defi
 | Antigravity | ✅ Yes | Custom subagents | `.agents/agents/*.md` | File-backed convention (instruct subagent in its role definition) |
 | OpenAI Codex | ✅ Yes | Custom agents (TOML roles) | `.codex/agents/*.toml` | File-backed convention (instruct agent in `developer_instructions`) |
 
+**Native memory is not the same thing.** Several IDEs now remember things on their own: Copilot Memory stores repository facts, Codex memories summarize past sessions, Cursor keeps per-project memories, and Antigravity maintains a knowledge base. None of these gives a specific role its own memory that the role reads and writes. Claude Code's `memory: project` field is the only native implementation of the factory engineering pattern.
+
 **File-backed memory convention:** Without native agent memory, instruct each agent, in its definition, to read a markdown file at the start of work and append learnings at the end. Use `.claude/agent-memory/{agent-name}/MEMORY.md` so the same file works with Claude Code's native agent memory.
 
 This convention approximates persistent memory. It is not equivalent to it:
