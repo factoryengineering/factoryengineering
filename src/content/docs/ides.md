@@ -23,6 +23,8 @@ Choose your IDE below for a dedicated guide covering everything you need to set 
 | [Google Antigravity](/ides/google-antigravity) | ✅ Native (`.agents/skills/`) | ✅ As skills (`/skill` in App, CLI, and IDE) | ✅ Custom subagents | ✅ Subagent delegation | [→ Guide](/ides/google-antigravity) |
 | [OpenAI Codex](/ides/openai-codex) | ✅ Native (`.agents/skills/`) | ✅ As skills (`$skill-name` in Codex CLI) | ✅ Custom agents (TOML) | ✅ Subagent delegation | [→ Guide](/ides/openai-codex) |
 
+**Workflows column:** "Subagent delegation" means the main agent can hand steps to named, project-defined agents. The model decides at run time whether to delegate, so delegation is not guaranteed, and none of these IDEs enforces a workflow document's order, checkpoints, or approval gates. See [IDE Support for Workflow Orchestration](/workflows#ide-support-for-workflow-orchestration) and [Comparing execution guarantees](/workflows#comparing-execution-guarantees).
+
 ---
 
 ## How to Read the Guides
