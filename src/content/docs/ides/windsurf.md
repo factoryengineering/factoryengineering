@@ -5,7 +5,9 @@ description: Complete factory engineering guide for Windsurf, now Devin Desktop 
 
 # Windsurf (Devin Desktop)
 
-Cognition acquired Windsurf in July 2025 and renamed the editor **Devin Desktop** in June 2026. Devin Desktop adds **Devin Local**, a newer local agent that shares its harness with the Devin CLI, alongside the original Cascade agent. Sources differ on whether Cascade remains available in current releases, so check your version. Devin Desktop moves project configuration to `.devin/` and still reads the legacy `.windsurf/` folders and the cross-tool `.agents/` folder. Devin Local supports subagents (in preview), so Windsurf is no longer limited to a single shared agent. The agent and workflow features below are Devin Local's.
+Cognition acquired Windsurf in July 2025 and renamed the editor **Devin Desktop** in June 2026. **Devin Local**, which shares its harness with the Devin CLI, subsequently replaced Cascade as the primary local coding agent. Cascade is now a legacy agent: current Devin Desktop releases no longer start new Cascade conversations or open existing ones. Devin Local supports subagents, sandboxing, worktrees, skills, and permission controls. Its subagent feature is in preview; Devin Local itself is not.
+
+Devin Desktop moves project configuration to `.devin/` and still reads the legacy `.windsurf/` folders and the cross-tool `.agents/` folder. To move Cascade workflows and memories over, run **Devin: Open Cascade Migration Wizard** from the command palette.
 
 Documentation is moving from docs.windsurf.com to docs.devin.ai.
 
@@ -46,9 +48,9 @@ For more about how commands work in factory engineering, see [Commands](/command
 
 ## Agents
 
-**Supports true agents:** ⚠️ Preview
+**Supports true agents:** ✅ Yes (Devin Local; custom subagents in preview)
 
-**Feature name:** Subagents (Devin Local)
+**Feature name:** Devin Local; Subagents (Preview)
 
 **Storage location:** `.devin/agents/{agent-name}.md` (project) or `~/.config/devin/agents/{agent-name}.md` (global)
 
@@ -56,9 +58,9 @@ Devin Local can delegate work to subagents that run in parallel and report back.
 
 **Instructions:** Devin Local reads `AGENTS.md` (and `AGENTS.local.md`) as always-on rules, including nested `AGENTS.md` files that apply to their directory.
 
-**Memory:** Devin Local generates memories automatically, but you cannot direct a specific subagent to read and write its own memory file. Get the factory engineering memory pattern by instructing each subagent, in its definition, to read from `.claude/agent-memory/{agent-name}/MEMORY.md` at the start of work and append learnings at the end.
+**Memory:** Devin Local does not persist memories. (Cascade's automatic memories do not carry over except through the migration wizard.) Get the factory engineering memory pattern by instructing each subagent, in its definition, to read from `.claude/agent-memory/{agent-name}/MEMORY.md` at the start of work and append learnings at the end.
 
-📖 [Devin Desktop Changelog](https://docs.devin.ai/desktop/changelog) · [AGENTS.md in Devin Desktop](https://docs.devin.ai/desktop/cascade/agents-md)
+📖 [Devin Local](https://docs.devin.ai/desktop/devin-local) · [Cascade (legacy)](https://docs.devin.ai/desktop/cascade/cascade) · [AGENTS.md in Devin Desktop](https://docs.devin.ai/desktop/cascade/agents-md)
 
 For more about how agents work in factory engineering, see [Agents](/agents).
 
@@ -68,7 +70,7 @@ For more about how agents work in factory engineering, see [Agents](/agents).
 
 **Orchestration support:** ⚠️ Preview
 
-With subagents enabled, Devin Local can read a factory engineering workflow and delegate steps to named subagents. Store the workflow as a skill and invoke it with **slash-workflow at-artifact** (e.g. `/tdd-cycle @docs/specs/order-validation.md`). Subagent support is in preview, so test each workflow before relying on it.
+With the **Subagents (Preview)** setting enabled, Devin Local can read a factory engineering workflow and delegate steps to named subagents. Store the workflow as a skill and invoke it with **slash-workflow at-artifact** (e.g. `/tdd-cycle @docs/specs/order-validation.md`). Subagent support is in preview, so test each workflow before relying on it.
 
 **Terminology collision:** Windsurf's "Workflows" (in `.windsurf/workflows/`) are what factory engineering calls commands. They are not orchestration documents that coordinate multiple named agents.
 
@@ -80,5 +82,7 @@ For more about how workflows work in factory engineering, see [Workflows](/workf
 
 - [Devin Desktop Skills Documentation](https://docs.devin.ai/desktop/cascade/skills)
 - [Windsurf Workflows Documentation](https://docs.devin.ai/desktop/cascade/workflows)
+- [Devin Local](https://docs.devin.ai/desktop/devin-local)
+- [Cascade (legacy)](https://docs.devin.ai/desktop/cascade/cascade)
 - [AGENTS.md in Devin Desktop](https://docs.devin.ai/desktop/cascade/agents-md)
 - [Devin Desktop Changelog](https://docs.devin.ai/desktop/changelog)
