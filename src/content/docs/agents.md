@@ -88,7 +88,7 @@ Each agent accumulates domain knowledge specific to its role and the project. Ov
 
 ## IDE Support for True Agents
 
-Only a few IDEs provide true agent support as defined above:
+Most IDEs now support true agents as defined above. The table shows what each IDE calls the feature and where agents live:
 
 | IDE | True Agent Support | Feature Name | Storage | Memory via markdown instruction |
 |-----|-------------------|--------------|---------|----------------------------------|
@@ -99,6 +99,8 @@ Only a few IDEs provide true agent support as defined above:
 | Windsurf (Devin Desktop) | ⚠️ Preview | Subagents (Devin Local) | `.devin/agents/*.md` | Yes (instruct subagent in its definition to read/append a markdown file) |
 | Antigravity | ✅ Yes | Custom subagents | `.agents/agents/*.md` | Yes (instruct subagent in its role definition to read/append a markdown file) |
 | OpenAI Codex | ✅ Yes | Custom agents (TOML roles) | `.codex/agents/*.toml` | Yes (instruct agent in `developer_instructions` to read/append a markdown file) |
+
+**Native memory is not the same thing.** Several IDEs now remember things on their own: Copilot Memory stores repository facts, Codex memories summarize past sessions, Cursor keeps per-project memories, and Antigravity maintains a knowledge base. None of these gives a specific role its own memory that the role reads and writes. Claude Code's `memory: project` field is the only native implementation of the factory engineering pattern.
 
 **Memory via markdown instruction:** Even without native agent memory, you can get the same behavior by instructing the assistant via that IDE's instruction mechanism (see table) to read from a markdown file at the start of work and append learnings at the end. Kilo Code agents used this way function as true agents.
 

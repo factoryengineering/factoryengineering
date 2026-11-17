@@ -11,7 +11,7 @@ This is the highest layer of the software factory. Skills encode knowledge. Comm
 
 ## The Word "Workflow" Is Used Differently by Different IDEs
 
-Several IDEs use the word "workflow" for something else. Windsurf and Kilo Code both have features they call "Workflows." Those are reusable slash commands, not orchestration of named agents. This page uses the factory engineering meaning: orchestration of agents, with delegation, branching, and looping.
+Several IDEs use the word "workflow" for something else. Windsurf and Kilo Code both have features they call "Workflows." Those are reusable slash commands, not orchestration of named agents. Claude Code, GitHub Copilot, and Google Antigravity use "workflows" for script-driven orchestration (see [Script-Driven Workflows](#script-driven-workflows)). This page uses the factory engineering meaning: a document that guides an orchestrator agent through delegation, branching, and looping.
 
 **Invocation:** Use **slash-workflow at-artifact**, e.g. `/tdd-cycle @docs/specs/order-validation.md`. The workflow name is the skill name. Store workflows as skills in `.agents/skills/`, alongside commands, so every IDE invokes them the same way (see the [Commands](/commands) page).
 
@@ -161,27 +161,48 @@ Instruct agents in the workflow or in their agent definitions to include deviati
 
 ## IDE Support for Workflow Orchestration
 
-| IDE | Orchestration Support | Feature Name | Notes |
-|-----|----------------------|--------------|-------|
-| Claude Code | ✅ Yes | Subagent orchestration | Main agent reads workflow, delegates via the Agent tool |
-| Kilo Code | ✅ Yes | Subagent delegation (`task` tool) | Primary agent delegates to named `mode: subagent` agents; Orchestrator mode is deprecated |
-| GitHub Copilot | ⚠️ Partial | `/fleet` (CLI) + custom agents | `/fleet` provides in-session parallel sub-agent orchestration; no workflow-document consumption |
-| Cursor | ⚠️ Partial | Agents Window + subagent delegation | Parent agents delegate to subagents; no workflow-document orchestrator |
-| Windsurf (Devin Desktop) | ⚠️ Preview | Subagents (Devin Local) | Devin Local delegates to subagents in preview; Windsurf "Workflows" are commands |
-| Antigravity | ✅ Yes | Custom subagents (`invoke_subagent`) | Main agent delegates to named subagents; also `/swarm` and script-driven Dynamic Workflows |
-| OpenAI Codex | ⚠️ Partial | Native sub-agent delegation | Parent agent spawns TOML-defined sub-agents in parallel; `max_threads` (default 6) and `max_depth` (default 1) |
+No IDE has a dedicated engine that parses a workflow file. In every IDE, the workflow is a command skill whose text tells the main agent which named specialists to call, in what order, and under what conditions. What matters is whether the main agent can delegate to **named, project-defined agents** and how reliably it does so.
+
+| IDE | Orchestration Support | Delegation Mechanism | Notes |
+|-----|----------------------|----------------------|-------|
+| Claude Code | ✅ Yes | Agent tool → `.claude/agents/` | Subagents can nest up to three levels; also script-driven dynamic workflows |
+| GitHub Copilot | ✅ Yes | `task` tool → `.github/agents/` | Copilot harness in VS Code and the CLI; `/fleet` for parallel fan-out; dynamic workflows in preview |
+| Cursor | ✅ Yes | `Task` tool → `.cursor/agents/` | Async and nested subagents; test delegation, because the parent sometimes does the work itself |
+| Kilo Code | ✅ Yes | `task` tool → `.kilo/agents/` | Foreground or background subagents; Orchestrator mode is deprecated |
+| Google Antigravity | ✅ Yes | `invoke_subagent` → `.agents/agents/` | Also `/swarm` and script-driven Dynamic Workflows |
+| OpenAI Codex | ✅ Yes | `spawn_agent` → `.codex/agents/` | `max_threads` default 6; `max_depth` default 1, so specialists cannot delegate further |
+| Windsurf (Devin Desktop) | ⚠️ Preview | Subagents (Devin Local) | Enable Subagents (Preview); Windsurf "Workflows" are commands |
 
 ---
 
 For full details on workflow orchestration in each IDE, see the dedicated IDE pages:
 
-- **[Claude Code](/ides/claude-code#workflows)** — ✅ Full orchestration. Main agent reads the workflow skill, delegates via the Agent tool to named subagents with looping, branching, and parallel coordination.
-- **[Kilo Code](/ides/kilo-code#workflows)** — ✅ Full orchestration. Primary agents delegate to named subagents with the `task` tool, in the foreground or background. Invoke with slash-workflow at-artifact.
-- **[GitHub Copilot](/ides/github-copilot#workflows)** — ⚠️ Partial. `/fleet` provides in-session parallel sub-agent orchestration. No workflow-document consumption.
-- **[Cursor](/ides/cursor#workflows)** — ⚠️ Partial. Agents Window (v3.0) runs agents in parallel; subagent delegation is ad-hoc, not workflow-document-driven.
-- **[Windsurf (Devin Desktop)](/ides/windsurf#workflows)** — ⚠️ Preview. Devin Local, which replaced Cascade, delegates to subagents in preview. Windsurf "Workflows" are commands.
-- **[Google Antigravity](/ides/google-antigravity#workflows)** — ✅ Yes. The main agent delegates to named custom subagents with `invoke_subagent`; `/swarm` and Dynamic Workflows add parallel coordination.
-- **[OpenAI Codex](/ides/openai-codex#workflows)** — ⚠️ Partial. Parent agent spawns parallel sub-agents (`max_threads` default 6, `max_depth` default 1); specialist roles defined in TOML profiles.
+- **[Claude Code](/ides/claude-code#workflows)** — ✅ The main agent reads the workflow skill and delegates via the Agent tool to named subagents with looping, branching, and parallel coordination.
+- **[GitHub Copilot](/ides/github-copilot#workflows)** — ✅ The Copilot harness delegates to named custom agents with its `task` tool. `/fleet` fans one task out to parallel sub-agents.
+- **[Cursor](/ides/cursor#workflows)** — ✅ The parent agent delegates to named subagents by `/name` or plain-language request. Projects (beta) add a coordinator agent for long-running work.
+- **[Kilo Code](/ides/kilo-code#workflows)** — ✅ Primary agents delegate to named subagents with the `task` tool, in the foreground or background.
+- **[Google Antigravity](/ides/google-antigravity#workflows)** — ✅ The main agent delegates to named custom subagents with `invoke_subagent`; `/swarm` and Dynamic Workflows add parallel coordination.
+- **[OpenAI Codex](/ides/openai-codex#workflows)** — ✅ The parent agent spawns named TOML-defined roles with `spawn_agent`, in parallel.
+- **[Windsurf (Devin Desktop)](/ides/windsurf#workflows)** — ⚠️ Preview. Devin Local, which replaced Cascade, delegates to subagents in preview.
+
+---
+
+## Script-Driven Workflows
+
+In 2026 several IDEs added a second kind of orchestration, confusingly also called "workflows." Instead of a document the main agent interprets turn by turn, the agent writes a **script** that a runtime executes. The script spawns many subagents, runs them in parallel or in sequence, and cross-checks their results. You review or approve the script before it runs.
+
+| IDE | Feature | How to run it |
+|-----|---------|---------------|
+| Claude Code | Dynamic workflows (JavaScript) | Ask for a workflow; monitor with `/workflows`; save to `.claude/workflows/` and run as `/{name}` |
+| GitHub Copilot | Dynamic workflows (preview) | Copilot CLI, Copilot app, and SDK; `copilot workflow run {name}` |
+| Google Antigravity | Dynamic Workflows (Python) | `/run-workflow` (AI Pro and Ultra plans) |
+
+The two kinds serve different purposes:
+
+- **Document-driven workflows** (the subject of this page) hold the plan in prose. The orchestrator makes judgment calls at every step: whether to refactor, whether the plan still makes sense, when to escalate to the user. Use them for work whose next step depends on what the last step revealed, such as a TDD cycle or a spec-review loop.
+- **Script-driven workflows** hold the plan in code. They are deterministic about fan-out and scale to dozens of agents. Use them for broad, uniform work such as a codebase-wide audit, a large migration, or research cross-checked from several angles.
+
+Script-driven workflows are IDE-specific. They do not share across IDEs the way workflow skills do, so keep the factory's core workflows as document-driven skills.
 
 ---
 

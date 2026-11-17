@@ -86,15 +86,18 @@ For more about how agents work in factory engineering, see [Agents](/agents).
 
 ## Workflows
 
-**Orchestration support:** ⚠️ Partial — native sub-agent delegation, workflow-document consumption unverified
+**Orchestration support:** ✅ Yes
 
-Codex provides native **sub-agent delegation**: the top-level agent spawns custom sub-agents in parallel, routes results between them, and manages thread lifecycle. Orchestration is configurable via:
+Invoke a workflow by name with `$tdd-cycle` and mention the artifact. Store the workflow as a command skill in `.agents/skills/`. The parent agent reads it and delegates each step with the `spawn_agent` tool, passing a role name from `.codex/agents/` as the agent type. Codex includes each role's `description` in the guidance for that tool, so write descriptions that say when the orchestrator should use the role.
 
-- **`agents.max_threads`** — maximum concurrent sub-agents per session (default: `6`)
-- **`agents.max_depth`** — how deep sub-agents can spawn further sub-agents (default: `1`)
-- **Role delegation** — specialized TOML-defined agents are invoked by name from the parent agent
+Orchestration is configurable in the `[agents]` section of `config.toml`:
 
-Whether Codex's parent agent reads a structured workflow document (the way Claude Code and Kilo Code orchestrators do) and routes based on its branching/looping logic has not been confirmed in official documentation at the time of writing. You can approximate workflow-driven orchestration by writing a detailed workflow markdown file and providing it to the parent agent as context, but there is no documented orchestrator-as-agent that reads a workflow file and delegates to named specialists based on its contents.
+- **`max_threads`** — maximum concurrent sub-agents per session (default: `6`)
+- **`max_depth`** — how deep sub-agents can spawn further sub-agents (default: `1`, so specialists cannot delegate further)
+
+**Hooks and plugins:** Codex runs hooks from `hooks.json` (`SessionStart`, `PreToolUse`, `PostToolUse`, `Stop`, `SubagentStop`, and more) and installs plugins that bundle skills. Its plugin loader also accepts Claude Code and Cursor plugin manifests.
+
+📖 [OpenAI Codex Sub-Agents Documentation](https://developers.openai.com/codex/subagents)
 
 For more about how workflows work in factory engineering, see [Workflows](/workflows).
 
