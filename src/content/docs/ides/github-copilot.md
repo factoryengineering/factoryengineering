@@ -41,7 +41,7 @@ For more about how skills work in factory engineering, see [Skills](/skills).
 **Use the factory-engineering skill** for sync (workflow, frontmatter rules, and batch script):
 
 ```bash
-npx openskills install factoryengineering/skills
+npx skills add factoryengineering/skills --skill factory-engineering
 ```
 
 Then:

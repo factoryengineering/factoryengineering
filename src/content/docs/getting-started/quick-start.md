@@ -19,7 +19,7 @@ This walkthrough mirrors the **Do the Work, Then Capture It** pattern from [Arti
 
 No installs needed for this exercise.
 
-> **A note on IDE folders.** This guide saves the skill to `.agents/skills/`, the cross-tool location. GitHub Copilot, Cursor, OpenAI Codex, Kilo Code, Google Antigravity, and Windsurf (Devin Desktop) read it directly. Claude Code reads only `.claude/skills/`. If you use Claude Code, save the skill to `.claude/skills/` for this exercise, then set up the mirror described in the [sharing strategies on the Skills page](/skills#managing-skills-across-ides) once you finish.
+> **A note on IDE folders.** This guide saves the skill to `.agents/skills/`, the cross-tool location. GitHub Copilot, Cursor, OpenAI Codex, Kilo Code, Google Antigravity, and Windsurf (Devin Desktop) read it directly. Claude Code reads only `.claude/skills/`. If you use Claude Code, replace `.agents/skills/` with `.claude/skills/` in every step below, then move the skill to `.agents/skills/` and set up the mirror described in the [sharing strategies on the Skills page](/skills#managing-skills-across-ides) once you finish.
 
 ---
 
