@@ -18,7 +18,7 @@ Google Antigravity is Google's agent-first development platform. It launched as 
 | Project | `.agents/skills/` (legacy: `.agent/skills/`) |
 | Global | `~/.gemini/config/skills/` (legacy, IDE only: `~/.gemini/antigravity/skills/`) |
 
-Antigravity reads `.agents/skills/` directly, so **no copy or symlink is needed** when your canonical skills live there. Antigravity uses progressive disclosure: each skill sits dormant until a request matches its description, at which point the agent loads it into context. Invoke a skill explicitly with `/skill-name`.
+Antigravity reads `.agents/skills/` directly, so **no copy is needed** when your canonical skills live there. Antigravity uses progressive disclosure: each skill sits dormant until a request matches its description, at which point the agent loads it into context. Invoke a skill explicitly with `/skill-name`.
 
 Antigravity does not read `.claude/skills/`. It can import skills, commands, subagents, MCP servers, and instruction files from Claude Code, Codex, and Cursor configurations.
 

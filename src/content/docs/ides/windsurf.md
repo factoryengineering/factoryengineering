@@ -22,7 +22,7 @@ Documentation is moving from docs.windsurf.com to docs.devin.ai.
 | Project | `.devin/skills/`, `.agents/skills/` (legacy: `.windsurf/skills/`) |
 | Global | `~/.config/devin/skills/`, `~/.agents/skills/` (legacy: `~/.codeium/windsurf/skills/`) |
 
-Devin Desktop reads `.agents/skills/` directly, so **no copy or symlink is needed** when your canonical skills live there. The agent loads a skill automatically when your request matches its description.
+Devin Desktop reads `.agents/skills/` directly, so **no copy is needed** when your canonical skills live there. The agent loads a skill automatically when your request matches its description.
 
 📖 [Devin Desktop Skills Documentation](https://docs.devin.ai/desktop/cascade/skills)
 
