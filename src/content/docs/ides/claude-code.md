@@ -22,18 +22,18 @@ Claude Code automatically detects skills in `.claude/skills/` and loads them int
 
 Claude Code extends the base standard with frontmatter that other IDEs do not read: invocation control (`disable-model-invocation`, `user-invocable`), forked execution (`context: fork` with `agent:` to pick the subagent type), path scoping (`paths`), and dynamic context injection (a line starting with `` !`command` `` runs the command and replaces itself with the output before the skill reaches the model). The `anthropics/skills` repository on GitHub provides official skills ready to use.
 
-**Getting started:** Use the **skill-creator** skill to create new skills (see [Installing skill-creator and skill-optimizer](/skills#installing-skill-creator-and-skill-optimizer)). It guides you through the workflow and produces a proper skill directory and SKILL.md.
+**Getting started:** Use the **skill-creator** skill to create new skills (see [Authoring Skills with skill-creator and skill-optimizer](/skills#authoring-skills-with-skill-creator-and-skill-optimizer)). It guides you through the workflow and produces a proper skill directory and SKILL.md.
 
-**Sharing:** Claude Code does not read `.agents/skills/`, the canonical location every other IDE reads. Mirror the canonical folder into `.claude/skills/` with rsync:
+**Sharing:** Claude Code does not read `.agents/skills/`, the canonical location. Generate `.claude/skills/` from it with a one-way rsync:
 
 ```bash
 mkdir -p .agents/skills .claude/skills
 rsync -a --delete .agents/skills/ .claude/skills/
 ```
 
-Edit skills only in `.agents/skills/`, including when you work in Claude Code. Treat `.claude/skills/` as generated output.
+Edit skills only in `.agents/skills/`, including when you work in Claude Code. Treat `.claude/skills/` as generated output, and do not keep Claude-specific skills there: `--delete` removes anything that is not in `.agents/skills/`. In an existing repository, migrate `.claude/skills/` first.
 
-Automate this with a Git hook or file watcher so the copies stay in sync, and commit both folders. See [Skills: Sync with rsync](/skills#strategy-1-sync-with-rsync-recommended) for details and the symlink alternative.
+Automate this with a Git hook or a CI check so the copies stay in sync, and commit both folders. See [Mirror for Claude Code](/skills#mirror-for-claude-code) for the migration steps.
 
 📖 [Claude Code Skills Documentation](https://code.claude.com/docs/en/skills)
 

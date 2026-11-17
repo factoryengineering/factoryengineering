@@ -18,7 +18,7 @@ GitHub Copilot is GitHub's AI coding assistant, available in VS Code, Visual Stu
 | Project | `.github/skills/`, `.agents/skills/`, `.claude/skills/` |
 | Personal | `~/.copilot/skills/`, `~/.agents/skills/` |
 
-GitHub Copilot reads `.github/skills/`, `.agents/skills/`, and `.claude/skills/` at the project level, which means **no copy or symlink is needed** for the canonical `.agents/skills/` location. Copilot will find your skills automatically. Because Copilot also reads the `.claude/skills/` mirror kept for Claude Code, keep that mirror exact so both copies match.
+GitHub Copilot reads `.github/skills/`, `.agents/skills/`, and `.claude/skills/` at the project level, which means **no copy is needed** for the canonical `.agents/skills/` location. Copilot will find your skills automatically. Because Copilot also reads the `.claude/skills/` mirror kept for Claude Code, keep that mirror exact so both copies match.
 
 Agent Skills work across the Copilot cloud agent, Copilot code review, Copilot CLI, the Copilot app, and agent mode in VS Code, Visual Studio, and JetBrains IDEs. Skills are on by default in VS Code since version 1.109 (February 2026); no setting is required.
 
