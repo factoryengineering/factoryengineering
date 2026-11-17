@@ -13,20 +13,31 @@ This is the highest layer of the software factory. Skills encode knowledge. Comm
 
 Several IDEs use the word "workflow" for something else. Windsurf and Kilo Code both have features they call "Workflows." Those are reusable slash commands, not orchestration of named agents. This page uses the factory engineering meaning: orchestration of agents, with delegation, branching, and looping.
 
-**Invocation:** Use **slash-workflow at-artifact**, e.g. `/tdd-cycle @docs/specs/order-validation.md`. The workflow name is the skill name. Store workflows as skills in `.agents/skills/`, alongside commands, so every IDE finds them by the same name. The prefix depends on the IDE: `/tdd-cycle` in most IDEs, `$tdd-cycle` in OpenAI Codex, and `@tdd-cycle` in Windsurf (see the [Commands](/commands#ide-by-ide-reference) page).
+**Invocation:** Use **slash-workflow at-artifact**, e.g. `/tdd-cycle @docs/specs/order-validation.md`. The workflow name is the skill name. Store workflows as skills in `.agents/skills/`, alongside commands, so every IDE finds them by the same name. The prefix depends on the product: `/tdd-cycle` in most, `$tdd-cycle` in the Codex CLI, and `@tdd-cycle` in Devin Desktop (see the [Commands](/commands#ide-by-ide-reference) page).
 
 ---
 
 ## Recommended Location: `.agents/skills/`
 
-Store each workflow document as a command skill: `.agents/skills/{workflow-name}/SKILL.md` with `disable-model-invocation: true` and an `agents/openai.yaml` that disables implicit invocation (see [Commands](/commands#example-command)). That gives you:
+Store each workflow document as a command skill: `.agents/skills/{workflow-name}/SKILL.md` with `disable-model-invocation: true` and an `agents/openai.yaml` that disables implicit invocation (see [Commands](/commands#portable-metadata-and-vendor-specific-controls)). That gives you:
 
 - **One place for skills, commands, and workflows.** The user invokes a workflow by name; the file lives next to single-agent commands.
 - **Slash-workflow at-artifact.** Invoke with `/workflow-name @path/to/artifact`. The artifact is the input (e.g. a spec, a design, a user story).
 - **Shared across IDEs.** Every IDE except Claude Code reads `.agents/skills/` directly. The [skills sync](/skills#managing-skills-across-ides) mirrors it into `.claude/skills/` for Claude Code.
-- **Explicit invocation.** A workflow orchestrates many agents and spends many tokens. In Claude Code, Cursor, GitHub Copilot, and OpenAI Codex, disabling model invocation ensures it runs only when a user asks for it. Windsurf (Devin Desktop), Kilo Code, and Google Antigravity have no explicit-only control, so write the workflow's description to say it runs only when the user invokes it by name, and keep it specific to the artifact it processes.
+- **Explicit invocation.** A workflow orchestrates many agents and spends many tokens. In Claude Code, Cursor, GitHub Copilot (VS Code and CLI), and OpenAI Codex, the vendor controls stop the model from starting it on its own. Windsurf (Devin Desktop), Kilo Code, and Google Antigravity have no explicit-only control, so write the workflow's description to say it runs only when the user invokes it by name, and keep it specific to the artifact it processes.
 
 Do not maintain separate copies of the same workflow in each IDE by hand.
+
+### A workflow skill is instructions, not an engine
+
+The skill describes the process. The orchestrating agent reads it and decides, turn by turn, what to do next. Nothing in the skill format provides:
+
+- **Guaranteed execution order.** The agent can skip, reorder, or repeat a step.
+- **Isolation.** Specialists share the working tree unless the IDE offers per-agent worktrees and the workflow asks for them.
+- **Approval gates.** The agent stops for a person only where the workflow tells it to and it follows that instruction.
+- **Durable progress.** If the session ends, its progress ends with it. The next run starts from the beginning unless the workflow records progress somewhere it can read back.
+
+Design for these limits. Make each step's result visible in the repository (a test, a file, a commit) so the orchestrator and the reviewer can check it. Write escalation points as explicit "stop and ask the user" instructions. Have long workflows record their position in a progress file that a restarted run reads first. For work that needs deterministic fan-out rather than judgment, use the IDE's script-driven orchestration instead.
 
 Because workflows are shared across IDEs (like commands), keep them **IDE-agnostic**: do not rely on `$ARGUMENTS` or other placeholders. Not all IDEs support them. State in the workflow what the user will supply (e.g. a design or specification, via slash-workflow at-artifact) and instruct the orchestrator to stop and prompt the user if that input is missing. See the [Commands](/commands) page for the same pattern.
 
