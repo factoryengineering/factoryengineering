@@ -169,9 +169,9 @@ No IDE has a dedicated engine that parses a workflow file. In every IDE, the wor
 | GitHub Copilot | ✅ Yes | `task` tool → `.github/agents/` | Copilot harness in VS Code and the CLI; `/fleet` for parallel fan-out; dynamic workflows in preview |
 | Cursor | ✅ Yes | `Task` tool → `.cursor/agents/` | Async and nested subagents; test delegation, because the parent sometimes does the work itself |
 | Kilo Code | ✅ Yes | `task` tool → `.kilo/agents/` | Foreground or background subagents; Orchestrator mode is deprecated |
-| Google Antigravity | ✅ Yes | `invoke_subagent` → `.agents/agents/` | Also `/swarm` and script-driven Dynamic Workflows |
+| Google Antigravity | ✅ Yes | `invoke_subagent` → `.agents/agents/` | `/boost`, `/swarm`, and `/teamwork` are separate coordination modes; also script-driven Dynamic Workflows |
 | OpenAI Codex | ✅ Yes | `spawn_agent` → `.codex/agents/` | `max_threads` default 6; `max_depth` default 1, so specialists cannot delegate further |
-| Windsurf (Devin Desktop) | ⚠️ Preview | Subagents (Devin Local) | Enable Subagents (Preview); Windsurf "Workflows" are commands |
+| Windsurf (Devin Desktop) | ⚠️ Preview | Subagents (Preview) in Devin Local | Devin Local replaced Cascade; delegation needs the Subagents (Preview) setting; Windsurf "Workflows" are commands |
 
 ---
 
@@ -181,9 +181,9 @@ For full details on workflow orchestration in each IDE, see the dedicated IDE pa
 - **[GitHub Copilot](/ides/github-copilot#workflows)** — ✅ The Copilot harness delegates to named custom agents with its `task` tool. `/fleet` fans one task out to parallel sub-agents.
 - **[Cursor](/ides/cursor#workflows)** — ✅ The parent agent delegates to named subagents by `/name` or plain-language request. Projects (beta) add a coordinator agent for long-running work.
 - **[Kilo Code](/ides/kilo-code#workflows)** — ✅ Primary agents delegate to named subagents with the `task` tool, in the foreground or background.
-- **[Google Antigravity](/ides/google-antigravity#workflows)** — ✅ The main agent delegates to named custom subagents with `invoke_subagent`; `/swarm` and Dynamic Workflows add parallel coordination.
+- **[Google Antigravity](/ides/google-antigravity#workflows)** — ✅ The main agent delegates to named custom subagents with `invoke_subagent`. `/boost`, `/swarm`, `/teamwork`, and Dynamic Workflows are separate coordination modes.
 - **[OpenAI Codex](/ides/openai-codex#workflows)** — ✅ The parent agent spawns named TOML-defined roles with `spawn_agent`, in parallel.
-- **[Windsurf (Devin Desktop)](/ides/windsurf#workflows)** — ⚠️ Preview. Devin Local, the newer local agent alongside Cascade, delegates to subagents in preview.
+- **[Windsurf (Devin Desktop)](/ides/windsurf#workflows)** — ⚠️ Preview. Devin Local, which replaced Cascade, delegates to subagents through its Subagents (Preview) setting.
 
 ---
 

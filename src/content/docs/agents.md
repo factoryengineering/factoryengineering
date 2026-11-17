@@ -88,21 +88,28 @@ Each agent accumulates domain knowledge specific to its role and the project. Ov
 
 ## IDE Support for True Agents
 
-Most IDEs now support true agents as defined above. The table shows what each IDE calls the feature and where agents live:
+The table separates three things that are easy to conflate: whether you can define a role-specific agent, what the IDE calls that feature and where it lives, and how the agent gets memory. Support for one does not imply the others; delegation and parallel orchestration are covered on the [Workflows](/workflows) page.
 
-| IDE | True Agent Support | Feature Name | Storage | Memory via markdown instruction |
-|-----|-------------------|--------------|---------|----------------------------------|
+| IDE | Role-Specific Agents | Feature Name | Storage | Memory |
+|-----|---------------------|--------------|---------|--------|
 | Claude Code | ✅ Yes | Sub-agents | `.claude/agents/` | Native (`memory: project` → `.claude/agent-memory/{name}/MEMORY.md`) |
-| GitHub Copilot | ✅ Yes | Custom agents + sub-agents | `.github/agents/*.agent.md` (also reads `.claude/agents/`) | Yes (instruct agent to read/append a file) |
-| Kilo Code | ✅ Yes | Agents (formerly modes) | `.kilo/agents/*.md` | Yes (instruct agent in its prompt to read/append a markdown file) |
-| Cursor | ✅ Yes | Subagents | `.cursor/agents/` (also reads `.claude/agents/`) | Yes (instruct agent via its definition, `.cursor/rules`, or `AGENTS.md`) |
-| Windsurf (Devin Desktop) | ⚠️ Preview | Subagents (Devin Local) | `.devin/agents/*.md` | Yes (instruct subagent in its definition to read/append a markdown file) |
-| Antigravity | ✅ Yes | Custom subagents | `.agents/agents/*.md` | Yes (instruct subagent in its role definition to read/append a markdown file) |
-| OpenAI Codex | ✅ Yes | Custom agents (TOML roles) | `.codex/agents/*.toml` | Yes (instruct agent in `developer_instructions` to read/append a markdown file) |
+| GitHub Copilot | ✅ Yes | Custom agents + sub-agents | `.github/agents/*.agent.md` (also reads `.claude/agents/`) | File-backed convention (instruct agent to read/append a file) |
+| Kilo Code | ✅ Yes | Agents (`mode: primary`) and subagents (`mode: subagent`) | `.kilo/agents/*.md` | File-backed convention (instruct agent in its prompt) |
+| Cursor | ✅ Yes | Subagents | `.cursor/agents/` (also reads `.claude/agents/`) | File-backed convention (instruct agent in its definition) |
+| Windsurf (Devin Desktop) | ✅ Yes (subagents in preview) | Devin Local; Subagents (Preview) | `.devin/agents/*.md` | File-backed convention (instruct subagent in its definition) |
+| Antigravity | ✅ Yes | Custom subagents | `.agents/agents/*.md` | File-backed convention (instruct subagent in its role definition) |
+| OpenAI Codex | ✅ Yes | Custom agents (TOML roles) | `.codex/agents/*.toml` | File-backed convention (instruct agent in `developer_instructions`) |
 
 **Native memory is not the same thing.** Several IDEs now remember things on their own: Copilot Memory stores repository facts, Codex memories summarize past sessions, Cursor keeps per-project memories, and Antigravity maintains a knowledge base. None of these gives a specific role its own memory that the role reads and writes. Claude Code's `memory: project` field is the only native implementation of the factory engineering pattern.
 
-**Memory via markdown instruction:** Even without native agent memory, you can get the same behavior by instructing the assistant via that IDE's instruction mechanism (see table) to read from a markdown file at the start of work and append learnings at the end. Kilo Code agents used this way function as true agents.
+**File-backed memory convention:** Without native agent memory, instruct each agent, in its definition, to read a markdown file at the start of work and append learnings at the end. Use `.claude/agent-memory/{agent-name}/MEMORY.md` so the same file works with Claude Code's native agent memory.
+
+This convention approximates persistent memory. It is not equivalent to it:
+
+- **Updates are not guaranteed.** The agent writes memory only if it follows the instruction. Check the file after each run while you tune the agent.
+- **Concurrent writes can conflict.** Two parallel instances of the same agent can overwrite each other's appends. Do not run the same role in parallel, or give each instance its own file.
+- **Memory is not isolated.** Any agent with file access can read or change the file. Review memory changes in pull requests like any other change.
+- **The file grows without bound.** Prune it periodically. Claude Code, for example, injects only the first 200 lines.
 
 ---
 
@@ -112,6 +119,6 @@ For full setup details on defining, configuring, and invoking agents in each IDE
 - **[GitHub Copilot](/ides/github-copilot#agents)** — Custom agents + sub-agents; defined in `.github/agents/`; Copilot Memory stores repository facts, not per-agent memory
 - **[Kilo Code](/ides/kilo-code#agents)** — Markdown agents (formerly modes) in `.kilo/agents/`; `mode: subagent` for delegated roles
 - **[Cursor](/ides/cursor#agents)** — Subagents; defined in `.cursor/agents/` (also reads `.claude/agents/`); async delegation (v2.5+); Agents Window (v3.0)
-- **[Windsurf (Devin Desktop)](/ides/windsurf#agents)** — Subagents in preview with Devin Local, the newer local agent alongside Cascade; defined in `.devin/agents/`
+- **[Windsurf (Devin Desktop)](/ides/windsurf#agents)** — Devin Local replaced Cascade as the local agent; custom subagents (preview) defined in `.devin/agents/`
 - **[Antigravity](/ides/google-antigravity#agents)** — Custom subagents in `.agents/agents/`, invoked by name with `invoke_subagent`
 - **[OpenAI Codex](/ides/openai-codex#agents)** — Custom agents via TOML role profiles in `.codex/agents/`; built-in `default`/`worker`/`explorer` roles; native memories are global, not per agent, so use the markdown-instruction pattern
