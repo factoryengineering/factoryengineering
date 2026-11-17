@@ -5,7 +5,9 @@ description: Complete factory engineering guide for Kilo Code — skills, comman
 
 # Kilo Code
 
-Kilo Code is an open-source (MIT) coding agent that runs as a VS Code extension, a JetBrains plugin, and the Kilo CLI. In 2026 Kilo rebuilt the extension on the Kilo CLI, a fork of OpenCode. The rebuild moved configuration from `.kilocode/` to `.kilo/` and `kilo.jsonc`, turned workflows into commands, turned modes into Markdown agents, and replaced Orchestrator mode with subagent delegation. Its model gateway gives you access to 500+ models, including Claude, Gemini, and GPT, at the provider's rate with no markup.
+Kilo Code is an open-source (MIT) coding agent that runs as a VS Code extension, a JetBrains plugin, and the Kilo CLI. In 2026 Kilo rebuilt the extension on the Kilo CLI, a fork of OpenCode. The rebuild moved new configuration to `.kilo/` and `kilo.jsonc`, turned workflows into commands, turned modes into Markdown agents, and replaced Orchestrator mode with subagent delegation. Its model gateway gives you access to 500+ models, including Claude, Gemini, and GPT, at the provider's rate with no markup.
+
+**Migrating from the legacy extension:** Existing configuration keeps working. Kilo Code still reads `.kilocode/agents/` and `.kilocode/rules/`, migrates `.kilocode/workflows/` to `.kilo/commands/` on startup, and converts `.kilocodemodes` and `custom_modes.yaml` into agent files. Put new configuration in `.kilo/`.
 
 ---
 
@@ -54,9 +56,17 @@ For more about how commands work in factory engineering, see [Commands](/command
 
 **Feature name:** Agents (formerly modes)
 
-**Storage location:** `.kilo/agents/{agent-name}.md` (project) or `~/.config/kilo/agents/` (global)
+**Storage location:** `.kilo/agents/{agent-name}.md` or `.kilo/agent/{agent-name}.md` (project; legacy `.kilocode/agents/` is still read) or `~/.config/kilo/agents/` (global)
 
-Kilo Code agents are Markdown files with YAML frontmatter. The filename becomes the agent name, and the Markdown body becomes the system prompt. Frontmatter fields include `description`, `mode` (`primary`, `subagent`, or `all`), `model`, `permission`, `color`, and `steps`. A `subagent` agent runs in its own isolated session when a primary agent delegates to it.
+Kilo Code agents are Markdown files with YAML frontmatter. The filename becomes the agent name, and the Markdown body becomes the system prompt. Frontmatter fields include `description`, `mode`, `model`, `permission`, `color`, and `steps`. The `mode` field decides how the agent can be used:
+
+| `mode` | How it is used |
+|--------|----------------|
+| `primary` | A user-facing agent you select directly (switch with **Tab**). Not available for delegation. |
+| `subagent` | Available only for delegation through the `task` tool or an `@agent-name` mention. Runs in its own isolated session. |
+| `all` | Both. This is the default for custom agents. |
+
+Define factory engineering specialists (spec writer, test writer, reviewer) as `mode: subagent` so an orchestrating workflow can delegate to them. Define an orchestrator you select by hand as `mode: primary`.
 
 Kilo Code migrates legacy `.kilocodemodes` definitions automatically: `roleDefinition` and `customInstructions` become the prompt, `groups` become `permission`, and `whenToUse` becomes `description`.
 

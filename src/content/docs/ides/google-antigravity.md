@@ -34,7 +34,9 @@ For more about how skills work in factory engineering, see [Skills](/skills).
 
 **Invocation:** `/command-name`. Use **slash-command at-artifact** (e.g. `/write-spec @docs/user-stories/submit-sales-order.md`).
 
-Antigravity's legacy **workflows** (files in `.agent/workflows/`) are deprecated. The `/migrate-workflows` command converts each workflow into `.agents/skills/{name}/SKILL.md` and keeps the original with a `.bak` suffix. When a skill and a legacy workflow share a name, the skill wins.
+Antigravity's legacy **workflows** (Markdown files in `.agent/workflows/`) are deprecated but continue to work during the transition. In the Antigravity App 2.12.0 and later, the `/migrate-workflows` command converts each workflow into `.agents/skills/{name}/SKILL.md` and keeps the original with a `.bak` suffix. The command is not available in the CLI or IDE; convert workflows by hand there. When a skill and a legacy workflow share a name, the skill wins.
+
+Legacy Markdown workflows are reusable instructions, which factory engineering calls commands. Do not confuse them with **Dynamic Workflows** (`/run-workflow`), which orchestrate agents through a generated Python script (see [Workflows](#workflows)).
 
 Author factory engineering commands as skills (see [Commands](/commands)). Antigravity picks them up from `.agents/skills/` with no extra sharing step.
 
@@ -70,12 +72,20 @@ For more about how agents work in factory engineering, see [Agents](/agents).
 
 Invoke a factory engineering workflow with **slash-workflow at-artifact** (e.g. `/tdd-cycle @docs/specs/order-validation.md`). Store the workflow as a skill. The main agent reads it and delegates each step to the named custom subagents with `invoke_subagent`. Several subagents can run at once.
 
-Antigravity 2.0 adds two more coordination features:
+Antigravity offers four agent-coordination mechanisms. They are not four names for the same capability: each has its own coordination model, verification strategy, and plan requirement.
 
-- **`/swarm`** coordinates several subagents over a shared message board.
-- **Dynamic Workflows** (`/run-workflow`, rolling out to AI Pro and Ultra plans from November 2026) have the agent write a Python script that coordinates subagents in parallel or in sequence. You approve the script before it runs. This is script-driven orchestration rather than workflow-document orchestration (see [Workflows](/workflows)).
+| Mechanism | Intended use | How it coordinates | Availability |
+|-----------|--------------|--------------------|--------------|
+| **Subagents** | Focused, self-contained side tasks (codebase research, browser validation, a test run) while the main thread continues | Each subagent reports privately to the agent that started it | Built in |
+| **`/boost`** | Hard problems that need iterative reasoning and verification (root-cause debugging, race conditions, algorithmic optimization) | Breaks the problem down, delegates focused workstreams, and independently verifies solutions across rounds | Paid plans |
+| **`/swarm`** | Broad work that splits into independent pieces | Named workers and a verifier coordinate on a shared message board with @mentions | Google AI Pro and Ultra (preview) |
+| **`/teamwork`** | Long-running, multi-milestone projects (repository migrations, formal proofs) | Starts with a scoping interview and gates each milestone with an audit | Paid plans (`/teamwork-preview` in some CLI versions) |
 
-📖 [Google Antigravity Dynamic Workflows](https://antigravity.google/docs/dynamic-workflows) · [Introducing Google Antigravity 2.0](https://antigravity.google/blog/introducing-google-antigravity-2)
+Build factory engineering workflows on **subagents**. The workflow names each specialist, and the main agent delegates to that named subagent with `invoke_subagent`. Use `/boost`, `/swarm`, or `/teamwork` when the task fits their intended use better than your team's defined process.
+
+**Dynamic Workflows** (`/run-workflow`, rolling out to AI Pro and Ultra plans from November 2026) are a fifth, script-driven option. The agent writes a Python script that coordinates subagents in parallel or in sequence, and you approve the script before it runs. They are unrelated to the legacy Markdown workflows described under [Commands](#commands) (see [Script-Driven Workflows](/workflows)).
+
+📖 [Custom subagents](https://antigravity.google/docs/subagents) · [Boost (/boost)](https://antigravity.google/docs/boost) · [Swarm (/swarm)](https://antigravity.google/docs/swarm) · [Teamwork (/teamwork)](https://antigravity.google/docs/teamwork) · [Dynamic Workflows](https://antigravity.google/docs/dynamic-workflows)
 
 For more about how workflows work in factory engineering, see [Workflows](/workflows).
 
@@ -87,5 +97,6 @@ For more about how workflows work in factory engineering, see [Workflows](/workf
 - [Migrating workflows to skills](https://antigravity.google/docs/migration/workflows-to-skills)
 - [Google Antigravity Subagents Documentation](https://antigravity.google/docs/subagents)
 - [Google Antigravity Rules Documentation](https://antigravity.google/docs/rules)
+- [Google Antigravity Boost, Swarm, and Teamwork](https://antigravity.google/docs/slash-commands)
 - [Google Antigravity Dynamic Workflows](https://antigravity.google/docs/dynamic-workflows)
 - [Google Antigravity Changelog](https://antigravity.google/docs/changelog)
