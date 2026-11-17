@@ -67,7 +67,7 @@ For more about how commands work in factory engineering, see [Commands](/command
 
 **Copilot Memory** is available on all paid Copilot plans. It stores repository facts and user preferences, not per-agent memory, so use the markdown-instruction pattern below for factory engineering agents.
 
-Custom agents are specialized versions of the Copilot coding agent that you tailor to your workflows, conventions, and use cases. You define them once with **agent profiles**: Markdown files with YAML frontmatter that specify name, description, prompt, and optionally tools or MCP servers. Custom agents and sub-agents are generally available in VS Code, the Copilot CLI, the cloud agent, and JetBrains IDEs (JetBrains GA announced March 11, 2026). Eclipse and Xcode support remains in preview.
+Custom agents are specialized versions of the Copilot coding agent that you tailor to your workflows, conventions, and use cases. You define them once with **agent profiles**: Markdown files with YAML frontmatter that specify name, description, prompt, and optionally tools or MCP servers. Custom agents are supported in VS Code, Visual Studio, the Copilot CLI, and the cloud agent on GitHub.com, and are in preview in JetBrains IDEs, Eclipse, and Xcode. Sub-agents are supported in VS Code and the Copilot CLI, and are in preview in JetBrains IDEs, Eclipse, and Xcode (per GitHub's customization support matrix).
 
 **Sub-agents:** Custom agents can spawn sub-agents to handle discrete subtasks within a session. A parent agent delegates work to a sub-agent, which runs in its own context with its own tool access, then returns results to the parent.
 
