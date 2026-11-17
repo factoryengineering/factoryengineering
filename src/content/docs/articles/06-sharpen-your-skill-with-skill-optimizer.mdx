@@ -22,7 +22,7 @@ Tight means the skill matches the published authoring standard: a single, specif
 `skill-optimizer` is a published skill from `factoryengineering/skills`. Install it once per repo:
 
 ```bash
-npx openskills install factoryengineering/skills
+npx skills add factoryengineering/skills --skill skill-optimizer -a claude-code
 ```
 
 The installer places `.claude/skills/skill-optimizer/` in your project, including a bundled copy of the best-practices reference so the skill works offline. Commit the install. Every teammate who clones the repo gets the same optimizer.

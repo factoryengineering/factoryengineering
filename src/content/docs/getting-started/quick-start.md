@@ -19,7 +19,7 @@ This walkthrough mirrors the **Do the Work, Then Capture It** pattern from [Arti
 
 No installs needed for this exercise.
 
-> **A note on IDE folders.** This guide saves the skill to `.claude/skills/`, the de facto canonical location across the ecosystem. Claude Code, Cursor, and GitHub Copilot read it directly. Windsurf, Kilo Code, Google Antigravity, and OpenAI Codex look in their own folders and need a one-time copy or symlink before they will load the skill — see the [sharing strategies on the Skills page](/skills#managing-skills-across-ides), or your [IDE guide](/ides), once you finish the exercise.
+> **A note on IDE folders.** This guide saves the skill to `.agents/skills/`, the cross-tool location. GitHub Copilot, Cursor, OpenAI Codex, Kilo Code, Google Antigravity, and Windsurf (Devin Desktop) read it directly. Claude Code reads only `.claude/skills/`. If you use Claude Code, save the skill to `.claude/skills/` for this exercise, then set up the mirror described in the [sharing strategies on the Skills page](/skills#managing-skills-across-ides) once you finish.
 
 ---
 
@@ -55,16 +55,16 @@ Iterate until the output is something you would happily commit. Do not compromis
 
 Once the output is right, say:
 
-> Create a skill that captures the standards you just followed. Save it to `.claude/skills/my-first-skill/SKILL.md`. Use a clear `description` so the assistant knows when to load it.
+> Create a skill that captures the standards you just followed. Save it to `.agents/skills/my-first-skill/SKILL.md`. Use a clear `description` so the assistant knows when to load it.
 
 The assistant will write a `SKILL.md` containing the rules it followed during the corrections.
 
 ### 5. Save and commit
 
-Verify the file exists at `.claude/skills/my-first-skill/SKILL.md`. Read it. Tighten the description if it is vague. Commit it with the rest of your changes.
+Verify the file exists at `.agents/skills/my-first-skill/SKILL.md`. Read it. Tighten the description if it is vague. Commit it with the rest of your changes.
 
 ```bash
-git add .claude/skills/my-first-skill
+git add .agents/skills/my-first-skill
 git commit -m "Add my-first-skill"
 ```
 
@@ -77,7 +77,7 @@ If the description is good, the assistant will load the skill on its own and fol
 If it does not, there are two possible reasons:
 
 - **The description is not specific enough.** Edit the `description:` line in `SKILL.md` so it names the *trigger*: when this skill should fire. Test again.
-- **Your IDE does not read `.claude/skills/`.** If you use Windsurf, Kilo Code, Antigravity, or Codex, mirror the skill into your IDE's folder using one of the [sharing strategies on the Skills page](/skills#managing-skills-across-ides), then test again.
+- **Your IDE does not read the folder you saved to.** Claude Code reads only `.claude/skills/`; every other IDE covered here reads `.agents/skills/`. Mirror the skill using the [sharing strategies on the Skills page](/skills#managing-skills-across-ides), then test again.
 
 ### 7. Celebrate
 

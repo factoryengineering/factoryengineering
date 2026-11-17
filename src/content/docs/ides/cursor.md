@@ -11,18 +11,18 @@ Cursor is an AI-native code editor built on VS Code. It supports the Agent Skill
 
 ## Skills
 
-**Supports Agent Skills standard:** ✅ Yes — primary `.cursor/skills/`, compatibility `.claude/skills/`
+**Supports Agent Skills standard:** ✅ Yes — reads `.agents/skills/`, `.cursor/skills/`, and compatibility folders
 
 | Scope | Path |
 |-------|------|
-| Project (primary) | `.cursor/skills/` |
-| Project (compatibility) | `.claude/skills/` |
-| Global (primary) | `~/.cursor/skills/` |
-| Global (compatibility) | `~/.claude/skills/` |
+| Project | `.agents/skills/`, `.cursor/skills/` |
+| Project (compatibility) | `.claude/skills/`, `.codex/skills/` |
+| Global | `~/.agents/skills/`, `~/.cursor/skills/` |
+| Global (compatibility) | `~/.claude/skills/`, `~/.codex/skills/` |
 
-Cursor looks for skills in `.cursor/skills/` first, then in `.claude/skills/` for compatibility — similar to GitHub Copilot. If you use `.claude/skills/` as your canonical location, **no symlink is needed**; Cursor will find your skills automatically. Skills are loaded when they match your request, based on the `description` field in each `SKILL.md` frontmatter.
+Cursor reads `.agents/skills/` directly, so **no copy or symlink is needed** for the canonical location. Cursor also reads the `.claude/skills/` mirror kept for Claude Code; keep that mirror exact so both copies match. Skills are loaded when they match your request, based on the `description` field in each `SKILL.md` frontmatter. Skills in nested folders (for example `apps/web/.cursor/skills/`) surface only when the agent works in that folder.
 
-**Plugins (v2.5, February 2026):** Cursor's Plugins system integrates skills as first-class plugin components. The [Cursor Marketplace](https://cursor.com/marketplace) distributes plugin packages that bundle skills alongside subagents, MCP servers, hooks, and rules into one-click installs (browse the marketplace or run `/add-plugin`). Skills installed via plugins follow the same `SKILL.md` format and discovery mechanism — the plugin system supplements the folder convention, it does not replace it. Project-scoped skills committed to `.claude/skills/` continue to work unchanged alongside plugin-delivered skills.
+**Plugins (v2.5, February 2026):** Cursor's Plugins system integrates skills as first-class plugin components. The [Cursor Marketplace](https://cursor.com/marketplace) distributes plugin packages that bundle skills alongside subagents, MCP servers, hooks, and rules into one-click installs (browse the marketplace or run `/add-plugin`). Skills installed via plugins follow the same `SKILL.md` format and discovery mechanism — the plugin system supplements the folder convention, it does not replace it. Project-scoped skills committed to `.agents/skills/` continue to work unchanged alongside plugin-delivered skills.
 
 📖 [Cursor Agent Skills Documentation](https://cursor.com/docs/skills) · [Cursor Marketplace](https://cursor.com/marketplace)
 

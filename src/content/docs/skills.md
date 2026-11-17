@@ -26,7 +26,7 @@ This alignment between skills and code is fundamental to factory engineering.
 
 ## The Agent Skills Open Standard
 
-The IDEs covered here all implement the **Agent Skills open standard**, originally pioneered by Anthropic and Claude Code and now adopted across every major AI IDE vendor—Claude Code, GitHub Copilot, Cursor, Windsurf, Kilo Code, Google Antigravity, and OpenAI Codex. Agent Skills has effectively become a platform-level convention rather than an IDE-specific feature, with enterprise adoption visible through projects like [Elastic's agent-skills repository](https://github.com/elastic/agent-skills). The standard is published and maintained at **[agentskills.io](https://agentskills.io)**.
+The IDEs covered here all implement the **Agent Skills open standard**, originally pioneered by Anthropic and Claude Code and now adopted across every major AI IDE vendor: Claude Code, GitHub Copilot, Cursor, Windsurf (Devin Desktop), Kilo Code, Google Antigravity, and OpenAI Codex. Agent Skills has effectively become a platform-level convention rather than an IDE-specific feature, with enterprise adoption visible through projects like [Elastic's agent-skills repository](https://github.com/elastic/agent-skills). The standard is published and maintained at **[agentskills.io](https://agentskills.io)**.
 
 A skill is a directory containing:
 
@@ -75,10 +75,12 @@ disable-model-invocation: true
 
 ## Installing skill-creator and skill-optimizer
 
-To support authoring and optimizing skills, install these published skills:
+To support authoring and optimizing skills, install these published skills with the [`skills`](https://github.com/vercel-labs/skills) installer. It writes each skill to `.agents/skills/{name}/` and supports every IDE covered here.
 
-- **skill-creator** — Install with `npx openskills install anthropics/skills`. Use when creating or updating a skill; it provides authoring guidance, best practices, and the full skill-creation workflow.
-- **skill-optimizer** — Install with `npx openskills install factoryengineering/skills`. Use to apply authoring best practices to an existing skill or to verify a skill after creation. If the target skill does not exist yet, use skill-creator first, then skill-optimizer.
+- **skill-creator**: Install with `npx skills add anthropics/skills --skill skill-creator`. Use when creating or updating a skill; it provides authoring guidance, best practices, and the full skill-creation workflow.
+- **skill-optimizer**: Install with `npx skills add factoryengineering/skills --skill skill-optimizer`. Use to apply authoring best practices to an existing skill or to verify a skill after creation. If the target skill does not exist yet, use skill-creator first, then skill-optimizer.
+
+After installing, mirror the new skills into `.claude/skills/` for Claude Code (see [Managing Skills Across IDEs](#managing-skills-across-ides)).
 
 ---
 
@@ -86,7 +88,7 @@ To support authoring and optimizing skills, install these published skills:
 
 **1. Do the task once with the agent.** Pick a concrete task (e.g. "Write a LINQ query to fetch this data" or "Refactor this unit test"). Work through the result. Fix gaps, adjust structure, clarify wording until the output is what you want. Do not compromise on quality.
 
-**2. Capture the process as a skill.** Ask the agent to use the **skill-creator** skill to create a skill that captures your standards and opinions. Give it the name of the skill. Then instruct the agent to use **skill-optimizer** to align it with best practices and refine the content.
+**2. Capture the process as a skill.** Ask the agent to use the **skill-creator** skill to create a skill in `.agents/skills/` that captures your standards and opinions. Give it the name of the skill. Then instruct the agent to use **skill-optimizer** to align it with best practices and refine the content.
 
 **3. Run the skill against a task.** In a new session, give the agent a new instance of the same kind of task (e.g. another user story or PR). Carefully observe whether the LLM uses the skill you created. Do not hand-hold; let the skill stand on its own. Note where the output is wrong, vague, or inconsistent with how you refined it in step 1.
 
@@ -102,107 +104,83 @@ From here, every team member can invoke the skill by describing the task or by n
 
 ## Managing Skills Across IDEs
 
-Different IDEs look for skills in different folders. Managing multiple copies of the same skill across multiple folders is not viable for a team—it creates drift, duplication, and maintenance burden. Establish one canonical skills location in your repository and use one of the strategies below to keep every IDE in sync.
+Different IDEs look for skills in different folders. Managing multiple hand-maintained copies of the same skill is not viable for a team. It creates drift, duplication, and maintenance burden. Establish one canonical skills location in your repository and keep every IDE in sync from it.
 
 **Canonical location:**
 
 ```
-.claude/skills/
+.agents/skills/
 ```
 
-This folder is the most widely recognized across the ecosystem. Use it as your source of truth.
+`.agents/skills/` is the cross-tool convention. GitHub Copilot, Cursor, OpenAI Codex, Kilo Code, Google Antigravity, and Windsurf (Devin Desktop) all read it directly, and the `skills` installer writes to it. Use it as your source of truth.
 
-### Strategy 1 — Sync with rsync (recommended for most teams)
+**Claude Code is the exception.** It reads only `.claude/skills/`, so mirror the canonical folder there. That single mirror is the only sharing step a team needs.
 
-Keep canonical skills in `.claude/skills/` and use a two-step `rsync` to keep every IDE folder in sync. This approach works on every OS (rsync is pre-installed on macOS and Linux, and available on Windows via Git Bash/MSYS2), avoids symlink pitfalls, and produces real files that every IDE’s file watcher can detect reliably.
+### Strategy 1: Sync with rsync (recommended)
 
-The two-step pattern handles the case where a developer edits a skill in a non-canonical location (e.g., `.kilocode/skills/`) rather than in `.claude/skills/`. Step 1 gathers those changes back to canonical before step 2 mirrors canonical everywhere, so no work is lost.
+Keep canonical skills in `.agents/skills/` and use a two-step `rsync` to keep `.claude/skills/` in sync. This works on every OS (rsync is pre-installed on macOS and Linux, and available on Windows via Git Bash/MSYS2), avoids symlink pitfalls, and produces real files that every IDE's file watcher detects reliably.
+
+The two-step pattern handles the case where a Claude Code user edits a skill in `.claude/skills/` rather than in `.agents/skills/`. Step 1 gathers those changes back to canonical before step 2 mirrors canonical, so no work is lost.
 
 ```bash
 #!/usr/bin/env bash
-# sync-skills.sh — run from repo root
+# sync-skills.sh: run from repo root
 
-IDE_SKILLS=(.windsurf/skills .kilocode/skills .agent/skills .agents/skills)
+mkdir -p .agents/skills .claude/skills
 
-# Ensure canonical directory exists (first-time setup)
-mkdir -p .claude/skills
+# Step 1: reverse-sync. Gather changes made in .claude/skills back to canonical.
+rsync -a .claude/skills/ .agents/skills/
 
-# Step 1: reverse-sync — gather changes from any IDE location back to canonical
-for src in "${IDE_SKILLS[@]}"; do
-  [ -d "$src" ] && rsync -a "$src/" .claude/skills/
-done
-
-# Step 2: forward-sync — mirror canonical to all IDE locations
-for dest in "${IDE_SKILLS[@]}"; do
-  mkdir -p "$dest"
-  rsync -a --delete .claude/skills/ "$dest"/
-done
+# Step 2: forward-sync. Mirror canonical to .claude/skills.
+rsync -a --delete .agents/skills/ .claude/skills/
 ```
 
-**Step 1** is additive (no `--delete`): new or modified files in any IDE folder are copied back to `.claude/skills/` without removing anything. **Step 2** uses `--delete` so each destination becomes an exact mirror of canonical — stale files that were removed from `.claude/skills/` are cleaned up.
+**Step 1** is additive (no `--delete`): new or modified files in `.claude/skills/` are copied back to `.agents/skills/` without removing anything. **Step 2** uses `--delete` so `.claude/skills/` becomes an exact mirror of canonical. Stale files that were removed from `.agents/skills/` are cleaned up.
 
-Automate this with a `post-commit` or `post-merge` Git hook, a file-watcher script, or a CI step so copies never drift. Commit the synced folders so every team member gets them on clone.
+Automate this with a `post-commit` or `post-merge` Git hook, a file-watcher script, or a CI step so the copies never drift. Commit both folders so every team member gets them on clone.
 
-### Strategy 2 — IDE-Native Locations Only
+GitHub Copilot, Cursor, and Kilo Code read both `.agents/skills/` and `.claude/skills/`, so they find each skill twice. Because the mirror is exact, both copies have the same name and content. Run the sync before every commit so the copies never disagree.
 
-Store skills directly in each IDE’s folder (`.windsurf/skills/`, `.kilocode/skills/`, etc.) and skip the canonical location for IDEs that do not read `.claude/skills/`. This is the simplest option for teams that use only one or two IDEs, but it increases maintenance burden as the number of IDEs grows.
+### Strategy 2: Symlink (macOS/Linux only, with caveats)
 
-### Strategy 3 — Symlinks (macOS/Linux only, with caveats)
-
-Symlinks point each IDE’s expected folder to `.claude/skills/`. This avoids file duplication but comes with significant caveats:
-
-- **Windows:** Symlinks require Developer Mode or administrator privileges. Developer Mode is often restricted in corporate environments, and `core.symlinks` must be enabled in Git. Symlinks created on macOS/Linux may not resolve correctly when cloned on Windows even with Developer Mode enabled.
-- **Cursor:** Cursor’s file watcher does not properly follow directory symlinks. If you use Cursor, prefer copy-on-change or place skills directly in `.cursor/skills/` (Cursor also reads `.claude/skills/` directly, so a symlink is unnecessary for skills).
-- **IDE inconsistencies:** Some IDEs watch the symlink target correctly; others watch the symlink itself or skip watching entirely. Test with your specific IDE versions.
-- **Cross-platform Git:** Symlinks committed on macOS/Linux may appear as plain text files containing the target path when cloned on Windows, depending on the user’s Git configuration.
-
-If your team is macOS/Linux-only and does not use Cursor, symlinks remain a viable option:
-
-**Option A — Use the factory-engineering skill:** Install with `npx openskills install factoryengineering/skills`, then ask your agent to create symlinks. The skill sets up symlinks for **commands/workflows** (`.claude/commands/`) and, for IDEs that need them, **skills** (`.claude/skills/` → Windsurf, Kilo Code, Antigravity, OpenAI Codex; Cursor and Copilot read `.claude/skills/` directly). Use `--type all` (default) for both, or `--type commands` / `--type skills`. The agent can detect which IDEs you have, confirm with you, and offer to copy existing contents into the canonical folder if a target already exists. On Windows, use the skill’s PowerShell script. See the [Commands](/commands) page for more details and the skill’s SKILL.md (and symlinks.md) for script options.
-
-**Option B — Create symlinks manually for each IDE:**
+A single symlink points `.claude/skills/` at the canonical folder:
 
 ```bash
-# Windsurf
-ln -s ../.claude/skills .windsurf/skills
-
-# Kilo Code
-ln -s ../.claude/skills .kilocode/skills
-
-# Antigravity (uses .agent/skills at project level)
-ln -s ../.claude/skills .agent/skills
-
-# OpenAI Codex
-ln -s ../.claude/skills .agents/skills
-
-# Cursor and GitHub Copilot read .claude/skills directly — no symlink needed
+mkdir -p .claude
+ln -s ../.agents/skills .claude/skills
 ```
 
-Commit the symlinks to your repository. Every team member on macOS/Linux gets the correct folder structure automatically on clone.
+Commit the symlink. This avoids duplicate files but has significant caveats:
+
+- **Windows:** Symlinks require Developer Mode or administrator privileges. Developer Mode is often restricted in corporate environments, and `core.symlinks` must be enabled in Git. Without it, the symlink is checked out as a plain text file containing the target path.
+- **Cursor:** Cursor does not reliably discover skills through symlinked directories, especially in the CLI and Cloud Agents. Because Cursor reads `.agents/skills/` directly, keep the canonical folder a real directory.
+- **IDE inconsistencies:** Some IDEs watch the symlink target correctly; others watch the symlink itself or skip watching entirely. Test with your specific IDE versions.
+
+Use the symlink only when your team is macOS/Linux-only. Otherwise, use rsync.
 
 ---
 
 ## IDE-by-IDE Reference
 
-Every major AI IDE supports the Agent Skills standard. The table below summarizes folder locations and sharing requirements. Use copy-on-change, IDE-native locations, or symlinks (see [Managing Skills Across IDEs](#managing-skills-across-ides)) depending on your team's OS and IDE mix.
+Every major AI IDE supports the Agent Skills standard. The table below summarizes folder locations and sharing requirements.
 
-| IDE | Project Folder | Sharing Required? | Details |
-|-----|---------------|-------------------|---------|
-| [Claude Code](/ides/claude-code) | `.claude/skills/` | No (canonical location) | [Full setup →](/ides/claude-code#skills) |
-| [GitHub Copilot](/ides/github-copilot) | `.github/skills/` + `.claude/skills/` | No (reads `.claude/skills/` directly) | [Full setup →](/ides/github-copilot#skills) |
-| [Cursor](/ides/cursor) | `.cursor/skills/` + `.claude/skills/` | No (reads `.claude/skills/` directly) | [Full setup →](/ides/cursor#skills) |
-| [Windsurf](/ides/windsurf) | `.windsurf/skills/` | ✅ Yes (copy or symlink) | [Full setup →](/ides/windsurf#skills) |
-| [Kilo Code](/ides/kilo-code) | `.kilocode/skills/` | ✅ Yes (copy or symlink) | [Full setup →](/ides/kilo-code#skills) |
-| [Google Antigravity](/ides/google-antigravity) | `.agent/skills/` | ✅ Yes (copy or symlink) | [Full setup →](/ides/google-antigravity#skills) |
-| [OpenAI Codex](/ides/openai-codex) | `.agents/skills/` | ✅ Yes (copy or symlink) | [Full setup →](/ides/openai-codex#skills) |
+| IDE | Reads `.agents/skills/` | Other project folders | Sharing Required? | Details |
+|-----|------------------------|-----------------------|-------------------|---------|
+| [Claude Code](/ides/claude-code) | ❌ No | `.claude/skills/` | ✅ Yes (mirror to `.claude/skills/`) | [Full setup →](/ides/claude-code#skills) |
+| [GitHub Copilot](/ides/github-copilot) | ✅ Yes | `.github/skills/`, `.claude/skills/` | No | [Full setup →](/ides/github-copilot#skills) |
+| [Cursor](/ides/cursor) | ✅ Yes | `.cursor/skills/`, `.claude/skills/`, `.codex/skills/` | No | [Full setup →](/ides/cursor#skills) |
+| [Windsurf (Devin Desktop)](/ides/windsurf) | ✅ Yes | `.devin/skills/`, `.windsurf/skills/` | No | [Full setup →](/ides/windsurf#skills) |
+| [Kilo Code](/ides/kilo-code) | ✅ Yes | `.kilo/skills/`, `.claude/skills/` | No | [Full setup →](/ides/kilo-code#skills) |
+| [Google Antigravity](/ides/google-antigravity) | ✅ Yes | `.agent/skills/` (legacy) | No | [Full setup →](/ides/google-antigravity#skills) |
+| [OpenAI Codex](/ides/openai-codex) | ✅ Yes | `.codex/skills/` | No | [Full setup →](/ides/openai-codex#skills) |
 
 ---
 
 ## Ecosystem: Agent Skills as a Platform Standard
 
-Agent Skills is no longer an IDE-specific feature — it is a platform-level standard adopted by every major AI IDE vendor. Claude Code pioneered the format; GitHub Copilot, Cursor, Windsurf, Kilo Code, Google Antigravity, and OpenAI Codex have all implemented it natively. Enterprise organizations publish shared skill libraries (for example, [Elastic's agent-skills repository](https://github.com/elastic/agent-skills)) and the specification is maintained openly at [agentskills.io](https://agentskills.io).
+Agent Skills is no longer an IDE-specific feature. It is a platform-level standard adopted by every major AI IDE vendor. Claude Code pioneered the format; GitHub Copilot, Cursor, Windsurf, Kilo Code, Google Antigravity, and OpenAI Codex have all implemented it natively, and all but Claude Code have converged on `.agents/skills/` as the shared project folder. Enterprise organizations publish shared skill libraries (for example, [Elastic's agent-skills repository](https://github.com/elastic/agent-skills)), installers such as [`skills`](https://github.com/vercel-labs/skills) distribute them across IDEs, and the specification is maintained openly at [agentskills.io](https://agentskills.io).
 
-For factory engineering, this ecosystem-wide support is a defining strength. A skill authored in your repository today works across whichever IDE your teammates choose, and continues to work as the market evolves. You are investing in an open, portable standard — not a single vendor's proprietary format.
+For factory engineering, this ecosystem-wide support is a defining strength. A skill authored in your repository today works across whichever IDE your teammates choose, and continues to work as the market evolves. You are investing in an open, portable standard, not a single vendor's proprietary format. Keep that portability by limiting frontmatter to the standard fields, plus IDE extensions that other IDEs safely ignore (such as `disable-model-invocation`).
 
 ---
 
@@ -213,17 +191,17 @@ Here is the full setup for a team using multiple IDEs with one canonical skills 
 **1. Create your canonical skills directory:**
 
 ```bash
-mkdir -p .claude/skills
+mkdir -p .agents/skills
 ```
 
-**2. Create your first skill:** Use the **skill-creator** skill (see [Installing skill-creator and skill-optimizer](#installing-skill-creator-and-skill-optimizer)). Ask your agent to create a new skill in `.claude/skills`; it will guide you through the workflow and produce a proper SKILL.md and directory structure.
+**2. Create your first skill:** Use the **skill-creator** skill (see [Installing skill-creator and skill-optimizer](#installing-skill-creator-and-skill-optimizer)). Ask your agent to create a new skill in `.agents/skills`; it will guide you through the workflow and produce a proper SKILL.md and directory structure.
 
-**3. Share skills with each IDE your team uses:** Choose the strategy that fits your team (see [Managing Skills Across IDEs](#managing-skills-across-ides)). For most teams, **copy-on-change** is the safest default — it works on every OS and avoids symlink pitfalls. If your team is macOS/Linux-only and does not use Cursor, symlinks are also viable. You can use the **factory-engineering** skill to automate either approach, or set up sharing manually.
+**3. Mirror skills for Claude Code:** Add the `sync-skills.sh` script from [Strategy 1](#strategy-1-sync-with-rsync-recommended) and run it. Every other IDE reads `.agents/skills/` directly.
 
 **4. Commit everything:**
 
 ```bash
-git add .claude/skills .cursor .windsurf .kilocode .agent .agents
+git add .agents/skills .claude/skills sync-skills.sh
 git commit -m "Initialize software factory skills"
 ```
 

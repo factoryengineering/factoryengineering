@@ -5,7 +5,7 @@ description: Complete factory engineering guide for Claude Code — skills, comm
 
 # Claude Code
 
-Claude Code is Anthropic's AI-native coding agent and the origin of many factory engineering conventions. It pioneered the Agent Skills open standard, native sub-agents, and workflow orchestration via the Agent tool (named the Task tool before v2.1.63). Claude Code is the canonical reference implementation for factory engineering — the `.claude/` folder structure is the recommended canonical location for skills and commands across all IDEs.
+Claude Code is Anthropic's AI-native coding agent and the origin of many factory engineering conventions. It pioneered the Agent Skills open standard, native sub-agents, and workflow orchestration via the Agent tool (named the Task tool before v2.1.63). Claude Code is the reference implementation for many factory engineering patterns. It is also the one IDE that does not read the cross-tool `.agents/skills/` folder, so it needs a mirror of your canonical skills.
 
 ---
 
@@ -24,7 +24,15 @@ Claude Code extends the base standard with frontmatter that other IDEs do not re
 
 **Getting started:** Use the **skill-creator** skill to create new skills (see [Installing skill-creator and skill-optimizer](/skills#installing-skill-creator-and-skill-optimizer)). It guides you through the workflow and produces a proper skill directory and SKILL.md.
 
-**Symlinks:** Claude Code's `.claude/skills/` is the recommended canonical location. No symlink needed — other IDEs symlink *to* this folder.
+**Sharing:** Claude Code does not read `.agents/skills/`, the canonical location every other IDE reads. Mirror the canonical folder into `.claude/skills/` with rsync:
+
+```bash
+mkdir -p .agents/skills .claude/skills
+rsync -a .claude/skills/ .agents/skills/
+rsync -a --delete .agents/skills/ .claude/skills/
+```
+
+Automate this with a Git hook or file watcher so the copies stay in sync, and commit both folders. See [Skills: Sync with rsync](/skills#strategy-1-sync-with-rsync-recommended) for details and the symlink alternative.
 
 📖 [Claude Code Skills Documentation](https://code.claude.com/docs/en/skills)
 
