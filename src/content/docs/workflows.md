@@ -13,7 +13,7 @@ This is the highest layer of the software factory. Skills encode knowledge. Comm
 
 Several IDEs use the word "workflow" for something else. Windsurf and Kilo Code both have features they call "Workflows." Those are reusable slash commands, not orchestration of named agents. Claude Code, GitHub Copilot, and Google Antigravity use "workflows" for script-driven orchestration (see [Script-Driven Workflows](#script-driven-workflows)). This page uses the factory engineering meaning: a document that guides an orchestrator agent through delegation, branching, and looping.
 
-**Invocation:** Use **slash-workflow at-artifact**, e.g. `/tdd-cycle @docs/specs/order-validation.md`. The workflow name is the skill name. Store workflows as skills in `.agents/skills/`, alongside commands, so every IDE invokes them the same way (see the [Commands](/commands) page).
+**Invocation:** Use **slash-workflow at-artifact**, e.g. `/tdd-cycle @docs/specs/order-validation.md`. The workflow name is the skill name. Store workflows as skills in `.agents/skills/`, alongside commands, so every IDE finds them by the same name. The prefix depends on the IDE: `/tdd-cycle` in most IDEs, `$tdd-cycle` in OpenAI Codex, and `@tdd-cycle` in Windsurf (see the [Commands](/commands#ide-by-ide-reference) page).
 
 ---
 
@@ -24,7 +24,7 @@ Store each workflow document as a command skill: `.agents/skills/{workflow-name}
 - **One place for skills, commands, and workflows.** The user invokes a workflow by name; the file lives next to single-agent commands.
 - **Slash-workflow at-artifact.** Invoke with `/workflow-name @path/to/artifact`. The artifact is the input (e.g. a spec, a design, a user story).
 - **Shared across IDEs.** Every IDE except Claude Code reads `.agents/skills/` directly. The [skills sync](/skills#managing-skills-across-ides) mirrors it into `.claude/skills/` for Claude Code.
-- **Explicit invocation only.** A workflow orchestrates many agents and spends many tokens. Disabling model invocation ensures it runs only when a user asks for it.
+- **Explicit invocation.** A workflow orchestrates many agents and spends many tokens. In Claude Code, Cursor, GitHub Copilot, and OpenAI Codex, disabling model invocation ensures it runs only when a user asks for it. Windsurf (Devin Desktop), Kilo Code, and Google Antigravity have no explicit-only control, so write the workflow's description to say it runs only when the user invokes it by name, and keep it specific to the artifact it processes.
 
 Do not maintain separate copies of the same workflow in each IDE by hand.
 
@@ -39,7 +39,7 @@ The following workflow runs a full TDD cycle from design to passing tests. It is
 ````markdown
 ---
 name: tdd-cycle
-description: Run a full TDD cycle from design to passing tests. Run only when explicitly invoked.
+description: Run a full TDD cycle from design to passing tests. Run only when the user invokes /tdd-cycle explicitly.
 disable-model-invocation: true
 ---
 
