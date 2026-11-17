@@ -33,12 +33,12 @@ A skill is a directory containing:
 ```
 my-skill/
 ├── SKILL.md          # Required: skill definition with YAML frontmatter
-├── scripts/          # Optional: scripts the skill can execute
-├── examples/         # Optional: examples to guide the agent
-└── resources/        # Optional: templates and reference files
+├── scripts/          # Optional: executable code the skill can run
+├── references/       # Optional: additional documentation loaded on demand
+└── assets/           # Optional: templates, images, and data files
 ```
 
-The `SKILL.md` file uses YAML frontmatter to declare the skill's name and description. The description is critical—it is what the agent reads to determine whether to load and apply the skill. The standard also defines optional invocation controls such as `user-invocable` (whether a user can call the skill explicitly by name) and `disable-model-invocation` (prevent the model from auto-loading the skill, reserving it for explicit invocation):
+The `SKILL.md` file uses YAML frontmatter to declare the skill's name and description. The description is critical. It is what the agent reads to determine whether to load and apply the skill. The standard requires only `name` and `description`, and defines four optional fields: `license`, `compatibility`, `metadata`, and `allowed-tools` (experimental). Keep portable skills to these six fields:
 
 ```markdown
 ---
@@ -61,13 +61,12 @@ description: Use when designing or reviewing REST APIs, defining endpoints, requ
 
 The agent loads only the skills relevant to the current task, keeping context lean and responses accurate. This is called **progressive disclosure**—skills sit dormant until needed.
 
-A skill that should only be invoked explicitly by name—never auto-loaded by the model—declares both optional properties in its frontmatter:
+Some IDEs extend the standard with their own frontmatter. The most useful extension is `disable-model-invocation: true`, which prevents the model from auto-loading a skill and reserves it for explicit invocation by name. Claude Code, Cursor, and GitHub Copilot in VS Code honor it. It is not part of the standard, so other IDEs ignore it. OpenAI Codex declares the same policy in a separate `agents/openai.yaml` file (see [OpenAI Codex](/ides/openai-codex#skills)).
 
 ```markdown
 ---
 name: release-notes
 description: Generate release notes from the current milestone. Run only when explicitly requested.
-user-invocable: true
 disable-model-invocation: true
 ---
 ```

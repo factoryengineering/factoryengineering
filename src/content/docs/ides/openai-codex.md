@@ -5,19 +5,21 @@ description: Complete factory engineering guide for OpenAI Codex — skills, sub
 
 # OpenAI Codex
 
-OpenAI Codex adopted the Agent Skills open standard in December 2025, reaching parity with the rest of the AI IDE ecosystem. In March 2026, Codex added **sub-agents** with custom TOML-defined roles, enabling parallel delegation and workflow orchestration. Codex loads skills from `.agents/skills/` and evaluates each skill's `description` to decide when to load it — the same progressive disclosure model used by Claude Code, Cursor, and Copilot.
+OpenAI Codex implements the Agent Skills open standard, reaching parity with the rest of the AI IDE ecosystem. Codex also supports **sub-agents** with custom TOML-defined roles, enabling parallel delegation and workflow orchestration. Codex loads skills from `.agents/skills/` and evaluates each skill's `description` to decide when to load it — the same progressive disclosure model used by Claude Code, Cursor, and Copilot.
 
 ---
 
 ## Skills
 
-**Supports Agent Skills standard:** ✅ Yes — adopted December 2025
+**Supports Agent Skills standard:** ✅ Yes
 
 | Scope | Path |
 |-------|------|
 | Project | `.agents/skills/` |
 | User | `~/.agents/skills/` |
 | Admin | `/etc/codex/skills/` |
+
+Codex scans `.agents/skills/` in every directory from the current working directory up to the repository root. It still loads the older `~/.codex/skills/` user location for backward compatibility; do not add new skills there.
 
 Codex uses the shared `.agents/skills/` convention (not a Codex-specific folder) and evaluates each skill's `description` via progressive disclosure to decide when to load it. Share skills from your canonical location using copy-on-change or a symlink:
 
@@ -41,7 +43,14 @@ ln -s ../.claude/skills .agents/skills
 
 Symlinks require macOS/Linux and may not work on Windows clones. See [Skills — Managing Skills Across IDEs](/skills#managing-skills-across-ides) for details on caveats and alternatives.
 
-Codex supports the standard `user-invocable` and `disable-model-invocation` frontmatter properties for controlling when a skill is loaded automatically versus invoked by name. Inside Codex, list loaded skills with the `/skills` command and invoke a skill explicitly by name with `$skill-name`.
+Codex reads only `name` and `description` (plus `metadata.short-description`) from `SKILL.md`. It ignores Claude Code's `disable-model-invocation` and `user-invocable` properties. To reserve a skill for explicit invocation, add an `agents/openai.yaml` file inside the skill directory:
+
+```yaml
+policy:
+  allow_implicit_invocation: false
+```
+
+Inside Codex, list loaded skills with the `/skills` command and invoke a skill explicitly by name with `$skill-name`.
 
 📖 [OpenAI Codex Skills Documentation](https://developers.openai.com/codex/skills)
 
@@ -63,17 +72,29 @@ For more about how commands work in factory engineering, see [Commands](/command
 
 ## Agents
 
-**Supports true agents:** ⚠️ Partial
+**Supports true agents:** ✅ Yes (memory via markdown instruction)
 
 **Feature name:** Custom agents (sub-agents with role definitions)
 
 **Storage location:** TOML profiles — Project: `.codex/agents/`; User: `~/.codex/agents/`
 
-OpenAI Codex added sub-agents with custom role definitions in March 2026. Each custom agent is defined in a TOML file that declares its role, tool access, and model. Codex ships with three built-in agents — `default`, `worker`, and `explorer` — and lets you author additional custom agents for specialized roles.
+OpenAI Codex supports sub-agents with custom role definitions. Each custom agent is a TOML file in `.codex/agents/` that declares `name`, `description`, and the required `developer_instructions` (the role prompt), plus any `config.toml` setting to override for that role, such as `model`, `model_reasoning_effort`, or `sandbox_mode`. Codex ships with three built-in roles (`default`, `worker`, and `explorer`) and lets you author additional custom agents for specialized roles.
+
+```toml
+# .codex/agents/spec-writer.toml
+name = "spec-writer"
+description = "Technical specification writer. Use to turn a user story into a detailed spec."
+developer_instructions = """
+You are a technical specification writer.
+At the start of each task, read .claude/agent-memory/spec-writer/MEMORY.md.
+At the end of each task, append your learnings to that file.
+"""
+model_reasoning_effort = "high"
+```
 
 **Role specialization:** ✅ Custom agents are defined as TOML profiles with a distinct role, scoped tool access, and configurable model selection, so each agent runs in its own context for its delegated task.
 
-**Persistent memory:** ❌ Not native. Codex agents start fresh each invocation; there is no built-in read/write memory slot per agent. The `AGENTS.md` file that Codex reads at session start is an **instruction document**, not an agent memory file or an agent implementation.
+**Persistent memory:** ⚠️ Not per agent. Codex has a native **memories** feature (off by default; enable it in the `[memories]` section of `config.toml` or with `/memories`) that summarizes past sessions into `~/.codex/memories/` and injects the summary into later sessions. Those memories are global to the user, live outside the repository, and are not generated in sub-agent sessions, so they do not give each role its own shared memory. The `AGENTS.md` file that Codex reads at session start is an **instruction document**, not an agent memory file or an agent implementation.
 
 **Memory via markdown instruction:** Get the factory-engineering memory pattern by instructing each custom agent (in its TOML role definition or referenced skill) to read from a markdown file at the start of work and append learnings at the end. Use the path `.claude/agent-memory/{agent-name}/MEMORY.md` for cross-IDE compatibility.
 
@@ -89,8 +110,8 @@ For more about how agents work in factory engineering, see [Agents](/agents).
 
 Codex provides native **sub-agent delegation**: the top-level agent spawns custom sub-agents in parallel, routes results between them, and manages thread lifecycle. Orchestration is configurable via:
 
-- **`max_threads`** — maximum concurrent sub-agents (default: `6`)
-- **Depth limits** — how deep sub-agents can spawn further sub-agents
+- **`agents.max_threads`** — maximum concurrent sub-agents per session (default: `6`)
+- **`agents.max_depth`** — how deep sub-agents can spawn further sub-agents (default: `1`)
 - **Role delegation** — specialized TOML-defined agents are invoked by name from the parent agent
 
 Whether Codex's parent agent reads a structured workflow document (the way Claude Code and Kilo Code orchestrators do) and routes based on its branching/looping logic has not been confirmed in official documentation at the time of writing. You can approximate workflow-driven orchestration by writing a detailed workflow markdown file and providing it to the parent agent as context, but there is no documented orchestrator-as-agent that reads a workflow file and delegates to named specialists based on its contents.

@@ -160,25 +160,25 @@ Instruct agents in the workflow or in their agent definitions to include deviati
 
 | IDE | Orchestration Support | Feature Name | Notes |
 |-----|----------------------|--------------|-------|
-| Claude Code | ✅ Yes | CLAUDE.md + subagent orchestration | Main agent reads workflow, delegates via Task tool |
+| Claude Code | ✅ Yes | Subagent orchestration | Main agent reads workflow, delegates via the Agent tool |
 | Kilo Code | ✅ Yes | Orchestrator Mode | Built-in orchestrator delegates to named modes |
-| GitHub Copilot | ⚠️ Partial | Fleet mode (CLI) + Agent HQ | Fleet mode provides in-session sub-agent orchestration via `/fleet`; no workflow-document consumption. Agent HQ for cross-agent task assignment |
+| GitHub Copilot | ⚠️ Partial | `/fleet` (CLI) + custom agents | `/fleet` provides in-session parallel sub-agent orchestration; no workflow-document consumption |
 | Cursor | ⚠️ Partial | Agents Window + subagent delegation | Parent agents delegate to subagents; no workflow-document orchestrator |
 | Windsurf | ❌ No (terminology collision) | "Workflows" = commands | Cascade has no orchestration capability |
 | Antigravity | ⚠️ Partial | AgentKit 2.0 Manager View | Parallel async orchestration across specialized agents; UI-driven, no workflow-document consumption |
-| OpenAI Codex | ⚠️ Partial | Native sub-agent delegation | Parent agent spawns TOML-defined sub-agents in parallel; configurable `max_threads` (default 6) and depth limits. Workflow-document consumption unverified |
+| OpenAI Codex | ⚠️ Partial | Native sub-agent delegation | Parent agent spawns TOML-defined sub-agents in parallel; `max_threads` (default 6) and `max_depth` (default 1) |
 
 ---
 
 For full details on workflow orchestration in each IDE, see the dedicated IDE pages:
 
-- **[Claude Code](/ides/claude-code#workflows)** — ✅ Full orchestration. Main agent reads workflow from `.claude/commands/`, delegates via Task tool to named subagents with looping, branching, and parallel coordination.
+- **[Claude Code](/ides/claude-code#workflows)** — ✅ Full orchestration. Main agent reads workflow from `.claude/commands/`, delegates via the Agent tool to named subagents with looping, branching, and parallel coordination.
 - **[Kilo Code](/ides/kilo-code#workflows)** — ✅ Full orchestration. Built-in Orchestrator mode delegates to other modes via `new_task()`. Invoke with slash-workflow at-artifact.
-- **[GitHub Copilot](/ides/github-copilot#workflows)** — ⚠️ Partial. Fleet mode (`/fleet`) provides in-session sub-agent orchestration; Agent HQ for cross-agent task assignment. No workflow-document consumption.
+- **[GitHub Copilot](/ides/github-copilot#workflows)** — ⚠️ Partial. `/fleet` provides in-session parallel sub-agent orchestration. No workflow-document consumption.
 - **[Cursor](/ides/cursor#workflows)** — ⚠️ Partial. Agents Window (v3.0) runs agents in parallel; subagent delegation is ad-hoc, not workflow-document-driven.
 - **[Windsurf](/ides/windsurf#workflows)** — ❌ No orchestration. "Workflows" are commands; Cascade is a single agent with no delegation.
 - **[Google Antigravity](/ides/google-antigravity#workflows)** — ⚠️ Partial. AgentKit 2.0 Manager View provides UI-driven parallel agent orchestration; no workflow-document consumption.
-- **[OpenAI Codex](/ides/openai-codex#workflows)** — ⚠️ Partial. Parent agent spawns parallel sub-agents with configurable `max_threads` (default 6) and depth limits; specialist roles defined in TOML profiles. Workflow-document consumption (orchestrator reading a workflow file and routing based on its contents) is not confirmed in official documentation.
+- **[OpenAI Codex](/ides/openai-codex#workflows)** — ⚠️ Partial. Parent agent spawns parallel sub-agents (`max_threads` default 6, `max_depth` default 1); specialist roles defined in TOML profiles.
 
 ---
 
@@ -186,7 +186,7 @@ For full details on workflow orchestration in each IDE, see the dedicated IDE pa
 
 A factory engineering workflow is orchestration logic: decision-making guidance for an agent that reads the situation and routes work dynamically.
 
-**Do not use `$ARGUMENTS`.** Workflows live in `.claude/commands/` and are shared via symlinks; not all IDEs support placeholders. State what the user will supply and instruct the orchestrator to stop and prompt if it is missing.
+**Do not use `$ARGUMENTS`.** Workflows live in `.claude/commands/` and are shared via rsync or symlinks; not all IDEs support placeholders. State what the user will supply and instruct the orchestrator to stop and prompt if it is missing.
 
 **Describe conditions, not just steps.** A list of steps in order is a command. A workflow tells the orchestrator how to respond to what it finds (e.g. refactor only when warranted; delegate back to the planner only when the plan needs adjustment).
 

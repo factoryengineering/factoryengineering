@@ -22,7 +22,7 @@ Cursor is an AI-native code editor built on VS Code. It supports the Agent Skill
 
 Cursor looks for skills in `.cursor/skills/` first, then in `.claude/skills/` for compatibility — similar to GitHub Copilot. If you use `.claude/skills/` as your canonical location, **no symlink is needed**; Cursor will find your skills automatically. Skills are loaded when they match your request, based on the `description` field in each `SKILL.md` frontmatter.
 
-**Plugins (March 2026):** Cursor's Plugins system integrates skills as first-class plugin components. The [Cursor Marketplace](https://cursor.com/marketplace) distributes plugin packages that bundle skills alongside subagents, MCP servers, hooks, and rules into one-click installs. Skills installed via plugins follow the same `SKILL.md` format and discovery mechanism — the plugin system supplements the folder convention, it does not replace it. Project-scoped skills committed to `.claude/skills/` continue to work unchanged alongside plugin-delivered skills.
+**Plugins (v2.5, February 2026):** Cursor's Plugins system integrates skills as first-class plugin components. The [Cursor Marketplace](https://cursor.com/marketplace) distributes plugin packages that bundle skills alongside subagents, MCP servers, hooks, and rules into one-click installs (browse the marketplace or run `/add-plugin`). Skills installed via plugins follow the same `SKILL.md` format and discovery mechanism — the plugin system supplements the folder convention, it does not replace it. Project-scoped skills committed to `.claude/skills/` continue to work unchanged alongside plugin-delivered skills.
 
 📖 [Cursor Agent Skills Documentation](https://cursor.com/docs/skills) · [Cursor Marketplace](https://cursor.com/marketplace)
 
@@ -66,7 +66,7 @@ If you use a symlink, be aware that Cursor may not detect changes to files insid
 
 **Built-in commands (v3.0):** Cursor 3 added `/worktree` (creates an isolated git worktree so agents work without conflicts) and `/best-of-n` (runs the same prompt across multiple models in parallel worktrees and compares results). These are built-in commands, not user-defined — your custom commands in `.cursor/commands/` continue to work alongside them.
 
-📖 [Cursor Custom Commands Documentation](https://docs.cursor.com/chat/custom-commands)
+📖 [Cursor Commands Documentation](https://cursor.com/docs/context/commands)
 
 For more about how commands work in factory engineering, see [Commands](/commands).
 
@@ -82,15 +82,15 @@ For more about how commands work in factory engineering, see [Commands](/command
 
 Cursor reintroduced agent support in v2.4 (January 2026) with **subagents** — independent agents that handle discrete parts of a parent agent's task. Each subagent runs in its own context with configurable prompts, tool access, and model selection.
 
-**Built-in subagents:** Explore (codebase navigation), Bash (shell commands), and Browser (browser interactions).
+**Built-in subagents:** Cursor ships built-in subagents for codebase research and for running terminal commands.
 
-**Custom subagents** are Markdown files with YAML frontmatter stored in `.cursor/agents/` (project-scoped) or `~/.cursor/agents/` (global). Frontmatter fields include `name`, `description`, `model` (inherit, fast, or a specific model ID), `readonly`, and `is_background`.
+**Custom subagents** are Markdown files with YAML frontmatter stored in `.cursor/agents/` (project-scoped) or `~/.cursor/agents/` (global). Frontmatter fields include `name`, `description`, `model` (`inherit`, `fast`, or a specific model ID), and `readonly`. Cursor also reads Claude Code agents from `.claude/agents/` (and `.codex/agents/`); when names collide, the `.cursor/agents/` definition wins.
 
 **Async subagents (v2.5):** Subagents can run asynchronously — the parent continues working while subagents execute in the background. Subagents can also spawn their own subagents, creating a tree of coordinated work.
 
 **Plugins (v2.5):** The [Cursor Marketplace](https://cursor.com/marketplace) packages skills, subagents, MCP servers, hooks, and rules into one-click installs.
 
-**Agents Window (v3.0, April 2026):** A standalone workspace for running many agents in parallel across repos, worktrees, and cloud environments. Agent Tabs display multiple chats side-by-side in a grid. New commands include `/worktree` and `/best-of-n`. **Design Mode** lets you annotate UI elements in the browser to give agents precise visual feedback.
+**Agents Window (v3.0, April 2026):** A standalone workspace for running many agents in parallel across repos, worktrees, cloud environments, and SSH hosts. New commands include `/worktree` and `/best-of-n`. **Design Mode** lets you annotate UI elements in the browser to give agents precise visual feedback.
 
 **Memory:** Instruct agents via `.cursor/rules` or `AGENTS.md` to read from a markdown file at the start of work and append learnings at the end.
 
@@ -120,6 +120,6 @@ For more about how workflows work in factory engineering, see [Workflows](/workf
 
 - [Cursor Agent Skills Documentation](https://cursor.com/docs/skills)
 - [Cursor Marketplace](https://cursor.com/marketplace)
-- [Cursor Custom Commands Documentation](https://docs.cursor.com/chat/custom-commands)
+- [Cursor Commands Documentation](https://cursor.com/docs/context/commands)
 - [Cursor Subagents Documentation](https://cursor.com/docs/subagents)
 - [Cursor Changelog](https://cursor.com/changelog)
