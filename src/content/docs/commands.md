@@ -1,27 +1,56 @@
 ---
 title: Commands
-description: Reusable task instructions—lightweight markdown files that encode repeatable steps for specific tasks, invoked with a slash or `@` symbol in your IDE.
+description: Reusable task instructions—skills you invoke explicitly with a slash to run a repeatable sequence of steps against an artifact.
 ---
 
 # Commands: Reusable Task Instructions
 
-Commands are lightweight markdown files that encode repeatable instructions for specific tasks. Unlike skills, which are standardized across platforms, commands are simple prompt templates that you invoke with a `/` (or `@` symbol for some IDEs) to execute a predefined sequence of steps against an artifact.
+Commands encode repeatable instructions for specific tasks. You invoke a command explicitly, by name, to execute a predefined sequence of steps against an artifact. A skill loads when the agent decides it is relevant. A command runs when you ask for it.
 
-In factory engineering, artifacts such as user stories, specifications, product requirements documents, and user journeys move through the software factory. Commands define how to process those artifacts. The power move is **slash-command at-artifact**: e.g. `/write-spec @docs/user-stories/submit-sales-order` runs the write-spec command against that user story. The command provides the instructions, the artifact provides the target, and the agent does the work.
+Every IDE covered here has converged on one mechanism for commands: **a command is a skill that the model does not load on its own.** Claude Code merged custom commands into skills. Cursor ships `/migrate-to-skills` to convert commands. GitHub Copilot's default harness no longer loads prompt files. Kilo Code and Google Antigravity expose every skill as a slash command. OpenAI Codex has no command files at all, only skills. Author commands as skills, and one file works in every IDE.
+
+In factory engineering, artifacts such as user stories, specifications, product requirements documents, and user journeys move through the software factory. Commands define how to process those artifacts. The power move is **slash-command at-artifact**: e.g. `/write-spec @docs/user-stories/submit-sales-order.md` runs the write-spec command against that user story. The command provides the instructions, the artifact provides the target, and the agent does the work.
 
 ## Why Project-Scoped Commands Matter for Factory Engineering
 
 Like skills, commands must live in your project repository and evolve with your codebase. When commands are stored at the project level, they are versioned with your code, reviewed in pull requests, and automatically available to every team member on clone.
 
-**Invocation rule:** The slash name is the **filename without `.md`** (e.g. `write-spec.md` → `/write-spec`). Always use **slash-command at-artifact** to run a command against a specific artifact.
+**Invocation rule:** The slash name is the **skill name** (the directory name and the `name` field). For example, `.agents/skills/write-spec/SKILL.md` → `/write-spec`. Always use **slash-command at-artifact** to run a command against a specific artifact.
 
-## Example command file
+## Example command
 
-Commands are markdown files. The slash name is the filename without `.md` (e.g. `write-design.md` → `/write-design`). This is a convention shared across IDEs; folder locations vary (see table below). Because commands are shared across IDEs (via rsync or symlinks), keep them **IDE-agnostic**: do not rely on `$ARGUMENTS` or other placeholders, since not all IDEs support them. Instead, write the command so it **states what the user will supply** (e.g. a user story or design document, by link or by name) and **instructs the LLM to stop and prompt the user** if that input is missing. That pattern works consistently in every IDE. Below is an example showing this pattern plus location, purpose, structure, and a short checklist.
+A command is a skill directory in the canonical `.agents/skills/` folder (see [Skills](/skills#managing-skills-across-ides)). Its `SKILL.md` has two properties that make it a command:
 
-**Example (`.claude/commands/write-design.md`):**
+- **`disable-model-invocation: true`** prevents the model from loading it automatically, so it runs only when invoked. Claude Code, Cursor, and GitHub Copilot honor this property.
+- **An `agents/openai.yaml` file** with `allow_implicit_invocation: false` sets the same policy for OpenAI Codex, which ignores the frontmatter property.
+
+Keep commands **IDE-agnostic**: do not rely on `$ARGUMENTS` or other placeholders, since not all IDEs support them. Instead, write the command so it **states what the user will supply** (e.g. a user story or design document, by link or by name) and **instructs the LLM to stop and prompt the user** if that input is missing. That pattern works consistently in every IDE.
+
+**Layout:**
+
+```
+.agents/skills/write-design/
+├── SKILL.md
+└── agents/
+    └── openai.yaml
+```
+
+**`agents/openai.yaml`:**
+
+```yaml
+policy:
+  allow_implicit_invocation: false
+```
+
+**`SKILL.md`:**
 
 ```markdown
+---
+name: write-design
+description: Write or update a design document from a user story. Run only when explicitly invoked.
+disable-model-invocation: true
+---
+
 # Write Design Document
 
 The user will supply a user story or design document, either by link or by name. If no user story or design document is supplied, then stop and prompt the user. Create a new design document or update the existing one using the following instructions.
@@ -47,114 +76,67 @@ Include:
 
 ## Structure
 
-Use the recommended template in the [documentation-spec](../../skills/documentation-spec/SKILL.md) skill.
+Use the recommended template in the [documentation-spec](../documentation-spec/SKILL.md) skill.
 ```
 
 ---
 
 ## Creating Commands Iteratively
 
-**1. Do the task once with the agent.** Pick a concrete artifact (e.g. a user story) and tell the agent what you want (e.g. "Write a technical spec for this story"). Work through the result-fix gaps, adjust structure, clarify wording-until the output is what you want. Do not compromise on quality.
+**1. Do the task once with the agent.** Pick a concrete artifact (e.g. a user story) and tell the agent what you want (e.g. "Write a technical spec for this story"). Work through the result. Fix gaps, adjust structure, and clarify wording until the output is what you want. Do not compromise on quality.
 
-**2. Capture the process as a command.** Ask the agent to create a command file in `.claude/commands/` that encodes the instructions you just followed. The command should state what the user supplies (e.g. a user story or design doc) and tell the LLM to stop and prompt if that input is missing. Use the [recommended pattern](#example-command-file): location, purpose, contents, structure. Instruct the LLM to save the file (e.g. `write-spec.md` → `/write-spec`).
+**2. Capture the process as a command.** Ask the agent to create a command skill in `.agents/skills/{command-name}/` that encodes the instructions you just followed. The command should state what the user supplies (e.g. a user story or design doc) and tell the LLM to stop and prompt if that input is missing. Use the [recommended pattern](#example-command): `disable-model-invocation: true`, `agents/openai.yaml`, and sections for location, purpose, contents, and structure.
 
 **3. Run the command against an artifact.** Invoke **slash-command at-artifact** (e.g. `/write-spec @docs/user-stories/submit-sales-order.md`). Do not hand-hold; let the command stand on its own. Note where the output is wrong, vague, or inconsistent with how you refined it in step 1.
 
-**4. Refine the command.** For each shortcoming, ask: *Which part of the command allowed this?* Update the command text-add constraints, examples, or explicit structure (e.g. "Include…", "Do not…", "Use the template in…"). Commit the change.
+**4. Refine the command.** For each shortcoming, ask: *Which part of the command allowed this?* Update the command text: add constraints, examples, or explicit structure (e.g. "Include…", "Do not…", "Use the template in…"). Commit the change.
 
 **5. Repeat steps 3 and 4.** Re-run the command on the same or a different artifact. Keep tightening instructions until the command produces the desired result without extra guidance. When it does, that command is ready for the team.
 
 **6. Add more commands the same way.** For each new repeatable task (e.g. implementation plan, code review), do the task once, capture it as a command, then iterate by running and refining until the command is reliable.
 
-From here, every team member uses **slash-command at-artifact** (e.g. `/write-spec @docs/stories/submit-sales-order.md`). For multi-step orchestration, see the Workflows page.
+From here, every team member uses **slash-command at-artifact** (e.g. `/write-spec @docs/user-stories/submit-sales-order.md`). For multi-step orchestration, see the [Workflows](/workflows) page.
 
 ## Sharing Commands Across IDEs
 
-Both **commands** and **workflows** are stored in `.claude/commands/`. Each IDE looks in a different folder. Use one of the strategies below so that one canonical location works everywhere.
+Commands are skills, so they share with skills. Store them in `.agents/skills/` and run the [skills sync](/skills#managing-skills-across-ides) to mirror them into `.claude/skills/` for Claude Code. Every other IDE reads `.agents/skills/` directly. No separate commands folder or sync step is needed.
 
-### Strategy 1 — Sync with rsync (recommended for most teams)
+### Migrating legacy command files
 
-Keep canonical commands in `.claude/commands/` and use a two-step `rsync` to keep every IDE folder in sync. This works on every OS and avoids symlink caveats (see Strategy 3). The two-step pattern gathers changes from non-canonical locations first, so a developer who edits in `.kilocode/workflows/` does not lose work when the sync runs.
+If your repository has commands in IDE-specific folders, convert each one to a skill directory and delete the original:
 
-```bash
-#!/usr/bin/env bash
-# sync-commands.sh — run from repo root
+1. Create `.agents/skills/{command-name}/SKILL.md`.
+2. Add frontmatter with `name`, a `description`, and `disable-model-invocation: true`.
+3. Paste the command body below the frontmatter.
+4. Add `agents/openai.yaml` with `allow_implicit_invocation: false`.
+5. Remove the legacy file and any sync script or symlink that maintained it.
 
-IDE_COMMANDS=(.cursor/commands .windsurf/workflows .kilocode/workflows .agent/workflows)
+Several IDEs automate the conversion: Cursor's `/migrate-to-skills`, VS Code's **Convert prompt files to skills**, Antigravity's `/migrate-workflows`, and Codex's `/import`. Each writes to its own folder, so move the results into `.agents/skills/`.
 
-# Ensure canonical directory exists (first-time setup)
-mkdir -p .claude/commands
+Legacy command folders that the new pattern replaces:
 
-# Step 1: reverse-sync — gather changes from any IDE location back to canonical
-for src in "${IDE_COMMANDS[@]}"; do
-  [ -d "$src" ] && rsync -a "$src/" .claude/commands/
-done
-
-# Step 2: forward-sync — mirror canonical to all IDE locations
-for dest in "${IDE_COMMANDS[@]}"; do
-  mkdir -p "$dest"
-  rsync -a --delete .claude/commands/ "$dest"/
-done
-```
-
-**Step 1** is additive (no `--delete`): new or modified files in any IDE folder are copied back to `.claude/commands/`. **Step 2** uses `--delete` so each destination becomes an exact mirror of canonical.
-
-Automate this with a Git hook, file watcher, or CI step so copies never drift. Commit the synced folders.
-
-### Strategy 2 — IDE-Native Locations Only
-
-Store commands directly in each IDE's folder and skip the canonical location. Simple for one or two IDEs, but maintenance grows with IDE count.
-
-### Strategy 3 — Symlinks (macOS/Linux only, with caveats)
-
-Symlinks avoid file duplication but have significant limitations:
-
-- **Windows:** Requires Developer Mode or administrator privileges (often restricted in corporate environments). Symlinks created on macOS/Linux may not resolve when cloned on Windows.
-- **Cursor:** Cursor's file watcher does not properly follow directory symlinks. Use copy-on-change or place commands directly in `.cursor/commands/`.
-- **IDE inconsistencies:** Some IDEs watch symlink targets correctly; others watch the symlink itself or skip watching entirely.
-
-If your team is macOS/Linux-only and does not use Cursor, symlinks remain viable:
-
-**Option A — Use the factory-engineering skill:** Install with `npx openskills install factoryengineering/skills`, then ask your agent to create symlinks for your selected IDEs. The skill sets up symlinks for **commands/workflows** (`.claude/commands/`) and **skills** (`.claude/skills/`) in one go (or use `--type commands` to do only commands). The agent can **detect** which IDEs you have (e.g. run the script with `--detect`), confirm with you, then create symlinks. If a target folder already exists (e.g. `.cursor/commands`), the skill will **offer to copy** its contents into the canonical folder and then replace it with a symlink (`--copy-existing`). On **Windows**, use the skill's PowerShell script (`Setup-Symlinks.ps1`).
-
-**Option B — Create symlinks manually for each IDE:** Run these from your **repository root**. The symlink target `../.claude/commands` is resolved relative to the link's directory (e.g. `.cursor/`), so it correctly points at the repo's `.claude/commands/`.
-
-```bash
-# Cursor (prefer copy-on-change — see caveats above)
-mkdir -p .cursor
-ln -s ../.claude/commands .cursor/commands
-
-# Windsurf
-mkdir -p .windsurf
-ln -s ../.claude/commands .windsurf/workflows
-
-# Kilo Code
-mkdir -p .kilocode
-ln -s ../.claude/commands .kilocode/workflows
-
-# Antigravity
-mkdir -p .agent
-ln -s ../.claude/commands .agent/workflows
-```
-
-Commit the symlinks so every team member on macOS/Linux gets the correct structure on clone.
-
-**GitHub Copilot (VS Code)** uses prompt files (`.prompt.md`) with different naming and optional frontmatter, so commands cannot be shared via rsync or symlinks. Use a **format-aware sync** step instead; the **factory-engineering** skill includes sync instructions and a batch script (see [GitHub Copilot (VS Code)](#github-copilot-vs-code) below).
-
-Stored in `.claude/commands/`, this file is available as `/write-design` in Claude Code and Cursor; with rsync or symlinks, the same file is used by Windsurf, Kilo Code, and Antigravity. Invoke with **slash-command at-artifact** (e.g. `/write-design @docs/user-stories/billing-email.md`).
+| IDE | Legacy command folder | Status |
+|-----|----------------------|--------|
+| Claude Code | `.claude/commands/` | Still works; merged into skills |
+| Cursor | `.cursor/commands/` | Still works; skills recommended |
+| GitHub Copilot | `.github/prompts/*.prompt.md` | Not loaded by the default Copilot harness; Local harness deprecated |
+| Windsurf (Devin Desktop) | `.windsurf/workflows/` | Still works |
+| Kilo Code | `.kilocode/workflows/` | Migrated automatically to `.kilo/commands/` |
+| Google Antigravity | `.agent/workflows/` | Deprecated |
+| OpenAI Codex | None | Codex supports skills only |
 
 ## IDE-by-IDE Reference
 
-All IDEs support commands, but they use different folder locations, invocation patterns, and terminology. The table below summarizes the key differences. For full setup details, see each IDE's dedicated page.
+All IDEs support commands authored as skills. The table below summarizes invocation and sharing. For full setup details, see each IDE's dedicated page.
 
-| IDE | Folder | Invocation | Sharing Required? | Details |
-|-----|--------|------------|-------------------|---------|
-| [Claude Code](/ides/claude-code) | `.claude/commands/` | `/command-name` | No (canonical location) | [Full setup →](/ides/claude-code#commands) |
-| [Cursor](/ides/cursor) | `.cursor/commands/` | `/command-name` | ✅ Yes (copy or symlink) | [Full setup →](/ides/cursor#commands) |
-| [Windsurf](/ides/windsurf) | `.windsurf/workflows/` | `/workflow-name` | ✅ Yes (copy or symlink) | [Full setup →](/ides/windsurf#commands) |
-| [Kilo Code](/ides/kilo-code) | `.kilocode/workflows/` | `/workflow-name` | ✅ Yes (copy or symlink) | [Full setup →](/ides/kilo-code#commands) |
-| [Google Antigravity](/ides/google-antigravity) | `.agent/workflows/` | `/workflow-name` | ✅ Yes (copy or symlink) | [Full setup →](/ides/google-antigravity#commands) |
-| [GitHub Copilot](/ides/github-copilot) | `.github/prompts/` | `/prompt-name` | Sync (not symlink) | [Full setup →](/ides/github-copilot#commands) |
-| [OpenAI Codex](/ides/openai-codex) | `.agents/skills/` (via skills) | `$skill-name` | ⚠️ Needs investigation (use skills) | [Full setup →](/ides/openai-codex#commands) |
+| IDE | Reads command skills from | Invocation | Sharing Required? | Details |
+|-----|---------------------------|------------|-------------------|---------|
+| [Claude Code](/ides/claude-code) | `.claude/skills/` | `/command-name` | ✅ Yes (skills mirror) | [Full setup →](/ides/claude-code#commands) |
+| [GitHub Copilot](/ides/github-copilot) | `.agents/skills/` | `/command-name` | No | [Full setup →](/ides/github-copilot#commands) |
+| [Cursor](/ides/cursor) | `.agents/skills/` | `/command-name` | No | [Full setup →](/ides/cursor#commands) |
+| [Windsurf (Devin Desktop)](/ides/windsurf) | `.agents/skills/` | `@command-name` | No | [Full setup →](/ides/windsurf#commands) |
+| [Kilo Code](/ides/kilo-code) | `.agents/skills/` | `/command-name` | No | [Full setup →](/ides/kilo-code#commands) |
+| [Google Antigravity](/ides/google-antigravity) | `.agents/skills/` | `/command-name` | No | [Full setup →](/ides/google-antigravity#commands) |
+| [OpenAI Codex](/ides/openai-codex) | `.agents/skills/` | `$command-name` | No | [Full setup →](/ides/openai-codex#commands) |
 
-**Note:** OpenAI Codex's documented reusable-instruction mechanism is the Agent Skills standard (`$skill-name` invocation from `.agents/skills/`); whether it also supports slash-command markdown files has not been confirmed in official documentation. To share commands with a Codex user today, author them as skills. Windsurf and Kilo Code call their commands "Workflows" — this is their storage mechanism for reusable instructions, not factory engineering workflows. GitHub Copilot uses `.prompt.md` files with different naming and optional frontmatter, so commands require a sync step rather than a symlink. See [GitHub Copilot](/ides/github-copilot#commands) for details.
+**Note:** Windsurf and Kilo Code call their legacy commands "Workflows." That is their storage mechanism for reusable instructions, not factory engineering workflows.
