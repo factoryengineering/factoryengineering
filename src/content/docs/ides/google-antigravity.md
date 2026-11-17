@@ -1,45 +1,26 @@
 ---
 title: Google Antigravity
-description: Complete factory engineering guide for Google Antigravity — skills, commands, agents via AgentKit 2.0, and Manager View orchestration.
+description: Complete factory engineering guide for Google Antigravity — skills, custom subagents, and orchestration.
 ---
 
 # Google Antigravity
 
-Google Antigravity is an AI-native IDE powered by Gemini. It uses progressive disclosure for skills, supports commands via `.agent/workflows/`, and provides multi-agent orchestration through AgentKit 2.0's Manager View (March 2026). AgentKit 2.0 ships with 16 specialized agents across frontend, backend, testing, and DevOps roles, with support for assigning different models (Gemini, Claude, GPT) to each agent.
+Google Antigravity is Google's agent-first development platform. It launched as an IDE in November 2025. **Antigravity 2.0** (Google I/O, May 2026) added a standalone desktop app, the `agy` command-line tool (which replaces Gemini CLI), and an SDK; the IDE remains available. Antigravity implements the Agent Skills standard, supports custom subagents that the main agent delegates to by name, and adds script-driven Dynamic Workflows. Version 2.0 moved project configuration from `.agent/` to `.agents/`.
 
 ---
 
 ## Skills
 
-**Supports Agent Skills standard:** ✅ Yes, using its own folder structure
+**Supports Agent Skills standard:** ✅ Native
 
 | Scope | Path |
 |-------|------|
-| Project | `.agent/skills/` |
-| Global | `~/.gemini/antigravity/skills/` |
+| Project | `.agents/skills/` (legacy: `.agent/skills/`) |
+| Global | `~/.gemini/config/skills/` (legacy, IDE only: `~/.gemini/antigravity/skills/`) |
 
-Antigravity uses progressive disclosure for skills — each skill sits dormant until a request matches its description, at which point it is loaded into the agent's context. **AgentKit 2.0** (March 2026) added multi-agent orchestration via Manager View but did not change skills loading: skills still live in `.agent/skills/` and are loaded on-demand by whichever specialized agent is handling the task.
+Antigravity reads `.agents/skills/` directly, so **no copy or symlink is needed** when your canonical skills live there. Antigravity uses progressive disclosure: each skill sits dormant until a request matches its description, at which point the agent loads it into context. Invoke a skill explicitly with `/skill-name`.
 
-Antigravity uses `.agent/skills/` at the project level. Share skills from your canonical location using copy-on-change or a symlink:
-
-**Rsync (recommended):**
-
-```bash
-# Gather any local changes back to canonical, then mirror
-[ -d .agent/skills ] && rsync -a .agent/skills/ .claude/skills/
-mkdir -p .agent/skills
-rsync -a --delete .claude/skills/ .agent/skills/
-```
-
-Automate with a Git hook or file watcher so copies stay in sync. See [Skills — Sync with rsync](/skills#strategy-1--sync-with-rsync-recommended-for-most-teams) for the full two-step pattern covering all IDEs.
-
-**Symlink (macOS/Linux only):**
-
-```bash
-ln -s ../.claude/skills .agent/skills
-```
-
-Symlinks require macOS/Linux and may not work on Windows clones. See [Skills — Managing Skills Across IDEs](/skills#managing-skills-across-ides) for details on caveats and alternatives.
+Antigravity does not read `.claude/skills/`. It can import skills, commands, subagents, MCP servers, and instruction files from Claude Code, Codex, and Cursor configurations.
 
 📖 [Google Antigravity Skills Documentation](https://antigravity.google/docs/skills)
 
@@ -49,28 +30,17 @@ For more about how skills work in factory engineering, see [Skills](/skills).
 
 ## Commands
 
-**Folder location:** `.agent/workflows/` (project)
+**Folder location:** `.agents/skills/` (author commands as skills)
 
-**Invocation:** `/workflow-name` — Antigravity treats files in `.agent/workflows/` as workflows. With sharing (rsync or symlink), your `.claude/commands/` files appear there. Use **slash-command at-artifact** (e.g. `/write-spec @submit-sales-order`).
+**Invocation:** `/command-name`. Use **slash-command at-artifact** (e.g. `/write-spec @docs/user-stories/submit-sales-order.md`).
 
-Share your canonical commands folder using copy-on-change or a symlink:
+Antigravity's legacy **workflows** (Markdown files in `.agent/workflows/`) are deprecated but continue to work during the transition. In the Antigravity App 2.12.0 and later, the `/migrate-workflows` command converts each workflow into `.agents/skills/{name}/SKILL.md` and keeps the original with a `.bak` suffix. The command is not available in the CLI or IDE; convert workflows by hand there. When a skill and a legacy workflow share a name, the skill wins.
 
-**Rsync (recommended):**
+Legacy Markdown workflows are reusable instructions, which factory engineering calls commands. Do not confuse them with **Dynamic Workflows** (`/run-workflow`), which orchestrate agents through a generated Python script (see [Workflows](#workflows)).
 
-```bash
-[ -d .agent/workflows ] && rsync -a .agent/workflows/ .claude/commands/
-mkdir -p .agent/workflows
-rsync -a --delete .claude/commands/ .agent/workflows/
-```
+Author factory engineering commands as skills (see [Commands](/commands)). Antigravity picks them up from `.agents/skills/` with no extra sharing step.
 
-**Symlink (macOS/Linux only):**
-
-```bash
-mkdir -p .agent
-ln -s ../.claude/commands .agent/workflows
-```
-
-Without sharing, you would have to maintain a separate copy of commands in `.agent/workflows/`.
+📖 [Migrating workflows to skills](https://antigravity.google/docs/migration/workflows-to-skills)
 
 For more about how commands work in factory engineering, see [Commands](/commands).
 
@@ -80,15 +50,17 @@ For more about how commands work in factory engineering, see [Commands](/command
 
 **Supports true agents:** ✅ Yes
 
-**Feature name:** AgentKit 2.0 (specialized agents)
+**Feature name:** Custom subagents
 
-**Storage location:** IDE-managed profiles (Manager View)
+**Storage location:** `.agents/agents/{agent-name}.md` (project) or `~/.gemini/config/agents/{agent-name}.md` (global)
 
-Google Antigravity introduced agent support with **AgentKit 2.0** (March 2026). AgentKit 2.0 ships with 16 specialized agents across frontend, backend, testing, and DevOps roles, and each agent runs in its own context. You can assign a different model (Gemini, Claude, GPT) to each agent, so a reasoning-heavy role can run on one model while a fast-iteration role runs on another.
+A custom subagent is a Markdown file with YAML frontmatter that marks it as a subagent and declares its description. Optional fields set its model (`inherit`, `flash`, or `pro`), tools, skills, and MCP servers. The Markdown body is the agent's role definition. The main agent delegates to a named subagent with the `invoke_subagent` tool, and can also define a one-off subagent during a session. Each subagent can share the workspace or run in its own git worktree.
 
-**Role specialization:** Each of the built-in agents has a distinct role definition and tool scope. AgentKit 2.0's **Manager View** lets you orchestrate multiple agents in parallel with asynchronous task execution, so specialized agents run side-by-side rather than as a single shared assistant.
+**Instructions:** Antigravity reads `AGENTS.md` and `GEMINI.md` from the workspace and its parent folders up to the repository root, and modular rules from `.agents/rules/`.
 
-**Persistent memory via markdown instruction:** AgentKit 2.0 does not provide a built-in persistent-memory slot per agent. Get the same pattern by instructing each agent via `AGENTS.md`, `GEMINI.md`, or a skill's `SKILL.md` to read from a markdown file at the start of work and append learnings at the end. For compatibility with Claude Code agents, use the path `.claude/agent-memory/{agent-name}/MEMORY.md`.
+**Memory:** Antigravity maintains a knowledge base that agents retrieve from and contribute to, but it does not give each subagent its own memory file. Get the factory engineering memory pattern by instructing each subagent, in its role definition, to read from a markdown file at the start of work and append learnings at the end. Use the path `.claude/agent-memory/{agent-name}/MEMORY.md` so the same memory file works with Claude Code's native agent memory.
+
+📖 [Google Antigravity Subagents Documentation](https://antigravity.google/docs/subagents) · [Rules Documentation](https://antigravity.google/docs/rules)
 
 For more about how agents work in factory engineering, see [Agents](/agents).
 
@@ -96,11 +68,24 @@ For more about how agents work in factory engineering, see [Agents](/agents).
 
 ## Workflows
 
-**Orchestration support:** ⚠️ Partial
+**Orchestration support:** ✅ Yes
 
-Antigravity's **AgentKit 2.0 Manager View** (March 2026) orchestrates multiple specialized agents in parallel with asynchronous task execution. You can run frontend, backend, testing, and DevOps agents side-by-side, assign different models (Gemini, Claude, GPT) to each, and coordinate their output from a single view.
+Invoke a factory engineering workflow with **slash-workflow at-artifact** (e.g. `/tdd-cycle @docs/specs/order-validation.md`). Store the workflow as a skill. The main agent reads it and delegates each step to the named custom subagents with `invoke_subagent`. Several subagents can run at once.
 
-However, Manager View is UI-driven rather than workflow-document-driven. It does not read a structured workflow file the way Claude Code or Kilo Code's orchestrators do — routing and delegation are managed through the Manager View interface, not encoded in a `.claude/commands/{workflow}.md` file. You can approximate workflow-driven orchestration by writing detailed instructions in a command file and invoking agents from Manager View, but there is no orchestrator-as-agent that reads the workflow and delegates to named specialists based on its contents.
+Antigravity offers four agent-coordination mechanisms. They are not four names for the same capability: each has its own coordination model, verification strategy, and plan requirement.
+
+| Mechanism | Intended use | How it coordinates | Availability |
+|-----------|--------------|--------------------|--------------|
+| **Subagents** | Focused, self-contained side tasks (codebase research, browser validation, a test run) while the main thread continues | Each subagent reports privately to the agent that started it | Built in |
+| **`/boost`** | Hard problems that need iterative reasoning and verification (root-cause debugging, race conditions, algorithmic optimization) | Breaks the problem down, delegates focused workstreams, and independently verifies solutions across rounds | Paid plans |
+| **`/swarm`** | Broad work that splits into independent pieces | Named workers and a verifier coordinate on a shared message board with @mentions | Google AI Pro and Ultra (preview) |
+| **`/teamwork`** | Long-running, multi-milestone projects (repository migrations, formal proofs) | Starts with a scoping interview and gates each milestone with an audit | Paid plans (`/teamwork-preview` in some CLI versions) |
+
+Build factory engineering workflows on **subagents**. The workflow names each specialist, and the main agent delegates to that named subagent with `invoke_subagent`. Use `/boost`, `/swarm`, or `/teamwork` when the task fits their intended use better than your team's defined process.
+
+**Dynamic Workflows** (`/run-workflow`, rolling out to AI Pro and Ultra plans from November 2026) are a fifth, script-driven option. The agent writes a Python script that coordinates subagents in parallel or in sequence, and you approve the script before it runs. They are unrelated to the legacy Markdown workflows described under [Commands](#commands) (see [Script-Driven Workflows](/workflows)).
+
+📖 [Custom subagents](https://antigravity.google/docs/subagents) · [Boost (/boost)](https://antigravity.google/docs/boost) · [Swarm (/swarm)](https://antigravity.google/docs/swarm) · [Teamwork (/teamwork)](https://antigravity.google/docs/teamwork) · [Dynamic Workflows](https://antigravity.google/docs/dynamic-workflows)
 
 For more about how workflows work in factory engineering, see [Workflows](/workflows).
 
@@ -109,3 +94,9 @@ For more about how workflows work in factory engineering, see [Workflows](/workf
 ## External Docs
 
 - [Google Antigravity Skills Documentation](https://antigravity.google/docs/skills)
+- [Migrating workflows to skills](https://antigravity.google/docs/migration/workflows-to-skills)
+- [Google Antigravity Subagents Documentation](https://antigravity.google/docs/subagents)
+- [Google Antigravity Rules Documentation](https://antigravity.google/docs/rules)
+- [Google Antigravity Boost, Swarm, and Teamwork](https://antigravity.google/docs/slash-commands)
+- [Google Antigravity Dynamic Workflows](https://antigravity.google/docs/dynamic-workflows)
+- [Google Antigravity Changelog](https://antigravity.google/docs/changelog)

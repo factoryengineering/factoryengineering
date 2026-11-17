@@ -18,9 +18,9 @@ Choose your IDE below for a dedicated guide covering everything you need to set 
 | [Claude Code](/ides/claude-code) | ✅ Native | ✅ `/command` | ✅ Sub-agents | ✅ Full orchestration | [→ Guide](/ides/claude-code) |
 | [GitHub Copilot](/ides/github-copilot) | ✅ Native | ✅ `/command` | ✅ Custom agents | ⚠️ Partial (`/fleet`) | [→ Guide](/ides/github-copilot) |
 | [Cursor](/ides/cursor) | ✅ Native | ✅ `/command` | ✅ Subagents | ⚠️ Partial (subagent delegation) | [→ Guide](/ides/cursor) |
-| [Windsurf](/ides/windsurf) | ✅ Via copy or symlink | ✅ `/workflow` | ❌ No | ❌ No | [→ Guide](/ides/windsurf) |
-| [Kilo Code](/ides/kilo-code) | ✅ Native | ✅ `/workflow` | ✅ Modes | ✅ Orchestrator Mode | [→ Guide](/ides/kilo-code) |
-| [Google Antigravity](/ides/google-antigravity) | ✅ Via copy or symlink | ✅ `/workflow` | ✅ AgentKit 2.0 | ⚠️ Partial (Manager View) | [→ Guide](/ides/google-antigravity) |
+| [Windsurf (Devin Desktop)](/ides/windsurf) | ✅ Native (`.agents/skills/`) | ✅ `/workflow` | ✅ Devin Local; subagents (preview) | ⚠️ Preview | [→ Guide](/ides/windsurf) |
+| [Kilo Code](/ides/kilo-code) | ✅ Native | ✅ `/command` | ✅ Agents | ✅ Subagent delegation | [→ Guide](/ides/kilo-code) |
+| [Google Antigravity](/ides/google-antigravity) | ✅ Native (`.agents/skills/`) | ✅ `/skill` | ✅ Custom subagents | ✅ Subagent delegation | [→ Guide](/ides/google-antigravity) |
 | [OpenAI Codex](/ides/openai-codex) | ✅ Via copy or symlink | ⚠️ Needs investigation (`$skill-name`) | ✅ Custom agents (TOML) | ⚠️ Partial (sub-agent delegation) | [→ Guide](/ides/openai-codex) |
 
 ---

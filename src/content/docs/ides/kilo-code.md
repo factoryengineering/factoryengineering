@@ -1,47 +1,32 @@
 ---
 title: Kilo Code
-description: Complete factory engineering guide for Kilo Code — skills, commands, agents (modes), and workflow orchestration.
+description: Complete factory engineering guide for Kilo Code — skills, commands, agents, and subagent orchestration.
 ---
 
 # Kilo Code
 
-Kilo Code is an open-source VS Code extension with a model aggregator backend that gives you access to 500+ models — including Claude, Gemini, and GPT series — with pay-per-token billing at raw provider rates. This makes it a flexible choice for teams that want model independence without committing to a single vendor. Kilo Code was one of the first agents to natively implement the Agent Skills specification and provides full workflow orchestration via its built-in Orchestrator Mode.
+Kilo Code is an open-source (MIT) coding agent that runs as a VS Code extension, a JetBrains plugin, and the Kilo CLI. In 2026 Kilo rebuilt the extension on the Kilo CLI, a fork of OpenCode. The rebuild moved new configuration to `.kilo/` and `kilo.jsonc`, turned workflows into commands, turned modes into Markdown agents, and replaced Orchestrator mode with subagent delegation. Its model gateway gives you access to 500+ models, including Claude, Gemini, and GPT, at the provider's rate with no markup.
+
+**Migrating from the legacy extension:** Existing configuration keeps working. Kilo Code still reads `.kilocode/agents/` and `.kilocode/rules/`, migrates `.kilocode/workflows/` to `.kilo/commands/` on startup, and converts `.kilocodemodes` and `custom_modes.yaml` into agent files. Put new configuration in `.kilo/`.
 
 ---
 
 ## Skills
 
-**Supports Agent Skills standard:** ✅ Native — one of the first agents to adopt the standard
+**Supports Agent Skills standard:** ✅ Native
 
 | Scope | Path |
 |-------|------|
-| Project | `.kilocode/skills/` |
-| Global | `~/.kilocode/skills/` |
+| Project | `.kilo/skills/` |
+| Project (compatibility) | `.agents/skills/` (loaded by default), `.claude/skills/` |
+| Global | `~/.kilo/skills/` |
+| Global (compatibility) | `~/.agents/skills/`, `~/.claude/skills/` |
 
-Kilo Code loads skills from `.kilocode/skills/`. Share skills from your canonical location using copy-on-change or a symlink:
+Kilo Code loads skills from `.agents/skills/` by default, so **no copy or symlink is needed** when your canonical skills live there. The Kilo CLI also loads `.claude/skills/`. The VS Code extension loads `.claude/skills/` only when **Claude Code Compatibility** is enabled in settings.
 
-**Rsync (recommended):**
+All skills load into one shared pool. The agent compares each skill's `description` with the current task and loads the relevant skill. Mode-specific skill directories from the legacy extension are no longer supported.
 
-```bash
-# Gather any local changes back to canonical, then mirror
-[ -d .kilocode/skills ] && rsync -a .kilocode/skills/ .claude/skills/
-mkdir -p .kilocode/skills
-rsync -a --delete .claude/skills/ .kilocode/skills/
-```
-
-Automate with a Git hook or file watcher so copies stay in sync. See [Skills — Sync with rsync](/skills#strategy-1--sync-with-rsync-recommended-for-most-teams) for the full two-step pattern covering all IDEs.
-
-**Symlink (macOS/Linux only):**
-
-```bash
-ln -s ../.claude/skills .kilocode/skills
-```
-
-Symlinks require macOS/Linux and may not work on Windows clones. See [Skills — Managing Skills Across IDEs](/skills#managing-skills-across-ides) for details on caveats and alternatives.
-
-Kilo Code was one of the first agents to natively implement the Agent Skills specification with zero-configuration detection. Skills are evaluated before every response — the agent checks all skill descriptions against your request and loads the most relevant one.
-
-Kilo Code also supports mode-specific skills that activate only in specific modes (Code, Architect, Debugger, Orchestrator), which is especially useful for factory engineering workflows where different agents operate in different modes.
+Every loaded skill is also a slash command. Type `/skill-name` to invoke a skill explicitly. When a skill shares its name with a custom command, the command keeps `/name` and the skill appears as `/name:skill`.
 
 📖 [Kilo Code Skills Documentation](https://kilo.ai/docs/customize/skills)
 
@@ -51,35 +36,15 @@ For more about how skills work in factory engineering, see [Skills](/skills).
 
 ## Commands
 
-**Folder location:** `.kilocode/workflows/` (project) or `~/.kilocode/workflows/` (global)
+**Folder location:** `.kilo/commands/` (project) or `~/.config/kilo/commands/` (global)
 
-**Invocation:** `/workflow-name` or `@workflow-name`
+**Invocation:** `/command-name`. Use **slash-command at-artifact** (e.g. `/write-spec @docs/user-stories/submit-sales-order.md`).
 
-Kilo Code calls them "workflows" — this is Kilo Code's storage mechanism for commands, not factory engineering workflows. Kilo Code workflows are markdown files that define a sequence of steps.
+Kilo Code's documentation still calls these "workflows," but they are slash commands stored as Markdown files. A command file can carry optional frontmatter: `description`, `agent` (which agent runs it), `model`, and `subtask: true` (run it in a subagent session). Kilo Code migrates legacy `.kilocode/workflows/` files to `.kilo/commands/` on startup.
 
-**Usage:**
+Because every skill is already a slash command, author factory engineering commands as skills (see [Commands](/commands)). Kilo Code picks them up from `.agents/skills/` with no extra sharing step.
 
-```
-/write-spec @submit-sales-order
-```
-
-Share your canonical commands folder using copy-on-change or a symlink:
-
-**Rsync (recommended):**
-
-```bash
-[ -d .kilocode/workflows ] && rsync -a .kilocode/workflows/ .claude/commands/
-mkdir -p .kilocode/workflows
-rsync -a --delete .claude/commands/ .kilocode/workflows/
-```
-
-**Symlink (macOS/Linux only):**
-
-```bash
-ln -s ../.claude/commands .kilocode/workflows
-```
-
-📖 [Kilo Code Workflows Documentation](https://kilo.ai/docs/customize/workflows)
+📖 [Kilo Code Commands (Workflows) Documentation](https://kilo.ai/docs/customize/workflows)
 
 For more about how commands work in factory engineering, see [Commands](/commands).
 
@@ -89,35 +54,45 @@ For more about how commands work in factory engineering, see [Commands](/command
 
 **Supports true agents:** ✅ Yes
 
-**Feature name:** Modes
+**Feature name:** Agents (formerly modes)
 
-**Storage location:** Project modes: `.kilocodemodes` in the project root (YAML). Rules: `.kilo/rules-{slug}/` or `.kilorules-{slug}`
+**Storage location:** `.kilo/agents/{agent-name}.md` or `.kilo/agent/{agent-name}.md` (project; legacy `.kilocode/agents/` is still read) or `~/.config/kilo/agents/` (global)
 
-Kilo Code modes are true agents that work within their own context window. Modes support a role definition, custom instructions, and mode-specific rules from `.kilo/rules-{slug}/`. By adding instructions such as "At the start of each session, read from `.claude/agent-memory/{mode-name}/MEMORY.md`; at the end, append your learnings to that file," a mode implements the persistent, read/write memory pattern.
+Kilo Code agents are Markdown files with YAML frontmatter. The filename becomes the agent name, and the Markdown body becomes the system prompt. Frontmatter fields include `description`, `mode`, `model`, `permission`, `color`, and `steps`. The `mode` field decides how the agent can be used:
 
-**Example mode definition:**
+| `mode` | How it is used |
+|--------|----------------|
+| `primary` | A user-facing agent you select directly (switch with **Tab**). Not available for delegation. |
+| `subagent` | Available only for delegation through the `task` tool or an `@agent-name` mention. Runs in its own isolated session. |
+| `all` | Both. This is the default for custom agents. |
 
-```yaml
-customModes:
-  - slug: spec-writer
-    name: 📝 Spec Writer
-    description: Technical specification writer. Transforms user stories into detailed, unambiguous technical specs.
-    roleDefinition: |
-      You are a technical specification writer.
-      At the start of each session, read .claude/agent-memory/spec-writer/MEMORY.md.
-      At the end of each session, append your learnings to that file.
-      Write specs that include clear feature description, user flows, data model, API contracts, and acceptance criteria.
-    groups:
-      - read
-      - - edit
-        - fileRegex: \.(md|mdx)$
-          description: Markdown and MDX only
-    customInstructions: Update your agent memory with team patterns, standards learned, and spec conventions you discover.
+Define factory engineering specialists (spec writer, test writer, reviewer) as `mode: subagent` so an orchestrating workflow can delegate to them. Define an orchestrator you select by hand as `mode: primary`.
+
+Kilo Code migrates legacy `.kilocodemodes` definitions automatically: `roleDefinition` and `customInstructions` become the prompt, `groups` become `permission`, and `whenToUse` becomes `description`.
+
+**Example agent definition (`.kilo/agents/spec-writer.md`):**
+
+```markdown
+---
+description: Technical specification writer. Use to transform a user story into a detailed, unambiguous technical spec.
+mode: subagent
+permission:
+  bash: deny
+---
+
+You are a technical specification writer.
+
+At the start of each task, read `.claude/agent-memory/spec-writer/MEMORY.md`.
+At the end of each task, append your learnings to that file.
+
+Write specs that include a clear feature description, user flows, data model, API contracts, and acceptance criteria.
 ```
 
-**Note:** The `- - edit` is not a typo. In Kilo Code, `groups` is a list: each entry is either a capability string (e.g. `read`) or a list whose first element is the capability (e.g. `edit`) and whose remaining elements are options for that capability.
+**Memory:** Kilo Code has no native per-agent memory. The instructions in the prompt implement the factory engineering memory pattern. Use `.claude/agent-memory/{agent-name}/MEMORY.md` so the same memory file works with Claude Code's native agent memory.
 
-📖 [Kilo Code Custom Modes Documentation](https://kilo.ai/docs/customize/custom-modes)
+**Invoking an agent:** Mention it with `@agent-name`, or let a primary agent delegate to it.
+
+📖 [Kilo Code Custom Subagents Documentation](https://kilo.ai/docs/customize/custom-subagents) · [Kilo Code Custom Modes (legacy)](https://kilo.ai/docs/customize/custom-modes)
 
 For more about how agents work in factory engineering, see [Agents](/agents).
 
@@ -127,16 +102,13 @@ For more about how agents work in factory engineering, see [Agents](/agents).
 
 **Orchestration support:** ✅ Full
 
-Kilo Code has a built-in Orchestrator mode that breaks down complex tasks and delegates to other modes via `new_task()`. The Orchestrator reads the task, formulates a plan, and spawns work in other modes. Custom modes use a `whenToUse` field to guide delegation.
+Primary agents (Code, Plan, Debug) delegate to subagents with the `task` tool. Each subagent runs in an isolated session and returns a result summary to the parent. Subagents run in the foreground or in the background (`background: true`), and several can run in parallel. Kilo Code ships two built-in subagents, `general` and `explore`, alongside any custom `mode: subagent` agents you define.
 
-**Terminology:** Kilo Code's "Workflows" (in `.kilocode/workflows/`) are commands, but can be used for orchestration of agents. Create a symlink from `.claude/commands/` to `.kilocode/workflows/` so the same workflow file is available everywhere.
+Orchestrator mode, which delegated with `new_task()`, is deprecated and scheduled for removal. Use subagent delegation instead.
 
-Factory engineering workflows are implemented in Kilo Code through Orchestrator Mode. Invoke a workflow using the *slash-workflow at-artifact* pattern (e.g. `/tdd-cycle @docs/specs/order-validation.md`).
+Invoke a factory engineering workflow with **slash-workflow at-artifact** (e.g. `/tdd-cycle @docs/specs/order-validation.md`). The primary agent reads the workflow, then delegates each step to the named subagents in `.kilo/agents/`. **Kilo Swarm** gives the session and its subagents a shared board for coordination, and **Agent Manager** runs parallel sessions in separate worktrees.
 
-Place orchestration instructions in a rule file the Orchestrator reads, then invoke with the same pattern: slash-workflow at-artifact.
-
-📖 [Kilo Code Custom Modes](https://kilo.ai/docs/customize/custom-modes)
-📖 [Kilo Code Orchestrator Mode](https://kilo.ai/docs/code-with-ai/agents/orchestrator-mode)
+📖 [Kilo Code Custom Subagents](https://kilo.ai/docs/customize/custom-subagents) · [Orchestrator Mode (deprecated)](https://kilo.ai/docs/code-with-ai/agents/orchestrator-mode)
 
 For more about how workflows work in factory engineering, see [Workflows](/workflows).
 
@@ -145,6 +117,7 @@ For more about how workflows work in factory engineering, see [Workflows](/workf
 ## External Docs
 
 - [Kilo Code Skills Documentation](https://kilo.ai/docs/customize/skills)
-- [Kilo Code Workflows Documentation](https://kilo.ai/docs/customize/workflows)
-- [Kilo Code Custom Modes Documentation](https://kilo.ai/docs/customize/custom-modes)
-- [Kilo Code Orchestrator Mode](https://kilo.ai/docs/code-with-ai/agents/orchestrator-mode)
+- [Kilo Code Commands (Workflows) Documentation](https://kilo.ai/docs/customize/workflows)
+- [Kilo Code Custom Subagents Documentation](https://kilo.ai/docs/customize/custom-subagents)
+- [Kilo Code Custom Modes Documentation (legacy)](https://kilo.ai/docs/customize/custom-modes)
+- [Kilo Code Orchestrator Mode (deprecated)](https://kilo.ai/docs/code-with-ai/agents/orchestrator-mode)

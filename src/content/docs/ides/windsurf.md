@@ -1,47 +1,30 @@
 ---
-title: Windsurf
-description: Complete factory engineering guide for Windsurf — skills, commands, and Cascade's capabilities and limitations.
+title: Windsurf (Devin Desktop)
+description: Complete factory engineering guide for Windsurf, now Devin Desktop — skills, commands, subagents, and orchestration.
 ---
 
-# Windsurf
+# Windsurf (Devin Desktop)
 
-Windsurf is an AI-powered code editor featuring Cascade, a single shared AI agent. Windsurf supports the Agent Skills standard via its `.windsurf/skills/` folder and provides reusable command instructions through what it calls "Workflows." However, Windsurf does not support multiple agents or workflow orchestration in the factory engineering sense.
+Cognition acquired Windsurf in July 2025 and renamed the editor **Devin Desktop** in June 2026. **Devin Local**, which shares its harness with the Devin CLI, subsequently replaced Cascade as the primary local coding agent. Cascade is now a legacy agent: current Devin Desktop releases no longer start new Cascade conversations or open existing ones. Devin Local supports subagents, sandboxing, worktrees, skills, and permission controls. Its subagent feature is in preview; Devin Local itself is not.
+
+Devin Desktop moves project configuration to `.devin/` and still reads the legacy `.windsurf/` folders and the cross-tool `.agents/` folder. To move Cascade workflows and memories over, run **Devin: Open Cascade Migration Wizard** from the command palette.
+
+Documentation is moving from docs.windsurf.com to docs.devin.ai.
 
 ---
 
 ## Skills
 
-**Supports Agent Skills standard:** ✅ Yes, via `.windsurf/skills/`
+**Supports Agent Skills standard:** ✅ Yes
 
 | Scope | Path |
 |-------|------|
-| Project | `.windsurf/skills/` |
-| Global | `~/.windsurf/skills/` |
+| Project | `.devin/skills/`, `.agents/skills/` (legacy: `.windsurf/skills/`) |
+| Global | `~/.config/devin/skills/`, `~/.agents/skills/` (legacy: `~/.codeium/windsurf/skills/`) |
 
-Windsurf's Cascade agent looks for skills in `.windsurf/skills/`. Share skills from your canonical location using copy-on-change or a symlink:
+Devin Desktop reads `.agents/skills/` directly, so **no copy or symlink is needed** when your canonical skills live there. The agent loads a skill automatically when your request matches its description.
 
-**Rsync (recommended):**
-
-```bash
-# Gather any local changes back to canonical, then mirror
-[ -d .windsurf/skills ] && rsync -a .windsurf/skills/ .claude/skills/
-mkdir -p .windsurf/skills
-rsync -a --delete .claude/skills/ .windsurf/skills/
-```
-
-Automate with a Git hook or file watcher so copies stay in sync. See [Skills — Sync with rsync](/skills#strategy-1--sync-with-rsync-recommended-for-most-teams) for the full two-step pattern covering all IDEs.
-
-**Symlink (macOS/Linux only):**
-
-```bash
-ln -s ../.claude/skills .windsurf/skills
-```
-
-Symlinks require macOS/Linux and may not work on Windows clones. See [Skills — Managing Skills Across IDEs](/skills#managing-skills-across-ides) for details on caveats and alternatives.
-
-Cascade automatically invokes skills when your request matches a skill's description. To invoke a skill explicitly, type `@skill-name` in the Cascade input.
-
-📖 [Windsurf Cascade Skills Documentation](https://docs.windsurf.com/windsurf/cascade/skills)
+📖 [Devin Desktop Skills Documentation](https://docs.devin.ai/desktop/cascade/skills)
 
 For more about how skills work in factory engineering, see [Skills](/skills).
 
@@ -49,35 +32,15 @@ For more about how skills work in factory engineering, see [Skills](/skills).
 
 ## Commands
 
-**Folder location:** `.windsurf/workflows/` (project) or `~/.windsurf/workflows/` (global)
+**Folder location:** `.windsurf/workflows/` (project) or `~/.codeium/windsurf/global_workflows/` (global)
 
-**Invocation:** `/workflow-name` or `@workflow-name`
+**Invocation:** `/workflow-name`. Use **slash-command at-artifact** (e.g. `/write-spec @docs/user-stories/submit-sales-order.md`).
 
-Windsurf calls them "workflows" — note that this is different from workflows in the factory engineering sense. In Windsurf, these are simply the storage mechanism for reusable command instructions. Windsurf workflows are markdown files that define a sequence of steps for Cascade to follow.
+Windsurf calls its slash commands "Workflows." They are what factory engineering calls commands: reusable task instructions invoked with a slash, not orchestration documents. Workflows are invoked manually only, and each file is limited to 12,000 characters.
 
-**Usage:**
+Author factory engineering commands as skills (see [Commands](/commands)). Devin Desktop picks them up from `.agents/skills/` with no extra sharing step, which avoids maintaining a second copy in `.windsurf/workflows/`.
 
-```
-/write-spec @submit-sales-order
-```
-
-Share your canonical commands folder using copy-on-change or a symlink:
-
-**Rsync (recommended):**
-
-```bash
-[ -d .windsurf/workflows ] && rsync -a .windsurf/workflows/ .claude/commands/
-mkdir -p .windsurf/workflows
-rsync -a --delete .claude/commands/ .windsurf/workflows/
-```
-
-**Symlink (macOS/Linux only):**
-
-```bash
-ln -s ../.claude/commands .windsurf/workflows
-```
-
-📖 [Windsurf Workflows Documentation](https://docs.windsurf.com/windsurf/cascade/workflows)
+📖 [Windsurf Workflows Documentation](https://docs.devin.ai/desktop/cascade/workflows)
 
 For more about how commands work in factory engineering, see [Commands](/commands).
 
@@ -85,11 +48,19 @@ For more about how commands work in factory engineering, see [Commands](/command
 
 ## Agents
 
-**Supports true agents:** ❌ No
+**Supports true agents:** ✅ Yes (Devin Local; custom subagents in preview)
 
-Windsurf has a single agent called Cascade, which does generate and maintain memories automatically. However, you cannot create multiple agents with different roles, nor can you control how Cascade reads from and writes to memory in the way factory engineering defines.
+**Feature name:** Devin Local; Subagents (Preview)
 
-Cascade is a single, shared agent that all users work with in a given Windsurf session. It is not possible to define specialized agents like "spec writer" or "code reviewer" that operate independently with their own memory. You can still get the same memory pattern by instructing Cascade in `AGENTS.md` or in `.windsurf/rules` to read from a markdown file at the start and append learnings at the end.
+**Storage location:** `.devin/agents/{agent-name}.md` (project) or `~/.config/devin/agents/{agent-name}.md` (global)
+
+Devin Local can delegate work to subagents that run in parallel and report back. Enable the **Subagents (Preview)** setting, and define custom subagents as Markdown files in `agents/`. Set a default model for subagents in settings.
+
+**Instructions:** Devin Local reads `AGENTS.md` (and `AGENTS.local.md`) as always-on rules, including nested `AGENTS.md` files that apply to their directory.
+
+**Memory:** Devin Local does not persist memories. (Cascade's automatic memories do not carry over except through the migration wizard.) Get the factory engineering memory pattern by instructing each subagent, in its definition, to read from `.claude/agent-memory/{agent-name}/MEMORY.md` at the start of work and append learnings at the end.
+
+📖 [Devin Local](https://docs.devin.ai/desktop/devin-local) · [Cascade (legacy)](https://docs.devin.ai/desktop/cascade/cascade) · [AGENTS.md in Devin Desktop](https://docs.devin.ai/desktop/cascade/agents-md)
 
 For more about how agents work in factory engineering, see [Agents](/agents).
 
@@ -97,11 +68,11 @@ For more about how agents work in factory engineering, see [Agents](/agents).
 
 ## Workflows
 
-**Orchestration support:** ❌ No
+**Orchestration support:** ⚠️ Preview
 
-Windsurf calls its slash commands "Workflows"; they are commands, not agent orchestration. Cascade is a single shared agent with no delegation layer, so the closest you can get is running commands yourself in sequence. That is human orchestration, not workflow-driven agent orchestration.
+With the **Subagents (Preview)** setting enabled, Devin Local can read a factory engineering workflow and delegate steps to named subagents. Store the workflow as a skill and invoke it with **slash-workflow at-artifact** (e.g. `/tdd-cycle @docs/specs/order-validation.md`). Subagent support is in preview, so test each workflow before relying on it.
 
-**Terminology collision:** Windsurf's "Workflows" (in `.windsurf/workflows/`) are what factory engineering calls commands — reusable task instructions invoked with a slash. They are not orchestration documents that coordinate multiple named agents.
+**Terminology collision:** Windsurf's "Workflows" (in `.windsurf/workflows/`) are what factory engineering calls commands. They are not orchestration documents that coordinate multiple named agents.
 
 For more about how workflows work in factory engineering, see [Workflows](/workflows).
 
@@ -109,5 +80,9 @@ For more about how workflows work in factory engineering, see [Workflows](/workf
 
 ## External Docs
 
-- [Windsurf Cascade Skills Documentation](https://docs.windsurf.com/windsurf/cascade/skills)
-- [Windsurf Workflows Documentation](https://docs.windsurf.com/windsurf/cascade/workflows)
+- [Devin Desktop Skills Documentation](https://docs.devin.ai/desktop/cascade/skills)
+- [Windsurf Workflows Documentation](https://docs.devin.ai/desktop/cascade/workflows)
+- [Devin Local](https://docs.devin.ai/desktop/devin-local)
+- [Cascade (legacy)](https://docs.devin.ai/desktop/cascade/cascade)
+- [AGENTS.md in Devin Desktop](https://docs.devin.ai/desktop/cascade/agents-md)
+- [Devin Desktop Changelog](https://docs.devin.ai/desktop/changelog)
