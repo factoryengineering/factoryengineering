@@ -118,26 +118,22 @@ Different IDEs look for skills in different folders. Managing multiple hand-main
 
 ### Strategy 1: Sync with rsync (recommended)
 
-Keep canonical skills in `.agents/skills/` and use a two-step `rsync` to keep `.claude/skills/` in sync. This works on every OS (rsync is pre-installed on macOS and Linux, and available on Windows via Git Bash/MSYS2), avoids symlink pitfalls, and produces real files that every IDE's file watcher detects reliably.
+Keep canonical skills in `.agents/skills/` and mirror them one way into `.claude/skills/` with `rsync`. This works on every OS (rsync is pre-installed on macOS and Linux, and available on Windows via Git Bash/MSYS2), avoids symlink pitfalls, and produces real files that every IDE's file watcher detects reliably.
 
-The two-step pattern handles the case where a Claude Code user edits a skill in `.claude/skills/` rather than in `.agents/skills/`. Step 1 gathers those changes back to canonical before step 2 mirrors canonical, so no work is lost.
+**Edit skills only in `.agents/skills/`.** Treat `.claude/skills/` as generated output. Claude Code users edit the canonical copy too, then run the sync. A one-way mirror cannot overwrite newer canonical work with a stale copy, and deletions in canonical always propagate.
 
 ```bash
 #!/usr/bin/env bash
 # sync-skills.sh: run from repo root
+set -euo pipefail
 
 mkdir -p .agents/skills .claude/skills
 
-# Step 1: reverse-sync. Gather changes made in .claude/skills back to canonical.
-rsync -a .claude/skills/ .agents/skills/
-
-# Step 2: forward-sync. Mirror canonical to .claude/skills.
+# Mirror canonical to .claude/skills. --delete removes skills deleted from canonical.
 rsync -a --delete .agents/skills/ .claude/skills/
 ```
 
-**Step 1** is additive (no `--delete`): new or modified files in `.claude/skills/` are copied back to `.agents/skills/` without removing anything. **Step 2** uses `--delete` so `.claude/skills/` becomes an exact mirror of canonical. Stale files that were removed from `.agents/skills/` are cleaned up.
-
-Automate this with a `post-commit` or `post-merge` Git hook, a file-watcher script, or a CI step so the copies never drift. Commit both folders so every team member gets them on clone.
+Automate this with a `pre-commit` or `post-merge` Git hook, a file-watcher script, or a CI check that fails when `.claude/skills/` differs from `.agents/skills/`, so the copies never drift. Commit both folders so every team member gets them on clone.
 
 GitHub Copilot, Cursor, and Kilo Code read both `.agents/skills/` and `.claude/skills/`, so they find each skill twice. Because the mirror is exact, both copies have the same name and content. Run the sync before every commit so the copies never disagree.
 

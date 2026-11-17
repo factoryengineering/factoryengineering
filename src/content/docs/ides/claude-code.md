@@ -28,9 +28,10 @@ Claude Code extends the base standard with frontmatter that other IDEs do not re
 
 ```bash
 mkdir -p .agents/skills .claude/skills
-rsync -a .claude/skills/ .agents/skills/
 rsync -a --delete .agents/skills/ .claude/skills/
 ```
+
+Edit skills only in `.agents/skills/`, including when you work in Claude Code. Treat `.claude/skills/` as generated output.
 
 Automate this with a Git hook or file watcher so the copies stay in sync, and commit both folders. See [Skills: Sync with rsync](/skills#strategy-1-sync-with-rsync-recommended) for details and the symlink alternative.
 

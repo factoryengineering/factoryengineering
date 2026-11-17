@@ -179,7 +179,7 @@ For full details on workflow orchestration in each IDE, see the dedicated IDE pa
 - **[Kilo Code](/ides/kilo-code#workflows)** — ✅ Full orchestration. Primary agents delegate to named subagents with the `task` tool, in the foreground or background. Invoke with slash-workflow at-artifact.
 - **[GitHub Copilot](/ides/github-copilot#workflows)** — ⚠️ Partial. `/fleet` provides in-session parallel sub-agent orchestration. No workflow-document consumption.
 - **[Cursor](/ides/cursor#workflows)** — ⚠️ Partial. Agents Window (v3.0) runs agents in parallel; subagent delegation is ad-hoc, not workflow-document-driven.
-- **[Windsurf (Devin Desktop)](/ides/windsurf#workflows)** — ⚠️ Preview. Devin Local, which replaced Cascade, delegates to subagents in preview. Windsurf "Workflows" are commands.
+- **[Windsurf (Devin Desktop)](/ides/windsurf#workflows)** — ⚠️ Preview. Devin Local, the newer local agent alongside Cascade, delegates to subagents in preview. Windsurf "Workflows" are commands.
 - **[Google Antigravity](/ides/google-antigravity#workflows)** — ✅ Yes. The main agent delegates to named custom subagents with `invoke_subagent`; `/swarm` and Dynamic Workflows add parallel coordination.
 - **[OpenAI Codex](/ides/openai-codex#workflows)** — ⚠️ Partial. Parent agent spawns parallel sub-agents (`max_threads` default 6, `max_depth` default 1); specialist roles defined in TOML profiles.
 
