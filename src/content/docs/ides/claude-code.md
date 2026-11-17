@@ -43,19 +43,19 @@ For more about how skills work in factory engineering, see [Skills](/skills).
 
 ## Commands
 
-**Folder location:** `.claude/commands/` (project) or `~/.claude/commands/` (global)
+**Folder location:** `.claude/skills/{command-name}/SKILL.md` (mirrored from the canonical `.agents/skills/`)
 
-**Invocation:** `/command-name` — the filename without `.md` is the slash command (e.g. `write-spec.md` → `/write-spec`). Prefer `/command-name` for the command; the `@` symbol in **slash-command at-artifact** refers to the *artifact*, not the command.
+**Invocation:** `/command-name`. The skill name is the slash command (e.g. `.claude/skills/write-spec/SKILL.md` → `/write-spec`). Prefer `/command-name` for the command; the `@` symbol in **slash-command at-artifact** refers to the *artifact*, not the command.
 
-Claude Code stores commands as markdown files; each file becomes a slash command. Use the recommended pattern: state in the command what the user will supply and instruct the LLM to stop and prompt if it's missing. Do not rely on `$ARGUMENTS` — commands are shared across IDEs and not all IDEs support it.
+Claude Code has merged custom commands into skills. Author each command as a skill with `disable-model-invocation: true` so it runs only when you invoke it (see [Commands](/commands#example-command)). Legacy files in `.claude/commands/` keep working, but do not add new ones: most other IDEs do not read them. State in the command what the user will supply and instruct the LLM to stop and prompt if it's missing. Do not rely on `$ARGUMENTS`. Commands are shared across IDEs, and not all IDEs support it.
 
 **Usage:**
 
 ```
-/write-spec @submit-sales-order
+/write-spec @docs/user-stories/submit-sales-order.md
 ```
 
-📖 [Claude Code Slash Commands Documentation](https://code.claude.com/docs/en/slash-commands)
+📖 [Claude Code Skills Documentation](https://code.claude.com/docs/en/skills)
 
 For more about how commands work in factory engineering, see [Commands](/commands).
 
@@ -99,11 +99,11 @@ For more about how agents work in factory engineering, see [Agents](/agents).
 
 **Orchestration support:** ✅ Full
 
-Invoke with **slash-workflow at-artifact** (e.g. `/tdd-cycle @path/to/design.md`). The main agent reads the workflow from `.claude/commands/` and the artifact you supplied, then uses the Agent tool to delegate work to named subagents. The orchestrator reads the workflow, assesses the situation, and dynamically routes work based on what it discovers. It loops, branches, and coordinates parallel work according to the workflow.
+Invoke with **slash-workflow at-artifact** (e.g. `/tdd-cycle @path/to/design.md`). The main agent reads the workflow skill and the artifact you supplied, then uses the Agent tool to delegate work to named subagents. The orchestrator reads the workflow, assesses the situation, and dynamically routes work based on what it discovers. It loops, branches, and coordinates parallel work according to the workflow.
 
 By default, a subagent can spawn subagents of its own, up to three levels below the main conversation. Keep delegation at the orchestrator level: the workflow coordinates specialists, and specialists do their own work. Remove `Agent` from a specialist's `tools` list (or add it to `disallowedTools`) so it cannot delegate further.
 
-**Where workflows live:** In `.claude/commands/`, one file per workflow (e.g. `tdd-cycle.md`). Invoke with `/tdd-cycle @path/to/design.md`.
+**Where workflows live:** As command skills in `.agents/skills/`, mirrored into `.claude/skills/` (e.g. `.claude/skills/tdd-cycle/SKILL.md`). Invoke with `/tdd-cycle @path/to/design.md`.
 
 Define an orchestrator subagent that is restricted to specific tools and subagents, and that is instructed to read a given workflow file before starting. That makes the orchestrator a reusable, named agent the team can invoke by name.
 

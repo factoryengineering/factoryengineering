@@ -40,11 +40,28 @@ For more about how skills work in factory engineering, see [Skills](/skills).
 
 ## Commands
 
-**Slash-command markdown file support:** ⚠️ Needs investigation — Codex's primary reusable-instruction mechanism is the Agent Skills standard (`$skill-name` invocation, `/skills` to list loaded skills), and whether Codex also reads per-file slash-command markdown from a dedicated folder has not been confirmed in official documentation at the time of writing.
+**Slash-command markdown file support:** ❌ No. Use skills.
 
-**Practical approach today:** Use skills. To share factory-engineering commands with a Codex user, author them as skills (one skill per command) under `.agents/skills/` so they are invocable by name via `$skill-name`. For teams maintaining canonical `.claude/commands/*.md` files, wrap each command in a thin SKILL.md that references the command body, or invoke commands by reading the markdown file directly from context.
+Codex has no custom slash-command files. Its slash commands are a fixed built-in set, and custom prompt files are no longer supported. Skills are Codex's only reusable-instruction mechanism, which matches the factory engineering pattern of authoring commands as skills.
 
-This page will be updated once OpenAI's documentation confirms whether Codex supports slash-command markdown files alongside skills.
+Author each command as a skill in `.agents/skills/` with an `agents/openai.yaml` file that disables implicit invocation (see [Commands](/commands#portable-metadata-and-vendor-specific-controls)):
+
+```
+.agents/skills/write-spec/
+├── SKILL.md
+└── agents/
+    └── openai.yaml
+```
+
+```yaml
+# .agents/skills/write-spec/agents/openai.yaml
+policy:
+  allow_implicit_invocation: false
+```
+
+With `allow_implicit_invocation: false`, Codex does not select the skill on its own; it runs only when you name it. Codex ignores `disable-model-invocation` in `SKILL.md`, so keep both controls in shared commands.
+
+**Invocation:** In the Codex CLI, invoke the command by name with `$command-name`, not a slash, and mention the artifact (e.g. `$write-spec @docs/user-stories/submit-sales-order.md`). Codex reserves `/` for its built-in commands. Codex's `/import` command converts other IDEs' command folders into skills.
 
 For more about how commands work in factory engineering, see [Commands](/commands).
 

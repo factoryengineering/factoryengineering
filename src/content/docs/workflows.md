@@ -13,31 +13,45 @@ This is the highest layer of the software factory. Skills encode knowledge. Comm
 
 Several IDEs use the word "workflow" for something else. Windsurf and Kilo Code both have features they call "Workflows." Those are reusable slash commands, not orchestration of named agents. This page uses the factory engineering meaning: orchestration of agents, with delegation, branching, and looping.
 
-**Invocation:** Use **slash-workflow at-artifact**, e.g. `/tdd-cycle @docs/specs/order-validation.md`. The workflow name is the filename without `.md`. Store workflows in `.claude/commands/` so they sit alongside commands and can be invoked the same way. Share them into `.cursor/commands/`, `.windsurf/workflows/`, `.kilocode/workflows/`, and `.agent/workflows/` via rsync so every IDE sees the same files (see the [Commands](/commands) page).
+**Invocation:** Use **slash-workflow at-artifact**, e.g. `/tdd-cycle @docs/specs/order-validation.md`. The workflow name is the skill name. Store workflows as skills in `.agents/skills/`, alongside commands, so every IDE finds them by the same name. The prefix depends on the product: `/tdd-cycle` in most, `$tdd-cycle` in the Codex CLI, and `@tdd-cycle` in Devin Desktop (see the [Commands](/commands#ide-by-ide-reference) page).
 
 ---
 
-## Recommended Location: `.claude/commands/`
+## Recommended Location: `.agents/skills/`
 
-Store workflow documents in `.claude/commands/`. That gives you:
+Store each workflow document as a command skill: `.agents/skills/{workflow-name}/SKILL.md` with `disable-model-invocation: true` and an `agents/openai.yaml` that disables implicit invocation (see [Commands](/commands#portable-metadata-and-vendor-specific-controls)). That gives you:
 
-- **One place for both commands and workflows.** The user invokes a workflow by name; the file lives next to single-agent commands.
-- **Slash-workflow at-artifact.** Invoke with `/workflow-name @path/to/artifact`. The workflow name is the filename without `.md`; the artifact is the input (e.g. a spec, a design, a user story).
-- **Shared across IDEs.** Share `.claude/commands/` into each IDE’s commands/workflows folder (via rsync) so the same workflow file is available everywhere.
+- **One place for skills, commands, and workflows.** The user invokes a workflow by name; the file lives next to single-agent commands.
+- **Slash-workflow at-artifact.** Invoke with `/workflow-name @path/to/artifact`. The artifact is the input (e.g. a spec, a design, a user story).
+- **Shared across IDEs.** Every IDE except Claude Code reads `.agents/skills/` directly. The [skills sync](/skills#managing-skills-across-ides) mirrors it into `.claude/skills/` for Claude Code.
+- **Explicit invocation.** A workflow orchestrates many agents and spends many tokens. In Claude Code, Cursor, GitHub Copilot (VS Code and CLI), and OpenAI Codex, the vendor controls stop the model from starting it on its own. Windsurf (Devin Desktop), Kilo Code, and Google Antigravity have no explicit-only control, so write the workflow's description to say it runs only when the user invokes it by name, and keep it specific to the artifact it processes.
 
-Do not maintain separate copies of the same workflow in each IDE by hand. Use rsync to keep them in sync automatically. See the [Commands](/commands#sharing-commands-across-ides) page for strategy details.
+Do not maintain separate copies of the same workflow in each IDE by hand.
 
-Because workflows are stored in `.claude/commands/` and shared across IDEs (like commands), keep them **IDE-agnostic**: do not rely on `$ARGUMENTS` or other placeholders. Not all IDEs support them. State in the workflow what the user will supply (e.g. a design or specification, via slash-workflow at-artifact) and instruct the orchestrator to stop and prompt the user if that input is missing. See the [Commands](/commands) page for the same pattern.
+### A workflow skill is instructions, not an engine
+
+The skill describes the process. The orchestrating agent reads it and decides, turn by turn, what to do next. Nothing in the skill format provides:
+
+- **Guaranteed execution order.** The agent can skip, reorder, or repeat a step.
+- **Isolation.** Specialists share the working tree unless the IDE offers per-agent worktrees and the workflow asks for them.
+- **Approval gates.** The agent stops for a person only where the workflow tells it to and it follows that instruction.
+- **Durable progress.** If the session ends, its progress ends with it. The next run starts from the beginning unless the workflow records progress somewhere it can read back.
+
+Design for these limits. Make each step's result visible in the repository (a test, a file, a commit) so the orchestrator and the reviewer can check it. Write escalation points as explicit "stop and ask the user" instructions. Have long workflows record their position in a progress file that a restarted run reads first. For work that needs deterministic fan-out rather than judgment, use the IDE's script-driven orchestration instead.
+
+Because workflows are shared across IDEs (like commands), keep them **IDE-agnostic**: do not rely on `$ARGUMENTS` or other placeholders. Not all IDEs support them. State in the workflow what the user will supply (e.g. a design or specification, via slash-workflow at-artifact) and instruct the orchestrator to stop and prompt the user if that input is missing. See the [Commands](/commands) page for the same pattern.
 
 ---
 
 ## Example: TDD Cycle Workflow
 
-The following workflow runs a full TDD cycle from design to passing tests. It is stored as `.claude/commands/tdd-cycle.md` and invoked as `/tdd-cycle @path/to/design.md`. It shows delegation to named agents, conditional logic (refactor only when warranted, plan check), and a loop over tests. The orchestrator makes decisions based on what is learned each step. It uses the IDE-agnostic pattern: state what the user supplies and instruct the orchestrator to stop and prompt if missing (no `$ARGUMENTS`).
+The following workflow runs a full TDD cycle from design to passing tests. It is stored as `.agents/skills/tdd-cycle/SKILL.md` and invoked as `/tdd-cycle @path/to/design.md`. It shows delegation to named agents, conditional logic (refactor only when warranted, plan check), and a loop over tests. The orchestrator makes decisions based on what is learned each step. It uses the IDE-agnostic pattern: state what the user supplies and instruct the orchestrator to stop and prompt if missing (no `$ARGUMENTS`).
 
 ````markdown
 ---
-description: Run a full TDD cycle from design to passing tests
+name: tdd-cycle
+description: Run a full TDD cycle from design to passing tests. Run only when the user invokes /tdd-cycle explicitly.
+disable-model-invocation: true
 ---
 
 # TDD Cycle
@@ -172,7 +186,7 @@ Instruct agents in the workflow or in their agent definitions to include deviati
 
 For full details on workflow orchestration in each IDE, see the dedicated IDE pages:
 
-- **[Claude Code](/ides/claude-code#workflows)** — ✅ Full orchestration. Main agent reads workflow from `.claude/commands/`, delegates via the Agent tool to named subagents with looping, branching, and parallel coordination.
+- **[Claude Code](/ides/claude-code#workflows)** — ✅ Full orchestration. Main agent reads the workflow skill, delegates via the Agent tool to named subagents with looping, branching, and parallel coordination.
 - **[Kilo Code](/ides/kilo-code#workflows)** — ✅ Full orchestration. Primary agents delegate to named subagents with the `task` tool, in the foreground or background. Invoke with slash-workflow at-artifact.
 - **[GitHub Copilot](/ides/github-copilot#workflows)** — ⚠️ Partial. `/fleet` provides in-session parallel sub-agent orchestration. No workflow-document consumption.
 - **[Cursor](/ides/cursor#workflows)** — ⚠️ Partial. Agents Window (v3.0) runs agents in parallel; subagent delegation is ad-hoc, not workflow-document-driven.
@@ -186,7 +200,7 @@ For full details on workflow orchestration in each IDE, see the dedicated IDE pa
 
 A factory engineering workflow is orchestration logic: decision-making guidance for an agent that reads the situation and routes work dynamically.
 
-**Do not use `$ARGUMENTS`.** Workflows live in `.claude/commands/` and are shared via rsync; not all IDEs support placeholders. State what the user will supply and instruct the orchestrator to stop and prompt if it is missing.
+**Do not use `$ARGUMENTS`.** Workflows are skills shared across IDEs; not all IDEs support placeholders. State what the user will supply and instruct the orchestrator to stop and prompt if it is missing.
 
 **Describe conditions, not just steps.** A list of steps in order is a command. A workflow tells the orchestrator how to respond to what it finds (e.g. refactor only when warranted; delegate back to the planner only when the plan needs adjustment).
 

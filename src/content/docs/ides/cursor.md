@@ -32,33 +32,21 @@ For more about how skills work in factory engineering, see [Skills](/skills).
 
 ## Commands
 
-**Folder location:** `.cursor/commands/` (project) or `~/.cursor/commands/` (global)
+**Folder location:** `.agents/skills/{command-name}/SKILL.md` (canonical; read directly)
 
-**Invocation:** `/command-name` — filename without `.md` becomes the slash command. Use **slash-command at-artifact** (e.g. `/write-spec @submit-sales-order`). Follow the recommended pattern (state what the user supplies; stop and prompt if missing). Do not rely on `$ARGUMENTS` — commands are shared across IDEs and not all IDEs support it.
+**Invocation:** `/command-name`. Use **slash-command at-artifact** (e.g. `/write-spec @docs/user-stories/submit-sales-order.md`). Follow the recommended pattern (state what the user supplies; stop and prompt if missing). Do not rely on `$ARGUMENTS`. Commands are shared across IDEs, and not all IDEs support it.
+
+Author commands as skills with `disable-model-invocation: true` (see [Commands](/commands#example-command)). Cursor reads them from `.agents/skills/`, so no sharing step is needed. Cursor's built-in `/migrate-to-skills` command converts legacy `.cursor/commands/*.md` files into skills with the same property; move the results into `.agents/skills/`.
 
 **Usage:**
 
 ```
-/write-spec @submit-sales-order
+/write-spec @docs/user-stories/submit-sales-order.md
 ```
 
-Since Cursor uses `.cursor/commands/` and the canonical commands live in `.claude/commands/`, you need to share them. Copy them with rsync.
+**Built-in commands (v3.0):** Cursor 3 added `/worktree` (creates an isolated git worktree so agents work without conflicts) and `/best-of-n` (runs the same prompt across multiple models in parallel worktrees and compares results). These are built-in commands. Your command skills continue to work alongside them.
 
-**Rsync (recommended):**
-
-```bash
-# Gather any local changes back to canonical, then mirror
-mkdir -p .claude/commands
-[ -d .cursor/commands ] && rsync -a .cursor/commands/ .claude/commands/
-mkdir -p .cursor/commands
-rsync -a --delete .claude/commands/ .cursor/commands/
-```
-
-Automate this with a Git hook or file watcher so copies stay in sync. See [Commands — Sync with rsync](/commands#strategy-1--sync-with-rsync-recommended-for-most-teams) for the full two-step pattern covering all IDEs.
-
-**Built-in commands (v3.0):** Cursor 3 added `/worktree` (creates an isolated git worktree so agents work without conflicts) and `/best-of-n` (runs the same prompt across multiple models in parallel worktrees and compares results). These are built-in commands, not user-defined — your custom commands in `.cursor/commands/` continue to work alongside them.
-
-📖 [Cursor Commands Documentation](https://cursor.com/docs/context/commands)
+📖 [Cursor Skills Documentation](https://cursor.com/docs/skills)
 
 For more about how commands work in factory engineering, see [Commands](/commands).
 
@@ -100,7 +88,7 @@ Cursor's Agents Window (v3.0, April 2026) lets you run many agents in parallel a
 
 However, Cursor does not have a dedicated orchestrator that reads a workflow document and delegates to named specialists based on its contents. The delegation is ad-hoc — the parent agent decides how to split work based on its prompt, not by following a structured workflow file. You can approximate workflow-driven orchestration by writing detailed instructions in a command file and relying on the parent agent to follow them, but there is no enforcement layer.
 
-**Closest pattern:** Write a command in `.cursor/commands/` that describes phases and specialist subagents. Invoke it with `/command-name @artifact`. The parent agent reads the command and delegates to subagents, but routing logic depends on the model's interpretation rather than a built-in orchestration engine.
+**Closest pattern:** Write a workflow as a command skill in `.agents/skills/` that describes phases and specialist subagents. Invoke it with `/command-name @artifact`. The parent agent reads the command and delegates to subagents, but routing logic depends on the model's interpretation rather than a built-in orchestration engine.
 
 📖 [Cursor Subagents Documentation](https://cursor.com/docs/subagents) · [Cursor Agents Window](https://cursor.com/changelog/3-0)
 

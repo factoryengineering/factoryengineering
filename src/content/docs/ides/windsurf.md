@@ -32,13 +32,13 @@ For more about how skills work in factory engineering, see [Skills](/skills).
 
 ## Commands
 
-**Folder location:** `.windsurf/workflows/` (project) or `~/.codeium/windsurf/global_workflows/` (global)
+**Folder location:** `.agents/skills/{command-name}/SKILL.md` (canonical; read directly)
 
-**Invocation:** `/workflow-name`. Use **slash-command at-artifact** (e.g. `/write-spec @docs/user-stories/submit-sales-order.md`).
+**Invocation:** `@command-name`. Mention the artifact in the same message (e.g. `@write-spec @docs/user-stories/submit-sales-order.md`).
 
-Windsurf calls its slash commands "Workflows." They are what factory engineering calls commands: reusable task instructions invoked with a slash, not orchestration documents. Workflows are invoked manually only, and each file is limited to 12,000 characters.
+Author commands as skills (see [Commands](/commands#example-command)). Devin Desktop picks them up from `.agents/skills/` with no extra sharing step.
 
-Author factory engineering commands as skills (see [Commands](/commands)). Devin Desktop picks them up from `.agents/skills/` with no extra sharing step, which avoids maintaining a second copy in `.windsurf/workflows/`.
+Windsurf's own slash commands are called "Workflows" (`.windsurf/workflows/` in the project, `~/.codeium/windsurf/global_workflows/` globally). They are what factory engineering calls commands: reusable task instructions, not orchestration documents. They are invoked manually only, and each file is limited to 12,000 characters. Do not maintain a second copy of your commands there.
 
 📖 [Windsurf Workflows Documentation](https://docs.devin.ai/desktop/cascade/workflows)
 
