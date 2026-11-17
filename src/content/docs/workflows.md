@@ -183,7 +183,7 @@ For full details on workflow orchestration in each IDE, see the dedicated IDE pa
 - **[Kilo Code](/ides/kilo-code#workflows)** — ✅ Primary agents delegate to named subagents with the `task` tool, in the foreground or background.
 - **[Google Antigravity](/ides/google-antigravity#workflows)** — ✅ The main agent delegates to named custom subagents with `invoke_subagent`; `/swarm` and Dynamic Workflows add parallel coordination.
 - **[OpenAI Codex](/ides/openai-codex#workflows)** — ✅ The parent agent spawns named TOML-defined roles with `spawn_agent`, in parallel.
-- **[Windsurf (Devin Desktop)](/ides/windsurf#workflows)** — ⚠️ Preview. Devin Local, which replaced Cascade, delegates to subagents in preview.
+- **[Windsurf (Devin Desktop)](/ides/windsurf#workflows)** — ⚠️ Preview. Devin Local, the newer local agent alongside Cascade, delegates to subagents in preview.
 
 ---
 

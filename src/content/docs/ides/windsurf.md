@@ -5,7 +5,7 @@ description: Complete factory engineering guide for Windsurf, now Devin Desktop 
 
 # Windsurf (Devin Desktop)
 
-Cognition acquired Windsurf in July 2025 and renamed the editor **Devin Desktop** in June 2026. Its original agent, Cascade, has been replaced by **Devin Local**, which shares its harness with the Devin CLI. Devin Desktop moves project configuration to `.devin/` and still reads the legacy `.windsurf/` folders and the cross-tool `.agents/` folder. Unlike Cascade, Devin Local supports subagents (in preview), so Windsurf is no longer limited to a single shared agent.
+Cognition acquired Windsurf in July 2025 and renamed the editor **Devin Desktop** in June 2026. Devin Desktop adds **Devin Local**, a newer local agent that shares its harness with the Devin CLI, alongside the original Cascade agent. Sources differ on whether Cascade remains available in current releases, so check your version. Devin Desktop moves project configuration to `.devin/` and still reads the legacy `.windsurf/` folders and the cross-tool `.agents/` folder. Devin Local supports subagents (in preview), so Windsurf is no longer limited to a single shared agent. The agent and workflow features below are Devin Local's.
 
 Documentation is moving from docs.windsurf.com to docs.devin.ai.
 
@@ -22,7 +22,7 @@ Documentation is moving from docs.windsurf.com to docs.devin.ai.
 
 Devin Desktop reads `.agents/skills/` directly, so **no copy or symlink is needed** when your canonical skills live there. The agent loads a skill automatically when your request matches its description.
 
-📖 [Devin Desktop Skills Documentation](https://docs.windsurf.com/windsurf/cascade/skills)
+📖 [Devin Desktop Skills Documentation](https://docs.devin.ai/desktop/cascade/skills)
 
 For more about how skills work in factory engineering, see [Skills](/skills).
 
@@ -38,7 +38,7 @@ Author commands as skills (see [Commands](/commands#example-command)). Devin Des
 
 Windsurf's own slash commands are called "Workflows" (`.windsurf/workflows/` in the project, `~/.codeium/windsurf/global_workflows/` globally). They are what factory engineering calls commands: reusable task instructions, not orchestration documents. They are invoked manually only, and each file is limited to 12,000 characters. Do not maintain a second copy of your commands there.
 
-📖 [Windsurf Workflows Documentation](https://docs.windsurf.com/windsurf/cascade/workflows)
+📖 [Windsurf Workflows Documentation](https://docs.devin.ai/desktop/cascade/workflows)
 
 For more about how commands work in factory engineering, see [Commands](/commands).
 
@@ -78,7 +78,7 @@ For more about how workflows work in factory engineering, see [Workflows](/workf
 
 ## External Docs
 
-- [Devin Desktop Skills Documentation](https://docs.windsurf.com/windsurf/cascade/skills)
-- [Windsurf Workflows Documentation](https://docs.windsurf.com/windsurf/cascade/workflows)
+- [Devin Desktop Skills Documentation](https://docs.devin.ai/desktop/cascade/skills)
+- [Windsurf Workflows Documentation](https://docs.devin.ai/desktop/cascade/workflows)
 - [AGENTS.md in Devin Desktop](https://docs.devin.ai/desktop/cascade/agents-md)
 - [Devin Desktop Changelog](https://docs.devin.ai/desktop/changelog)
