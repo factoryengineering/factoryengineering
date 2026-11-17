@@ -13,7 +13,7 @@ This is the highest layer of the software factory. Skills encode knowledge. Comm
 
 Several IDEs use the word "workflow" for something else. Windsurf and Kilo Code both have features they call "Workflows." Those are reusable slash commands, not orchestration of named agents. This page uses the factory engineering meaning: orchestration of agents, with delegation, branching, and looping.
 
-**Invocation:** Use **slash-workflow at-artifact**, e.g. `/tdd-cycle @docs/specs/order-validation.md`. The workflow name is the filename without `.md`. Store workflows in `.claude/commands/` so they sit alongside commands and can be invoked the same way. Share them into `.cursor/commands/`, `.windsurf/workflows/`, `.kilocode/workflows/`, and `.agent/workflows/` via copy-on-change or symlinks so every IDE sees the same files (see the [Commands](/commands) page).
+**Invocation:** Use **slash-workflow at-artifact**, e.g. `/tdd-cycle @docs/specs/order-validation.md`. The workflow name is the filename without `.md`. Store workflows in `.claude/commands/` so they sit alongside commands and can be invoked the same way. Share them into `.cursor/commands/`, `.windsurf/workflows/`, `.kilocode/workflows/`, and `.agent/workflows/` via rsync so every IDE sees the same files (see the [Commands](/commands) page).
 
 ---
 
@@ -23,9 +23,9 @@ Store workflow documents in `.claude/commands/`. That gives you:
 
 - **One place for both commands and workflows.** The user invokes a workflow by name; the file lives next to single-agent commands.
 - **Slash-workflow at-artifact.** Invoke with `/workflow-name @path/to/artifact`. The workflow name is the filename without `.md`; the artifact is the input (e.g. a spec, a design, a user story).
-- **Shared across IDEs.** Share `.claude/commands/` into each IDE’s commands/workflows folder (via copy-on-change or symlinks) so the same workflow file is available everywhere.
+- **Shared across IDEs.** Share `.claude/commands/` into each IDE’s commands/workflows folder (via rsync) so the same workflow file is available everywhere.
 
-Do not maintain separate copies of the same workflow in each IDE by hand. Use copy-on-change (recommended) or symlinks to keep them in sync automatically. See the [Commands](/commands#sharing-commands-across-ides) page for strategy details.
+Do not maintain separate copies of the same workflow in each IDE by hand. Use rsync to keep them in sync automatically. See the [Commands](/commands#sharing-commands-across-ides) page for strategy details.
 
 Because workflows are stored in `.claude/commands/` and shared across IDEs (like commands), keep them **IDE-agnostic**: do not rely on `$ARGUMENTS` or other placeholders. Not all IDEs support them. State in the workflow what the user will supply (e.g. a design or specification, via slash-workflow at-artifact) and instruct the orchestrator to stop and prompt the user if that input is missing. See the [Commands](/commands) page for the same pattern.
 
@@ -186,7 +186,7 @@ For full details on workflow orchestration in each IDE, see the dedicated IDE pa
 
 A factory engineering workflow is orchestration logic: decision-making guidance for an agent that reads the situation and routes work dynamically.
 
-**Do not use `$ARGUMENTS`.** Workflows live in `.claude/commands/` and are shared via rsync or symlinks; not all IDEs support placeholders. State what the user will supply and instruct the orchestrator to stop and prompt if it is missing.
+**Do not use `$ARGUMENTS`.** Workflows live in `.claude/commands/` and are shared via rsync; not all IDEs support placeholders. State what the user will supply and instruct the orchestrator to stop and prompt if it is missing.
 
 **Describe conditions, not just steps.** A list of steps in order is a command. A workflow tells the orchestrator how to respond to what it finds (e.g. refactor only when warranted; delegate back to the planner only when the plan needs adjustment).
 

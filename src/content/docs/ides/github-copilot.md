@@ -18,7 +18,7 @@ GitHub Copilot is GitHub's AI coding assistant, available in VS Code, Visual Stu
 | Project | `.github/skills/`, `.agents/skills/`, `.claude/skills/` |
 | Personal | `~/.copilot/skills/`, `~/.agents/skills/` |
 
-GitHub Copilot reads `.github/skills/`, `.agents/skills/`, and `.claude/skills/` at the project level, which means **no copy or symlink is needed** for the canonical `.agents/skills/` location. Copilot will find your skills automatically. Because Copilot also reads the `.claude/skills/` mirror kept for Claude Code, keep that mirror exact so both copies match.
+GitHub Copilot reads `.github/skills/`, `.agents/skills/`, and `.claude/skills/` at the project level, which means **no copy is needed** for the canonical `.agents/skills/` location. Copilot will find your skills automatically. Because Copilot also reads the `.claude/skills/` mirror kept for Claude Code, keep that mirror exact so both copies match.
 
 Agent Skills work across the Copilot cloud agent, Copilot code review, Copilot CLI, the Copilot app, and agent mode in VS Code, Visual Studio, and JetBrains IDEs. Skills are on by default in VS Code since version 1.109 (February 2026); no setting is required.
 
@@ -36,20 +36,7 @@ For more about how skills work in factory engineering, see [Skills](/skills).
 
 **Format:** Prompt files use the `.prompt.md` extension (not plain `.md`). They support optional YAML frontmatter (`description`, `agent`, `tools`, etc.). See [Use prompt files in VS Code](https://code.visualstudio.com/docs/agent-customization/prompt-files) (VS Code 1.100+, April 2025).
 
-**Syncing commands for Copilot:** Copilot expects `.prompt.md` files and optional frontmatter, so the same `.claude/commands/*.md` files cannot be used directly via symlink. Keep canonical commands in `.claude/commands/*.md` and **sync** them into `.github/prompts/` when you add or change commands.
-
-**Use the factory-engineering skill** for sync (workflow, frontmatter rules, and batch script):
-
-```bash
-npx skills add factoryengineering/skills --skill factory-engineering
-```
-
-Then:
-
-1. **When you add or change commands**, ask your agent to sync commands to Copilot, or run the skill's bundled script from repo root.
-2. **Commit** the generated `.github/prompts/*.prompt.md` files so everyone on the team gets slash commands in VS Code.
-
-Avoid maintaining `.github/prompts/` by hand so the canonical source stays `.claude/commands/`.
+**Syncing commands for Copilot:** Copilot expects `.prompt.md` files and optional frontmatter, so the same `.claude/commands/*.md` files cannot be used directly. Keep canonical commands in `.claude/commands/*.md`, copy each one into `.github/prompts/{name}.prompt.md` when you add or change it, and commit the generated files.
 
 For more about how commands work in factory engineering, see [Commands](/commands).
 

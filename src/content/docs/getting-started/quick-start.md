@@ -19,7 +19,7 @@ This walkthrough mirrors the **Do the Work, Then Capture It** pattern from [Arti
 
 No installs needed for this exercise.
 
-> **A note on IDE folders.** This guide saves the skill to `.agents/skills/`, the cross-tool location. GitHub Copilot, Cursor, OpenAI Codex, Kilo Code, Google Antigravity, and Windsurf (Devin Desktop) read it directly. Claude Code reads only `.claude/skills/`. If you use Claude Code, replace `.agents/skills/` with `.claude/skills/` in every step below, then move the skill to `.agents/skills/` and set up the mirror described in the [sharing strategies on the Skills page](/skills#managing-skills-across-ides) once you finish.
+> **A note on IDE folders.** Everyone saves the skill to `.agents/skills/`, the canonical location. GitHub Copilot, Cursor, OpenAI Codex, Kilo Code, Google Antigravity, and Windsurf (Devin Desktop) read it directly. Claude Code reads only `.claude/skills/`, so Claude Code users run one mirror command before testing (step 6).
 
 ---
 
@@ -70,6 +70,15 @@ git commit -m "Add my-first-skill"
 
 ### 6. Test it in a fresh session
 
+**Claude Code users:** first generate the Claude Code copy from the canonical folder:
+
+```bash
+mkdir -p .claude/skills
+rsync -a .agents/skills/my-first-skill/ .claude/skills/my-first-skill/
+```
+
+See [Mirror for Claude Code](/skills#mirror-for-claude-code) to automate this for every skill.
+
 Start a new session in the same IDE. Give the assistant a similar task — a different function to test, a different config file to format. Do not mention the skill by name.
 
 If the description is good, the assistant will load the skill on its own and follow your standards without further prompting.
@@ -77,7 +86,7 @@ If the description is good, the assistant will load the skill on its own and fol
 If it does not, there are two possible reasons:
 
 - **The description is not specific enough.** Edit the `description:` line in `SKILL.md` so it names the *trigger*: when this skill should fire. Test again.
-- **Your IDE does not read the folder you saved to.** Claude Code reads only `.claude/skills/`; every other IDE covered here reads `.agents/skills/`. Mirror the skill using the [sharing strategies on the Skills page](/skills#managing-skills-across-ides), then test again.
+- **Your IDE does not see the skill.** In Claude Code, confirm that `.claude/skills/my-first-skill/SKILL.md` exists and matches the canonical copy. In any other IDE, confirm that your version discovers `.agents/skills/` (see your [IDE guide](/ides)). Then test again.
 
 ### 7. Celebrate
 

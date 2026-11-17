@@ -22,7 +22,7 @@ Kilo Code is an open-source (MIT) coding agent that runs as a VS Code extension,
 | Global | `~/.kilo/skills/` |
 | Global (compatibility) | `~/.agents/skills/`, `~/.claude/skills/` |
 
-Kilo Code loads skills from `.agents/skills/` by default, so **no copy or symlink is needed** when your canonical skills live there. The Kilo CLI also loads `.claude/skills/`. The VS Code extension loads `.claude/skills/` only when **Claude Code Compatibility** is enabled in settings.
+Kilo Code loads skills from `.agents/skills/` by default, so **no copy is needed** when your canonical skills live there. The Kilo CLI also loads `.claude/skills/`. The VS Code extension loads `.claude/skills/` only when **Claude Code Compatibility** is enabled in settings.
 
 All skills load into one shared pool. The agent compares each skill's `description` with the current task and loads the relevant skill. Mode-specific skill directories from the legacy extension are no longer supported.
 
