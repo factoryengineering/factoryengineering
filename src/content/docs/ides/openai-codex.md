@@ -44,7 +44,24 @@ For more about how skills work in factory engineering, see [Skills](/skills).
 
 Codex has no custom slash-command files. Its slash commands are a fixed built-in set, and custom prompt files are no longer supported. Skills are Codex's only reusable-instruction mechanism, which matches the factory engineering pattern of authoring commands as skills.
 
-Author each command as a skill in `.agents/skills/` with an `agents/openai.yaml` file that disables implicit invocation (see [Commands](/commands#example-command)). Invoke it by name with `$command-name` and mention the artifact (e.g. `$write-spec @docs/user-stories/submit-sales-order.md`). Codex's `/import` command converts other IDEs' command folders into skills.
+Author each command as a skill in `.agents/skills/` with an `agents/openai.yaml` file that disables implicit invocation (see [Commands](/commands#portable-metadata-and-vendor-specific-controls)):
+
+```
+.agents/skills/write-spec/
+├── SKILL.md
+└── agents/
+    └── openai.yaml
+```
+
+```yaml
+# .agents/skills/write-spec/agents/openai.yaml
+policy:
+  allow_implicit_invocation: false
+```
+
+With `allow_implicit_invocation: false`, Codex does not select the skill on its own; it runs only when you name it. Codex ignores `disable-model-invocation` in `SKILL.md`, so keep both controls in shared commands.
+
+**Invocation:** In the Codex CLI, invoke the command by name with `$command-name`, not a slash, and mention the artifact (e.g. `$write-spec @docs/user-stories/submit-sales-order.md`). Codex reserves `/` for its built-in commands. Codex's `/import` command converts other IDEs' command folders into skills.
 
 For more about how commands work in factory engineering, see [Commands](/commands).
 

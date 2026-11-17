@@ -32,13 +32,21 @@ For more about how skills work in factory engineering, see [Skills](/skills).
 
 **Folder location:** `.agents/skills/{command-name}/SKILL.md` (canonical; read directly)
 
-**Invocation:** Type `/` in Copilot Chat or the Copilot CLI, then the skill name (e.g. `/write-spec`). Add the artifact with `@` (e.g. `/write-spec @docs/user-stories/submit-sales-order.md`).
+**Invocation:** Type `/` in VS Code chat or the Copilot CLI, then the skill name (e.g. `/write-spec`). Add the artifact with `@` (e.g. `/write-spec @docs/user-stories/submit-sales-order.md`).
 
-Author commands as skills with `disable-model-invocation: true` (see [Commands](/commands#example-command)). VS Code honors that property and lists the skill as a slash command. Copilot reads `.agents/skills/` directly, so no sharing step is needed.
+Author commands as skills with `disable-model-invocation: true` (see [Commands](/commands#portable-metadata-and-vendor-specific-controls)). Support differs by Copilot product:
 
-**Do not author new prompt files.** Prompt files (`.github/prompts/*.prompt.md`) work only in VS Code's Local harness, which is deprecated and scheduled for removal by February 2027. The default Copilot harness (VS Code 1.143+) does not load them, and the Copilot CLI never did. Use VS Code's **Convert prompt files to skills** action to migrate existing prompt files, then move the results into `.agents/skills/`.
+| Product | `.agents/skills/` | `/skill-name` | `disable-model-invocation` |
+|---------|-------------------|---------------|----------------------------|
+| VS Code chat | ✅ | ✅ | ✅ |
+| Copilot CLI | ✅ | ✅ | ✅ (also `user-invocable`) |
+| Copilot cloud agent (GitHub.com) | ✅ | Not applicable (tasks are assigned, not typed) | Not documented for skills |
 
-📖 [Migrate customizations in VS Code](https://code.visualstudio.com/docs/agent-customization/migrate-customizations) · [Use prompt files in VS Code (legacy)](https://code.visualstudio.com/docs/agent-customization/prompt-files)
+Copilot reads `.agents/skills/` directly, so no sharing step is needed.
+
+**Do not author new prompt files.** VS Code runs prompt files (`.github/prompts/*.prompt.md`) only in sessions that use the **Local** harness, selected in the chat view's harness picker. The Local harness is deprecated and will be removed by February 2027. Since VS Code 1.143, new sessions default to the **Copilot** harness, which does not run prompt files. The Copilot CLI and the cloud agent do not support them either. Use VS Code's **Convert prompt files to skills** action to migrate existing prompt files, then move the results into `.agents/skills/`.
+
+📖 [VS Code 1.143 release notes](https://code.visualstudio.com/updates/v1_143#_copilot-harness-as-the-default) · [Use prompt files in VS Code (Local harness)](https://code.visualstudio.com/docs/agent-customization/prompt-files) · [Migrate customizations in VS Code](https://code.visualstudio.com/docs/agent-customization/migrate-customizations) · [Use skills as slash commands](https://code.visualstudio.com/docs/agent-customization/agent-skills#_use-skills-as-slash-commands)
 
 For more about how commands work in factory engineering, see [Commands](/commands).
 
