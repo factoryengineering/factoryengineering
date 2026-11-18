@@ -33,7 +33,8 @@ const examples = defineCollection({
     description: z.string(),
     difficulty: z.enum(['beginner', 'intermediate', 'advanced']).optional(),
     tags: z.array(z.string()).optional(),
-    githubUrl: z.string().url().optional(),
+    githubUrl: z.string().url(),
+    demonstrates: z.array(z.string()).optional(),
   }),
 });
 

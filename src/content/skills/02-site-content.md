@@ -62,26 +62,27 @@ Examples demonstrate ready-to-use factory configurations for common scenarios.
 **Schema**:
 ```yaml
 ---
-title: "Example Factory Name"
-description: "What this factory does"
-difficulty: "beginner"
-tags: ["documentation", "markdown"]
-githubUrl: "https://github.com/..."
+title: "repo-name"
+description: "What this example repository is"
+githubUrl: "https://github.com/factoryengineering/repo-name"
+demonstrates:
+  - "A factory component or technique the repository shows"
 ---
 ```
 
 **Required Fields**:
 - `title` (string): Example name
-- `description` (string): What the factory does
+- `description` (string): What the repository is (inline Markdown allowed)
+- `githubUrl` (URL string): Link to the example repository
 
 **Optional Fields**:
 - `difficulty` (enum): "beginner", "intermediate", or "advanced"
 - `tags` (array of strings): Categorization tags
-- `githubUrl` (URL string): Link to example repository
+- `demonstrates` (array of strings): What the example shows, rendered as a list
 
 **Naming Convention**: Use numeric prefixes for ordering
-- `01-simple-documentation-factory.md`
-- `02-code-review-factory.md`
+- `01-demo.md`
+- `02-eval.md`
 
 ### Skills Collection
 

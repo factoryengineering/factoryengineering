@@ -162,12 +162,8 @@ Read articles: /articles
 
 ### Examples
 
-- Simple Documentation Factory
-- Code Review Factory
-- Testing Automation Factory
-- Content Generation Factory
-- API Development Factory
-- Full-Stack Factory
+- [demo](https://github.com/factoryengineering/demo): Festify, built with a complete software factory
+- [eval](https://github.com/factoryengineering/eval): the evidence-driven eval runner
 
 View examples: /examples
 
