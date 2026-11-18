@@ -35,6 +35,8 @@ Every factory is built from four kinds of components. Each addresses a different
 
 Most teams start with skills. A handful of well-tested skills will already raise the floor on quality across the team.
 
+To see how these components fit together, watch [How a Software Factory Improves](/getting-started/factory-loops). It animates the loops inside a factory and shows how each skill removes rework.
+
 ---
 
 ## Choose your IDE

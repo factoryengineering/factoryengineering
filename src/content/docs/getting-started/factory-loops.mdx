@@ -1,0 +1,32 @@
+---
+title: How a Software Factory Improves
+description: An animated tour of the loops inside a software factory, from a single coding loop to a factory that upgrades its own skills.
+---
+
+import FactoryLoops from '~/components/user-components/FactoryLoops.astro';
+
+A software factory is a set of loops. Each loop takes an artifact in, does one kind of work, and passes the result on. When the work falls short, a loop sends the artifact back for rework. Every pass through rework is time the factory spends fixing something it could have done right the first time.
+
+Skills remove rework. Install the right skill at the right station and the artifact passes on its first try.
+
+<FactoryLoops caption="Use ▶ or → to advance. Press ⚙ Install to add each scene's skill. Press ⛶ for full screen." />
+
+## What you are watching
+
+The tour builds the factory one loop at a time. Each scene runs twice: once without a skill, and once after you install it.
+
+1. **The Code Loop.** A prompt becomes code. The red lines are bugs nobody has caught yet.
+2. **The Test Loop.** Failing tests send the code back to Code. A coding skill makes the tests pass on the first run.
+3. **Spec-Driven Development.** Explore gathers context and Plan turns it into a plan. A research skill gathers the context in one pass instead of three.
+4. **The Review Loop.** Review catches a plan that misses a requirement and sends it back. A planning skill covers every requirement up front.
+5. **The Delivery Loop.** Merged code is built and deployed. A deploy checklist makes the first deploy succeed.
+6. **The Feedback Loop.** Observe turns production telemetry into the next issue. A telemetry skill turns noisy signals into a clear issue.
+7. **The Factory Loop.** A new kind of issue arrives, and the old skills don't cover it. The retrospective studies the run and upgrades the skills itself.
+
+## The loop that matters most
+
+The first six scenes need you to install each skill. The seventh does not. A retrospective watches every station, finds where rework happened, and turns that lesson into better skills.
+
+That is the goal of factory engineering: a factory that gets better every time it runs. The [Build Your Software Factory](/articles) series walks through each step by hand, starting with [capturing your first skill](/articles/03-do-the-work-then-capture-it) and running [your first retrospective](/articles/05-the-retrospective-did-you-use-a-skill).
+
+Continue to [Your First Skill in 5 Minutes →](/getting-started/quick-start)

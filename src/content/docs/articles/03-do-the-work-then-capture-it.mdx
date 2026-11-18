@@ -8,6 +8,7 @@ draft: false
 ---
 
 import ChatAnim from '~/components/user-components/ChatAnim.astro';
+import FactoryLoops from '~/components/user-components/FactoryLoops.astro';
 
 *Build Your Software Factory — Article 1 of 20*
 
@@ -133,6 +134,10 @@ Two corrections became two rules. The example is drawn from real work, not inven
 ## Save and commit
 
 Put the file in `.claude/skills/linq-standards/SKILL.md` and commit it. Every developer who clones the repo now has the skill. When they ask the assistant to write a LINQ query, it loads this skill and follows your team's standards — without anyone having to correct it again.
+
+Watch what that does to the loop between Code and Unit Tests. Without the skill, every failing test sends the code back for another pass. With it, the code passes on the first try.
+
+<FactoryLoops scene={2} only caption="Press ⚙ Install Coding skill to compare." />
 
 ## The first draft is rough
 

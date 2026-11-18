@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Software Factory Loops</title>
+<style>
+  :root{
+    --bg:#f6f4ef; --panel:#ffffff; --ink:#1f2328; --muted:#6b7280; --track:#d9d5cc; --pad:#bdb8ad;
+    --explore:#0f9b8e; --plan:#5b5bd6; --code:#2f6fde; --test:#2e9d4f; --review:#c98400;
+    --deliver:#8b4fd1; --observe:#d4457a; --retro:#e0661b; --red:#d93b3b;
+  }
+  /* Dark palette: follows the OS unless a host page sets data-theme (via ?theme= or postMessage). */
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){ --bg:#15171a; --panel:#23262b; --ink:#ecebe7; --muted:#9aa0a8; --track:#3a3e45; --pad:#565b63; }
+  }
+  :root[data-theme="dark"]{ --bg:#15171a; --panel:#23262b; --ink:#ecebe7; --muted:#9aa0a8; --track:#3a3e45; --pad:#565b63; }
+  /* Embedded: the host page supplies the frame, so blend into it. */
+  :root.embed svg#stage{cursor:default}
+  :root.only #dots{display:none}
+  html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);
+    font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden;
+    -webkit-user-select:none;user-select:none}
+  svg#stage{position:fixed;inset:0;width:100vw;height:100vh;display:block;cursor:pointer}
+  #hud{position:fixed;left:0;right:0;top:0;padding:18px 24px 0;pointer-events:none;text-align:center}
+  #step{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600}
+  #step b{color:var(--retro)}
+  #title{margin:4px 0 2px;font-size:clamp(20px,3.2vw,30px);font-weight:700;letter-spacing:-.01em}
+  #sub{margin:0 auto;max-width:760px;font-size:clamp(13px,1.6vw,16px);color:var(--muted);min-height:1.4em;transition:opacity .35s}
+  #controls{position:fixed;left:0;right:0;bottom:14px;display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:10px;padding:0 10px}
+  #controls button{width:38px;height:38px;border-radius:50%;border:1px solid var(--track);background:var(--panel);color:var(--ink);font-size:15px;cursor:pointer}
+  #controls button:hover{border-color:var(--muted)}
+  #controls button.pill{width:auto;border-radius:19px;padding:0 14px;font-size:13px;font-weight:600}
+  #controls button.pill.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+  #controls button.improve{border-color:var(--retro);color:var(--retro)}
+  #controls button.improve.ready{background:var(--retro);color:#fff}
+  #controls button:disabled{opacity:.35;cursor:default}
+  #dots{display:flex;gap:7px;padding:0 6px}
+  #dots span{width:9px;height:9px;border-radius:50%;background:var(--track);cursor:pointer;transition:background .3s,transform .3s}
+  #dots span.on{background:var(--ink);transform:scale(1.25)}
+  #hint{position:fixed;left:0;right:0;bottom:62px;text-align:center;font-size:13px;color:var(--muted);opacity:0;transition:opacity .5s;pointer-events:none}
+  #hint.show{opacity:1}
+  #hint b{color:var(--retro)}
+  @media (max-width:700px){ #hint{bottom:112px} #controls{row-gap:8px} }
+
+  .part{opacity:0;transition:opacity .9s ease}
+  .part.on{opacity:1}
+  .part.on.old{opacity:.42}
+  .track{fill:none;stroke:var(--c);stroke-opacity:.38;stroke-width:4;stroke-linejoin:round}
+  .ghost{fill:none;stroke:none}
+  .pad{fill:var(--pad)}
+  .route{fill:none;stroke:var(--c);stroke-width:2.5;stroke-dasharray:7 6;stroke-opacity:.75}
+  .rlabel{font-size:11px;fill:var(--c);font-weight:600}
+  .station rect{fill:var(--panel);stroke:var(--c);stroke-width:2;transition:fill .25s,stroke .25s,stroke-width .25s}
+  .station.upgraded rect{stroke:var(--retro);stroke-width:3;fill:color-mix(in srgb,var(--retro) 10%,var(--panel))}
+  .station.active rect{fill:color-mix(in srgb,var(--c) 26%,var(--panel))}
+  .station.watched rect{stroke:var(--retro);stroke-width:3.5}
+  .station.target{cursor:pointer}
+  .station.target rect{stroke:var(--retro);animation:pulse 1.1s ease-in-out infinite}
+  @keyframes pulse{0%,100%{stroke-width:2.5}50%{stroke-width:7}}
+  .slabel{font-size:11.5px;font-weight:650;fill:var(--ink);pointer-events:none}
+  .plabel{font-size:10px;fill:var(--muted);font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+  .carrier{stroke:var(--panel);stroke-width:2.5;transition:opacity .35s}
+
+  /* artifacts are physical objects: same colors in light and dark */
+  .artifact{transition:opacity .3s}
+  .artifact *, .badge *{stroke-linejoin:round;stroke-linecap:round}
+  .paper{fill:#fff;stroke:#2a2d33;stroke-width:1.5}
+  .paper.novel{fill:#fff4c7}
+  .fold{fill:#e9e6df;stroke:#2a2d33;stroke-width:1.5}
+  .dot{fill:#2a2d33}
+  .codeA{stroke:#2f6fde;stroke-width:2;fill:none}
+  .codeB{stroke:#2e9d4f;stroke-width:2;fill:none}
+  .bug{stroke:#e02424;stroke-width:2.6;fill:none}
+  .req{fill:#fff;stroke:#5b5bd6;stroke-width:1}
+  .req.on{fill:#5b5bd6}
+  .lines{stroke:#8a8f98;stroke-width:1.6;fill:none}
+  .scroll{fill:#fbf3dc;stroke:#2a2d33;stroke-width:1.5}
+  .roll{fill:#e7cf8e;stroke:#2a2d33;stroke-width:1.5}
+  .board{fill:#b07a45;stroke:#2a2d33;stroke-width:1.5}
+  .clip{fill:#9aa0a8;stroke:#2a2d33;stroke-width:1.5}
+  .check{stroke:#2e9d4f;stroke-width:1.8;fill:none}
+  .empty{fill:#fff;stroke:#e02424;stroke-width:1.2}
+  .prcard{fill:#efe6fb;stroke:#8b4fd1;stroke-width:1.5}
+  .branch{stroke:#8b4fd1;stroke-width:2;fill:none}
+  .node{fill:#fff;stroke:#8b4fd1;stroke-width:1.8}
+  .box{fill:#d9a86c;stroke:#7a4f25;stroke-width:1.5}
+  .boxline{stroke:#7a4f25;stroke-width:1.5;fill:none}
+  .srv{fill:#4b5563;stroke:#1f2328;stroke-width:1.2}
+  .led{fill:#4ade80}
+  .chartline{stroke:#d4457a;stroke-width:2;fill:none}
+  .bar{fill:#f3c3d4}
+  .gear{fill:#e0661b;stroke:#8f3f0e;stroke-width:1.4}
+  .gear.lv2{fill:#f2b705;stroke:#8a6500}
+  .hole{fill:#fff;stroke:#8f3f0e;stroke-width:1.4}
+  .star{fill:#f2b705;stroke:#8a6500;stroke-width:1}
+  .frag{fill:var(--explore);stroke:var(--panel);stroke-width:1}
+  .tag rect{fill:var(--retro)}
+  .tag text{fill:#fff;font-size:11px;font-weight:700}
+</style>
+</head>
+<body>
+<svg id="stage" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+  <g id="layerRoutes"></g>
+  <g id="layerLoops"></g>
+  <g id="layerTemp"></g>
+  <g id="layerArt"></g>
+</svg>
+<div id="hud"><div id="step"></div><h1 id="title"></h1><p id="sub"></p></div>
+<div id="hint"></div>
+<div id="controls">
+  <button id="ff" class="pill on" title="Fast-forward the loops from earlier scenes (F)">⏩ Fast-forward earlier loops</button>
+  <button id="prev" title="Back (←)">◀</button>
+  <div id="dots"></div>
+  <button id="replay" title="Replay scene (R)">⟲</button>
+  <button id="next" title="Advance (→)">▶</button>
+  <button id="improve" class="pill improve" title="Install the improvement (U)">⚙ Improve</button>
+  <button id="zoom" class="pill" title="Toggle zoom (Z)">🔍 Zoom: new parts</button>
+  <button id="fs" class="pill" title="Full screen" hidden>⛶ Full screen</button>
+</div>
+<script>
+(() => {
+const NS = 'http://www.w3.org/2000/svg';
+const $ = id => document.getElementById(id);
+
+/* ---------------- host options ----------------
+   ?theme=dark|light   force a palette (the host can also postMessage {type:'factory-loops:theme', theme})
+   ?embed              running inside a host page: clicks on the stage don't advance, Backspace isn't captured
+   ?scene=N            start at scene N (same as #scene-N)
+   ?only               stay on the starting scene: no scene dots, no moving to other scenes */
+const params = new URLSearchParams(location.search);
+const root = document.documentElement;
+function setTheme(t){ if (t === 'dark' || t === 'light') root.dataset.theme = t; }
+setTheme(params.get('theme'));
+addEventListener('message', e => { if (e.data && e.data.type === 'factory-loops:theme') setTheme(e.data.theme); });
+const EMBED = params.has('embed'), ONLY = params.has('only');
+root.classList.toggle('embed', EMBED); root.classList.toggle('only', ONLY);
+// Only whole scenes 1–7 are valid; anything else (0, -1, 2.5, "abc") falls back to the hash, then scene 1.
+function startScene(){
+  const q = params.get('scene'), h = location.hash.match(/^#scene-([1-7])$/);
+  if (q && /^[1-7]$/.test(q)) return +q;
+  return h ? +h[1] : 1;
+}
+const START = startScene();
+const svg = $('stage');
+const layerRoutes = $('layerRoutes'), layerLoops = $('layerLoops'), layerTemp = $('layerTemp'), layerArt = $('layerArt');
+function el(tag, attrs = {}, parent){ const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; }
+
+const COLOR = n => `var(--${n})`;
+const V = 150;          // world units per second at speed 1
+const RIDE = 21;        // artifact height above a carrier
+const REST = 14;        // artifact height above a pad
+const H = 60, R = 30;   // loop height and end radius
+
+/* ---------------- timing ---------------- */
+const CANCEL = Symbol('cancel');
+let token = 0, speed = 1;
+const linear = p => p;
+const easeInOut = p => p < .5 ? 2*p*p : 1 - Math.pow(-2*p + 2, 2)/2;
+const backOut = p => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3*Math.pow(p-1,3) + c1*Math.pow(p-1,2); };
+function tween(ms, fn, ease = easeInOut){
+  const my = token, dur = ms / speed;
+  return new Promise((res, rej) => {
+    const t0 = performance.now();
+    function f(now){
+      if (my !== token) { rej(CANCEL); return; }
+      const p = dur <= 0 ? 1 : Math.min(1, (now - t0) / dur);
+      fn(ease(p));
+      if (p < 1) requestAnimationFrame(f); else res();
+    }
+    requestAnimationFrame(f);
+  });
+}
+const sleep = ms => tween(ms, () => {}, linear);
+function wait(ms){ const my = token; return new Promise((res, rej) => setTimeout(() => my === token ? res() : rej(CANCEL), ms)); }
+const quiet = p => { p.catch(() => {}); return p; };
+
+/* ---------------- icons ---------------- */
+function gearPath(){
+  const teeth = 8, ro = 12.5, ri = 9; let d = '';
+  for (let i = 0; i < teeth*2; i++){
+    const r = i % 2 ? ri : ro, a0 = (i - .32) * Math.PI / teeth, a1 = (i + .32) * Math.PI / teeth;
+    d += (i ? 'L' : 'M') + (r*Math.cos(a0)).toFixed(2) + ',' + (r*Math.sin(a0)).toFixed(2) + 'L' + (r*Math.cos(a1)).toFixed(2) + ',' + (r*Math.sin(a1)).toFixed(2);
+  }
+  return d + 'Z';
+}
+function starPath(ro = 5.5, ri = 2.4){
+  let d = '';
+  for (let i = 0; i < 10; i++){ const r = i % 2 ? ri : ro, a = -Math.PI/2 + i*Math.PI/5; d += (i ? 'L' : 'M') + (r*Math.cos(a)).toFixed(2) + ',' + (r*Math.sin(a)).toFixed(2); }
+  return d + 'Z';
+}
+const GEAR = (lv = 1) => `<path class="gear${lv >= 2 ? ' lv2' : ''}" d="${gearPath()}"/><circle class="hole" r="3.6"/>`;
+const STAR = `<path class="star" d="${starPath()}"/>`;
+
+// Icons read the artifact's state: bugs (red code lines), checks (requirements covered by the plan), novel (a new kind of request).
+function icon(type, a){
+  switch (type){
+    case 'bubble': return `<path class="paper${a.novel ? ' novel' : ''}" d="M-10,-11 h20 a4,4 0 0 1 4,4 v10 a4,4 0 0 1 -4,4 h-11 l-6,6 v-6 h-3 a4,4 0 0 1 -4,-4 v-10 a4,4 0 0 1 4,-4z"/>
+      <circle class="dot" cx="-6" cy="-2" r="1.7"/><circle class="dot" cx="0" cy="-2" r="1.7"/><circle class="dot" cx="6" cy="-2" r="1.7"/>`;
+    case 'file': {
+      const bugs = a.bugs || 0;
+      const rows = [[-6,-3,7,'codeA'],[-3,1,9,'codeB'],[-3,5,6,'codeB'],[-6,9,11,'codeA']];
+      const buggy = [1, 3].slice(0, bugs);
+      let s = `<path class="paper${a.novel ? ' novel' : ''}" d="M-10,-13 h13 l7,7 v19 h-20z"/><path class="fold" d="M3,-13 v7 h7z"/>`;
+      rows.forEach(([x, y, w, c], i) => s += `<path class="${buggy.includes(i) ? 'bug' : c}" d="M${x},${y} h${w}"/>`);
+      if (a.checks !== undefined) for (let j = 0; j < 3; j++) s += `<rect class="req${j < a.checks ? ' on' : ''}" x="${-8 + j*4}" y="-10.5" width="3" height="3"/>`;
+      return s;
+    }
+    case 'issue': return `<rect class="paper${a.novel ? ' novel' : ''}" x="-13" y="-11" width="26" height="22" rx="4"/>
+      <circle cx="-6" cy="-3" r="4" fill="none" stroke="#2e9d4f" stroke-width="1.8"/><circle cx="-6" cy="-3" r="1.4" fill="#2e9d4f"/>
+      <path class="lines" d="M1,-5 h8 M1,-1 h6 M-9,6 h18"/>`;
+    case 'scroll': return `<rect class="scroll" x="-11" y="-10" width="22" height="20"/><rect class="roll" x="-14" y="-14" width="28" height="5.5" rx="2.75"/>
+      <rect class="roll" x="-14" y="8.5" width="28" height="5.5" rx="2.75"/><path class="lines" d="M-7,-4 h14 M-7,0 h11 M-7,4 h13"/>`;
+    case 'clipboard': {
+      const n = a.checks ?? 3;
+      let s = `<rect class="board" x="-11" y="-12" width="22" height="26" rx="3"/><rect class="paper" x="-8" y="-7" width="16" height="18"/>
+        <rect class="clip" x="-5" y="-15" width="10" height="6" rx="2"/>`;
+      [-3, 3, 9].forEach((y, i) => {
+        s += i < n ? `<path class="check" d="M-6,${y} l1.6,1.6 l3,-3.2"/>` : `<rect class="empty" x="-6.3" y="${y - 2}" width="4" height="4"/>`;
+        s += `<path class="lines" d="M0,${y} h5"/>`;
+      });
+      return s;
+    }
+    case 'branch': return `<rect class="prcard" x="-13" y="-13" width="26" height="26" rx="6"/><path class="branch" d="M-5,-6 v13 M-5,4 C-5,-2 6,0 6,-6"/>
+      <circle class="node" cx="-5" cy="-7" r="2.6"/><circle class="node" cx="-5" cy="8" r="2.6"/><circle class="node" cx="6" cy="-6" r="2.6"/>`;
+    case 'box': return `<path class="box" d="M-13,-6 L0,-12 L13,-6 L13,8 L0,14 L-13,8z"/><path class="boxline" d="M-13,-6 L0,0 L13,-6 M0,0 V14 M-6.5,-9 L6.5,-3"/>`;
+    case 'server': return `<rect class="srv" x="-12" y="-14" width="24" height="8" rx="2"/><rect class="srv" x="-12" y="-4" width="24" height="8" rx="2"/><rect class="srv" x="-12" y="6" width="24" height="8" rx="2"/>
+      <circle class="led" cx="-8" cy="-10" r="1.4"/><circle class="led" cx="-8" cy="0" r="1.4"/><circle class="led" cx="-8" cy="10" r="1.4"/>`;
+    case 'chart': return `<rect class="paper" x="-13" y="-11" width="26" height="22" rx="3"/><rect class="bar" x="-9" y="2" width="4" height="6"/><rect class="bar" x="-3" y="-1" width="4" height="9"/><rect class="bar" x="3" y="-4" width="4" height="12"/>
+      <path class="chartline" d="M-9,1 L-3,-3 L2,-1 L9,-7"/>`;
+    case 'gear': return GEAR(a.level || 1);
+  }
+}
+const BADGES = {
+  fail: `<circle r="6.5" fill="#d93b3b" stroke="#fff" stroke-width="1.5"/><path d="M-2.5,-2.5 L2.5,2.5 M2.5,-2.5 L-2.5,2.5" stroke="#fff" stroke-width="1.9" stroke-linecap="round"/>`,
+  pass: `<circle r="6.5" fill="#2e9d4f" stroke="#fff" stroke-width="1.5"/><path d="M-3,0 L-1,2.3 L3,-2.4" stroke="#fff" stroke-width="1.9" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`,
+  comments: `<circle r="6.5" fill="#c98400" stroke="#fff" stroke-width="1.5"/><circle r="1" cx="-2.6" fill="#fff"/><circle r="1" fill="#fff"/><circle r="1" cx="2.6" fill="#fff"/>`,
+  noise: `<circle r="6.5" fill="#6b7280" stroke="#fff" stroke-width="1.5"/><text y="3.3" text-anchor="middle" font-size="9" font-weight="800" fill="#fff">?</text>`
+};
+const FRAG_POS = [[-19,-12],[19,-15],[-20,6],[20,7],[0,-21]];
+
+/* ---------------- artifacts ---------------- */
+const arts = new Set();
+class Artifact {
+  constructor(type, x, y, props = {}){
+    this.g = el('g', {class:'artifact'}, layerArt);
+    this.icon = el('g', {}, this.g);
+    this.extra = el('g', {}, this.g);
+    this.mark = el('g', {transform:'translate(-14,-14)'}, this.g);
+    this.badgeG = el('g', {}, this.g);
+    Object.assign(this, props);
+    this.type = type; this.x = x; this.y = y; this.sc = 1; this.isc = 1; this.bsc = 1; this.frag = 0;
+    this.redraw(); this.render(); this.renderIcon(); this.renderBadge();
+    arts.add(this);
+  }
+  redraw(){ this.icon.innerHTML = icon(this.type, this); this.mark.innerHTML = this.novel ? STAR : ''; }
+  render(){ this.g.setAttribute('transform', `translate(${this.x.toFixed(2)},${this.y.toFixed(2)}) scale(${this.sc.toFixed(3)})`); }
+  renderIcon(){ this.icon.setAttribute('transform', `scale(${Math.max(0,this.isc).toFixed(3)})`); }
+  renderBadge(){ this.badgeG.setAttribute('transform', `translate(12,-12) scale(${Math.max(0,this.bsc).toFixed(3)})`); }
+  place(x, y){ this.x = x; this.y = y; this.render(); }
+  async setBadge(kind){
+    if (!kind){ this.badgeG.innerHTML = ''; return; }
+    this.badgeG.innerHTML = BADGES[kind]; this.bsc = 0; this.renderBadge();
+    await tween(320, p => { this.bsc = p; this.renderBadge(); }, backOut);
+  }
+  async addFragment(){
+    const [fx, fy] = FRAG_POS[this.frag % FRAG_POS.length]; this.frag++;
+    const c = el('circle', {class:'frag', cx:fx, cy:fy, r:0}, this.extra);
+    await tween(300, p => c.setAttribute('r', (3.2*p).toFixed(2)), backOut);
+  }
+  remove(){
+    arts.delete(this); unregister(this);
+    this.g.style.opacity = 0; const g = this.g; setTimeout(() => g.remove(), 350);
+  }
+}
+function spawn(type, x, y, props){ const a = new Artifact(type, x, y, props); a.sc = 0; a.render(); return a; }
+const popIn = a => tween(380, p => { a.sc = p; a.render(); }, backOut);
+async function morph(a, type){
+  await tween(170, p => { a.isc = 1 - p; a.renderIcon(); }, easeInOut);
+  a.type = type; a.redraw(); a.extra.innerHTML = ''; a.frag = 0;
+  await tween(300, p => { a.isc = p; a.renderIcon(); }, backOut);
+}
+function slide(a, x, y, ms = 320, scaleTo){
+  const x0 = a.x, y0 = a.y, s0 = a.sc;
+  return tween(ms, p => { a.x = x0 + (x - x0)*p; a.y = y0 + (y - y0)*p; if (scaleTo !== undefined) a.sc = s0 + (scaleTo - s0)*p; a.render(); });
+}
+
+/* ---------------- pads (deposit points) ---------------- */
+const pads = new Map();
+const key = p => `${p.x},${p.y}`;
+function unregister(a){ for (const [k, v] of pads) if (v === a) pads.delete(k); }
+
+/* ---------------- carriers ---------------- */
+const temps = new Set();
+class Carrier {
+  constructor(color, parent){ this.c = el('circle', {r:7, class:'carrier', fill:color}, parent); this.cargo = null; this.x = 0; this.y = 0; }
+  place(x, y){
+    this.x = x; this.y = y; this.c.setAttribute('cx', x.toFixed(2)); this.c.setAttribute('cy', y.toFixed(2));
+    if (this.cargo) this.cargo.place(x, y - RIDE);
+  }
+}
+function moveTo(c, x, y){
+  const x0 = c.x, y0 = c.y, d = Math.hypot(x - x0, y - y0);
+  return tween(d / V * 1000, p => c.place(x0 + (x - x0)*p, y0 + (y - y0)*p));
+}
+function movePath(c, path){
+  const len = path.getTotalLength();
+  return tween(len / V * 1000, p => { const pt = path.getPointAtLength(p*len); c.place(pt.x, pt.y); });
+}
+async function pickup(c, a){ unregister(a); await slide(a, c.x, c.y - RIDE); c.cargo = a; }
+async function drop(c, pad){
+  const a = c.cargo; c.cargo = null;
+  await slide(a, pad.x, pad.y - REST);
+  const k = key(pad), old = pads.get(k);
+  if (old && old !== a) old.remove();
+  pads.set(k, a);
+}
+function tempCarrier(color, x, y){
+  const c = new Carrier(color, layerTemp); c.c.style.opacity = 0; c.place(x, y);
+  requestAnimationFrame(() => c.c.style.opacity = 1); temps.add(c); return c;
+}
+function dismiss(c){ temps.delete(c); c.c.style.opacity = 0; setTimeout(() => c.c.remove(), 400); }
+async function ferry(a, route, from, to, color){
+  speed = rate(route.rid);
+  const c = tempCarrier(color, from.x, from.y);
+  await pickup(c, a);
+  await movePath(c, route);
+  await drop(c, to);
+  dismiss(c);
+}
+
+/* ---------------- loops ---------------- */
+class Loop {
+  constructor(id, o){
+    Object.assign(this, o); this.id = id; this.y = o.y || 0;
+    const y = this.y, x0 = this.x0, x1 = this.x1;
+    this.inPad = {x:x0 - 50, y}; this.outPad = {x:x1 + 50, y};
+    this.g = el('g', {class:'part', style:`--c:${o.color}`}, layerLoops);
+    el('path', {class:'track', d:`M${x0},${y} L${x1},${y} A${R},${R} 0 0 0 ${x1},${y-H} L${x0},${y-H} A${R},${R} 0 0 0 ${x0},${y}`}, this.g);
+    this.upper = el('path', {class:'ghost', d:`M${x1},${y} A${R},${R} 0 0 0 ${x1},${y-H} L${x0},${y-H} A${R},${R} 0 0 0 ${x0},${y}`}, this.g);
+    for (const p of [this.inPad, this.outPad]) el('rect', {class:'pad', x:p.x - 17, y:y - 1, width:34, height:5, rx:2.5}, this.g);
+    if (o.padLabel){ const t = el('text', {class:'plabel', x:this.outPad.x, y:y + 20, 'text-anchor':'middle'}, this.g); t.textContent = o.padLabel; }
+    this.stations = o.stations.map(s => {
+      const w = s.w || 86, g = el('g', {class:'station'}, this.g);
+      const rect = el('rect', {x:s.x - w/2, y:y - 22, width:w, height:44, rx:9}, g);
+      const t = el('text', {class:'slabel', x:s.x, y:y + 15, 'text-anchor':'middle'}, g); t.textContent = s.label;
+      const badge = el('g', {class:'badge', transform:`translate(${s.x + w/2 - 4},${y - 22}) scale(.72)`}, g);
+      const st = {...s, w, g, rect, badge, y, loop:this, level:0};
+      g.addEventListener('click', e => { if (g.classList.contains('target')){ e.stopPropagation(); improve(); } });
+      return st;
+    });
+    this.carrier = new Carrier(o.color, this.g);
+    this.reset();
+  }
+  reset(){ this.carrier.cargo = null; this.carrier.place(this.x0, this.y); this.idle = Promise.resolve(); }
+  async pass(a, {iterations = 1, onStation} = {}){
+    await this.idle;
+    speed = rate(this.id);
+    const c = this.carrier;
+    await pickup(c, a);
+    for (let i = 0; i < iterations; i++){
+      const last = i === iterations - 1;
+      for (let s = 0; s < this.stations.length; s++){
+        const st = this.stations[s];
+        await moveTo(c, st.x, this.y);
+        st.g.classList.add('active');
+        await sleep(160);
+        if (onStation) await onStation(a, {iter:i, last, station:s});
+        await sleep(280);
+        st.g.classList.remove('active');
+      }
+      await moveTo(c, this.x1, this.y);
+      if (!last) await movePath(c, this.upper);   // carry the artifact back around for another pass
+    }
+    await drop(c, this.outPad);
+    this.idle = quiet(movePath(c, this.upper));   // return empty on the upper track
+  }
+}
+
+const L = {
+  explore: new Loop('explore', {x0:-600, x1:-400, color:COLOR('explore'), stations:[{x:-500, label:'Explore'}]}),
+  plan:    new Loop('plan',    {x0:-300, x1:-100, color:COLOR('plan'),    stations:[{x:-200, label:'Plan'}]}),
+  code:    new Loop('code',    {x0:0,    x1:200,  color:COLOR('code'),    stations:[{x:100,  label:'Code'}]}),
+  test:    new Loop('test',    {x0:300,  x1:500,  color:COLOR('test'),    stations:[{x:400,  label:'Unit Tests'}]}),
+  review:  new Loop('review',  {x0:600,  x1:800,  color:COLOR('review'),  stations:[{x:700,  label:'Review'}]}),
+  deliver: new Loop('deliver', {x0:900,  x1:1200, color:COLOR('deliver'), stations:[{x:995, label:'Build'}, {x:1105, label:'Deploy'}], padLabel:'Production'}),
+  observe: new Loop('observe', {x0:1300, x1:1500, color:COLOR('observe'), stations:[{x:1400, label:'Observe'}]}),
+  retro:   new Loop('retro',   {x0:350,  x1:550,  y:-320, color:COLOR('retro'), stations:[{x:450, label:'Retrospective', w:122}]})
+};
+// Stations that can be improved, by key.
+const ST = {
+  explore: L.explore.stations[0], plan: L.plan.stations[0], code: L.code.stations[0],
+  deploy: L.deliver.stations[1], observe: L.observe.stations[0]
+};
+const DOMAIN = ['explore', 'plan', 'code'];   // skills here are specific to the kind of request
+
+function route(d, color, label, lx, ly){
+  const g = el('g', {class:'part', style:`--c:${color}`}, layerRoutes);
+  const p = el('path', {class:'route', d}, g);
+  if (label){ const t = el('text', {class:'rlabel', x:lx, y:ly, 'text-anchor':'middle'}, g); t.textContent = label; }
+  p.group = g; return p;
+}
+const RT = {
+  testRework:   route('M550,0 L550,-95 Q550,-115 530,-115 L-30,-115 Q-50,-115 -50,-95 L-50,0', COLOR('red'), 'tests fail → back to Code', 250, -123),
+  reviewRework: route('M850,0 L850,-145 Q850,-165 830,-165 L-330,-165 Q-350,-165 -350,-145 L-350,0', COLOR('review'), 'review comments → back to Plan', 250, -173),
+  feedback:     route('M1550,0 L1550,-195 Q1550,-215 1530,-215 L-630,-215 Q-650,-215 -650,-195 L-650,0', COLOR('observe'), 'telemetry becomes an issue', 450, -223),
+  installE:     route('M600,-320 C600,-262 -500,-292 -500,-62', COLOR('retro')),
+  installP:     route('M600,-320 C600,-252 -200,-272 -200,-62', COLOR('retro')),
+  installC:     route('M600,-320 C600,-232 100,-232 100,-62', COLOR('retro'))
+};
+for (const k in RT) RT[k].rid = k;
+
+/* ---------------- factory state ---------------- */
+let cur = 1, phase = 'before', levels = {};
+const vis = id => SCENES[cur].loops.includes(id);
+// A skill helps when its level covers the request. Novel requests need level 2 for domain skills.
+const skilled = (k, a) => (levels[k] || 0) >= ((a && a.novel && DOMAIN.includes(k)) ? 2 : 1);
+function setLevel(k, lv){
+  const st = ST[k]; st.level = lv;
+  st.badge.innerHTML = lv ? GEAR(lv) : '';
+  st.g.classList.toggle('upgraded', lv > 0);
+}
+function applyLevels(){ for (const k in ST) setLevel(k, levels[k] || 0); }
+
+/* ---------------- pipeline (behavior follows from installed skills) ---------------- */
+async function runPipeline(){
+  const S = SCENES[cur];
+  const startLoop = vis('explore') ? L.explore : L.code;
+  let a = pads.get(key(startLoop.inPad));
+  if (!a || !['bubble', 'issue'].includes(a.type)){
+    speed = rate(startLoop.id);
+    a = spawn(S.input || 'bubble', startLoop.inPad.x, startLoop.inPad.y - REST, {novel: !!S.novel});
+    pads.set(key(startLoop.inPad), a);
+    await popIn(a); await sleep(250);
+  }
+
+  // Explore: gathers three pieces of context. Unskilled, one per pass; skilled, all at once.
+  if (vis('explore')){
+    const sk = skilled('explore', a);
+    await L.explore.pass(a, {iterations: sk ? 1 : 3, onStation: async (x, {last}) => {
+      if (sk) await Promise.all([x.addFragment(), x.addFragment(), x.addFragment()]);
+      else await x.addFragment();
+      if (last){ await sleep(150); await morph(x, 'scroll'); }
+    }});
+  }
+  // Plan: an unskilled plan covers 2 of 3 requirements.
+  if (vis('plan')){
+    const sk = skilled('plan', a);
+    await L.plan.pass(a, {onStation: x => { x.checks = sk ? 3 : 2; return morph(x, 'clipboard'); }});
+  }
+
+  // Code: unskilled code has two bugs. Each failing test sends it back, and Code fixes one.
+  const generate = x => { if (x.bugs === undefined) x.bugs = skilled('code', x) ? 0 : 2; return x.setBadge(null).then(() => morph(x, 'file')); };
+  const fix = x => { x.bugs = Math.max(0, x.bugs - 1); return x.setBadge(null).then(() => morph(x, 'file')); };
+  for (;;){
+    await L.code.pass(a, {onStation: generate});
+    if (!vis('test')) return;
+    for (;;){
+      const fail = a.bugs > 0;
+      await L.test.pass(a, {onStation: x => x.setBadge(fail ? 'fail' : 'pass')});
+      if (!fail) break;
+      await ferry(a, RT.testRework, L.test.outPad, L.code.inPad, COLOR('red'));
+      await L.code.pass(a, {onStation: fix});
+    }
+    if (!vis('review')) return;
+    // Review: approves only code that covers every requirement in the plan.
+    const fail = (a.checks ?? 3) < 3;
+    await L.review.pass(a, {onStation: async x => {
+      if (fail) await x.setBadge('comments');
+      else { await x.setBadge(null); await morph(x, 'branch'); }
+    }});
+    if (!fail) break;
+    await ferry(a, RT.reviewRework, L.review.outPad, L.plan.inPad, COLOR('review'));
+    await L.plan.pass(a, {onStation: async x => { await x.setBadge(null); x.checks = 3; await morph(x, 'clipboard'); }});
+  }
+
+  // Deliver: an unskilled first deploy fails its health check and goes around again.
+  if (!vis('deliver')) return;
+  const skD = skilled('deploy', a);
+  await L.deliver.pass(a, {iterations: skD ? 1 : 2, onStation: async (x, {station, last}) => {
+    if (station === 0){ await x.setBadge(null); await morph(x, 'box'); }
+    else if (!last) await x.setBadge('fail');
+    else await morph(x, 'server');
+  }});
+
+  // Observe: turns telemetry into an issue. Unskilled, noisy telemetry takes two passes.
+  if (!vis('observe')) return;
+  speed = rate('observe');
+  await sleep(300);
+  const chart = spawn('chart', a.x, a.y - 32, {novel: a.novel});
+  await popIn(chart);
+  const skO = skilled('observe', chart);
+  await L.observe.pass(chart, {iterations: skO ? 1 : 2, onStation: async (x, {last}) => {
+    if (!last) await x.setBadge('noise');
+    else { await x.setBadge(null); await morph(x, 'issue'); }
+  }});
+  await ferry(chart, RT.feedback, L.observe.outPad, L.explore.inPad, COLOR('observe'));
+}
+
+/* ---------------- improvements ---------------- */
+async function installBeat(t){
+  const st = ST[t.key];
+  speed = NEW_SPEED;
+  const g = el('g', {class:'artifact'}, layerArt);
+  el('g', {}, g).innerHTML = GEAR(1);
+  const tag = el('g', {class:'tag'}, g);
+  const w = t.label.length * 6.6 + 18;
+  el('rect', {x:-w/2, y:-38, width:w, height:19, rx:9.5}, tag);
+  const tx = el('text', {x:0, y:-24.5, 'text-anchor':'middle'}, tag); tx.textContent = t.label;
+  const x0 = st.x, y0 = st.y - 200, x1 = st.x + st.w/2 - 4, y1 = st.y - 22;
+  const place = (x, y, s, o) => { g.setAttribute('transform', `translate(${x},${y}) scale(${s})`); g.style.opacity = o; };
+  place(x0, y0, 1.4, 0);
+  await tween(450, p => place(x0, y0 - 20*(1 - p), 1.4, p));
+  await sleep(700);
+  await tween(900, p => place(x0 + (x1 - x0)*p, y0 + (y1 - y0)*p, 1.4 - .68*p, 1));
+  tag.style.transition = 'opacity .3s'; tag.style.opacity = 0;
+  g.remove();
+  levels[t.key] = 1; setLevel(t.key, 1);
+  const b = st.badge, base = `translate(${x1},${y1})`;
+  await tween(380, p => b.setAttribute('transform', `${base} scale(${(.72 * (1 + .6*Math.sin(p*Math.PI))).toFixed(3)})`), linear);
+  b.setAttribute('transform', `${base} scale(.72)`);
+  await sleep(500);
+}
+
+async function retroUpgrade(){
+  speed = rate('retro');
+  const watched = Object.values(L).filter(l => l.id !== 'retro').flatMap(l => l.stations);
+  watched.forEach((s, i) => setTimeout(() => { s.g.classList.add('watched'); setTimeout(() => s.g.classList.remove('watched'), 700); }, i * 90));
+  await sleep(600);
+  const p = L.retro.inPad;
+  const lesson = spawn('chart', p.x, p.y - REST, {novel:true}); pads.set(key(p), lesson);
+  await popIn(lesson);
+  await L.retro.pass(lesson, {onStation: x => { x.level = 2; x.novel = false; return morph(x, 'gear'); }});
+  // The lesson becomes three upgraded skills: Explore, Plan and Code.
+  const out = L.retro.outPad;
+  const gears = [lesson, spawn('gear', lesson.x, lesson.y, {level:2}), spawn('gear', lesson.x, lesson.y, {level:2})];
+  await Promise.all(gears.slice(1).map(popIn));
+  const jobs = [['explore', RT.installE], ['plan', RT.installP], ['code', RT.installC]];
+  await Promise.all(jobs.map(async ([k, path], i) => {
+    const gear = gears[i], st = ST[k];
+    const c = tempCarrier(COLOR('retro'), out.x, out.y);
+    await pickup(c, gear);
+    await movePath(c, path);
+    c.cargo = null;
+    await slide(gear, st.x + st.w/2 - 4, st.y - 22, 420, .72);
+    gear.remove(); dismiss(c);
+    levels[k] = 2; setLevel(k, 2); st.loop.g.classList.remove('old');
+  }));
+  await sleep(500);
+}
+
+async function scene7(first){
+  if (first){
+    await runPipeline();
+    setSub(SCENES[7].subs.retro);
+    await retroUpgrade();
+    phase = 'after'; setStep(); setSub(SCENES[7].subs.after);
+    await sleep(300);
+  }
+  override = ff ? 2.4 : 3.6;   // the payoff: the whole factory runs faster, but still watchable
+  try { await runPipeline(); } finally { override = null; }
+}
+
+/* ---------------- speed: new parts play at normal speed, earlier loops fast-forward ---------------- */
+let ff = true, override = null;
+const NEW_SPEED = 1.1, FF_SPEED = 5;
+function rate(id){
+  if (override) return override;
+  const S = SCENES[cur];
+  if (!ff) return S.speed;
+  return S.hot.has(id) ? NEW_SPEED : FF_SPEED;
+}
+
+/* ---------------- scenes ---------------- */
+const SCENES = [null,
+  {title:'The Code Loop', loops:['code'], routes:[], fresh:['code'], top:-130, speed:1,
+   focus:{x0:-90, x1:290, top:-130, bot:60},
+   subs:{before:'A prompt goes into the coding station and comes out as code. The red lines are bugs nobody has caught yet.'}},
+  {title:'The Test Loop', loops:['code','test'], routes:['testRework'], fresh:['test','testRework'], top:-175, speed:1.1,
+   focus:{x0:-90, x1:590, top:-175, bot:60},
+   target:{key:'code', label:'Coding skill'},
+   subs:{before:'Each failing test sends the code back to Code, which fixes one bug. Green on the third pass.',
+         after:'With a coding skill installed, Code writes code without those bugs. The tests pass on the first try.'}},
+  {title:'Spec-Driven Development', loops:['explore','plan','code','test'], routes:['testRework'], fresh:['explore','plan'], top:-175, speed:1.45,
+   focus:{x0:-690, x1:-10, top:-130, bot:60},
+   target:{key:'explore', label:'Research skill'},
+   subs:{before:'Explore needs three passes to gather enough context for a spec. Plan turns the spec into a plan for the code.',
+         after:'A research skill gathers all the context in one pass.'}},
+  {title:'The Review Loop', loops:['explore','plan','code','test','review'], routes:['testRework','reviewRework'], fresh:['review','reviewRework'], top:-225, speed:1.8,
+   focus:{x0:-390, x1:890, top:-200, bot:60},
+   target:{key:'plan', label:'Planning skill'},
+   subs:{before:'The plan covers 2 of 3 requirements, so the code does too. Review catches the gap and sends comments back to Plan.',
+         after:'A planning skill covers every requirement. The code it produces is approved on its first review.'}},
+  {title:'The Delivery Loop', loops:['explore','plan','code','test','review','deliver'], routes:['testRework','reviewRework'], fresh:['deliver'], top:-225, speed:2.1,
+   focus:{x0:810, x1:1290, top:-130, bot:60},
+   target:{key:'deploy', label:'Deploy checklist'},
+   subs:{before:'Merged code is built and deployed. The first deploy fails its health check, so the release goes around again.',
+         after:'A deploy checklist makes the first deploy succeed.'}},
+  {title:'The Feedback Loop', loops:['explore','plan','code','test','review','deliver','observe'], routes:['testRework','reviewRework','feedback'], fresh:['observe','feedback'], top:-275, speed:2.4,
+   focus:{x0:1160, x1:1600, top:-250, bot:60},
+   target:{key:'observe', label:'Telemetry skill'},
+   subs:{before:'Observe turns production telemetry into an issue for the next run. Noisy telemetry takes two passes.',
+         after:'A telemetry skill turns production signals into a clear issue in one pass.'}},
+  {title:'The Factory Loop', loops:['explore','plan','code','test','review','deliver','observe','retro'], routes:['testRework','reviewRework','feedback','installE','installP','installC'],
+   fresh:['retro','installE','installP','installC'], top:-445, speed:2.6, novel:true, input:'issue',
+   focus:{x0:-700, x1:660, top:-445, bot:60}, run: scene7,
+   subs:{before:'Production raises a new kind of issue (★). The skills installed so far don’t cover it, so the old rework comes back.',
+         retro:'The retrospective studies the run and upgrades Explore, Plan and Code on its own.',
+         after:'The factory improved itself. Nobody pressed U.'}}
+];
+const N = SCENES.length - 1;
+const FIRST = ONLY ? Math.min(N, START) : 1, LAST = ONLY ? FIRST : N;   // navigable range
+const LOOP_OF = {explore:'explore', plan:'plan', code:'code', deploy:'deliver', observe:'observe'};
+for (const S of SCENES.slice(1)){
+  S.hot = new Set(S.fresh);
+  if (S.target) S.hot.add(LOOP_OF[S.target.key]);
+  S.run = S.run || (() => runPipeline());
+}
+function baseline(n){ const lv = {}; for (let m = 2; m < n; m++) if (SCENES[m].target) lv[SCENES[m].target.key] = 1; return lv; }
+
+/* ---------------- camera ---------------- */
+let cam = null, camTarget = null, zoom = 'focus';
+function bounds(n){
+  const S = SCENES[n];
+  let minX = Infinity, maxX = -Infinity, top = S.top, bot = 60, minW = 820;
+  if (zoom === 'focus'){ ({x0:minX, x1:maxX, top, bot} = S.focus); minW = 720; }
+  else for (const id of S.loops){ minX = Math.min(minX, L[id].x0 - 95); maxX = Math.max(maxX, L[id].x1 + 95); }
+  if (maxX - minX < minW){ const c = (minX + maxX)/2; minX = c - minW/2; maxX = c + minW/2; }
+  const w = maxX - minX, h = bot - top;
+  const W = innerWidth, Hh = innerHeight, hudPx = Math.min(160, 80 + W*0.05), ctlPx = W < 700 ? 140 : 95;
+  const availW = W - 40, availH = Math.max(120, Hh - hudPx - ctlPx);
+  const s = Math.max(w / availW, h / availH);
+  const cx = (minX + maxX)/2, cy = (top + bot)/2;
+  return {x: cx - W*s/2, y: cy - (hudPx + availH/2) * s, w: W*s, h: Hh*s};
+}
+function applyCam(){ svg.setAttribute('viewBox', `${cam.x} ${cam.y} ${cam.w} ${cam.h}`); }
+let lastT = performance.now();
+function camLoop(now){
+  const dt = Math.min(.05, (now - lastT)/1000); lastT = now;
+  if (cam && camTarget){
+    const k = 1 - Math.exp(-dt * 3.2);
+    for (const p of ['x','y','w','h']) cam[p] += (camTarget[p] - cam[p]) * k;
+    applyCam();
+  }
+  requestAnimationFrame(camLoop);
+}
+requestAnimationFrame(camLoop);
+addEventListener('resize', () => { camTarget = bounds(cur); cam = {...camTarget}; applyCam(); });
+
+/* ---------------- HUD ---------------- */
+const dots = $('dots');
+for (let i = 1; i <= N; i++){ const d = document.createElement('span'); d.title = `Scene ${i}`; d.onclick = e => { e.stopPropagation(); playScene(i); }; dots.appendChild(d); }
+function setSub(t){ const s = $('sub'); if (s.textContent === t) return; s.style.opacity = 0; setTimeout(() => { s.textContent = t; s.style.opacity = 1; }, 300); }
+function setStep(){
+  const S = SCENES[cur], tag = (S.target || cur === N) ? ` · <b>${phase === 'before' ? 'Before improvement' : 'After improvement'}</b>` : '';
+  $('step').innerHTML = ONLY ? (tag ? tag.slice(3) : '') : `Scene ${cur} of ${N}${tag}`;
+  const btn = $('improve'), can = !!S.target && phase === 'before';
+  btn.disabled = !can;
+  btn.textContent = S.target ? `⚙ Install ${S.target.label}` : '⚙ Improve';
+}
+// A flashed hint shows for a few seconds, then the scene's own hint comes back.
+let sceneHint = '', flashTimer = 0;
+function showHint(html){ const h = $('hint'); h.innerHTML = html || ''; h.classList.toggle('show', !!html); }
+function hint(html){ sceneHint = html || ''; if (!flashTimer) showHint(sceneHint); }
+function flashHint(html, ms){
+  clearTimeout(flashTimer); showHint(html);
+  flashTimer = setTimeout(() => { flashTimer = 0; showHint(sceneHint); }, ms);
+}
+function setHud(){
+  const S = SCENES[cur];
+  $('title').textContent = S.title;
+  setSub(phase === 'after' && S.subs.after ? S.subs.after : S.subs.before);
+  setStep();
+  [...dots.children].forEach((d, i) => d.classList.toggle('on', i + 1 === cur));
+  hint('');
+  $('improve').classList.remove('ready');
+}
+function afterFirstRun(){
+  const S = SCENES[cur];
+  if (S.target && phase === 'before'){
+    const st = ST[S.target.key];
+    st.g.classList.add('target');
+    $('improve').classList.add('ready');
+    hint(`Press <b>U</b> or <b>→</b> (or click the glowing station) to install the <b>${S.target.label}</b> on ${st.label}`);
+  } else if (cur < LAST) hint('Press → or Space for the next scene');
+  else hint('');
+}
+
+/* ---------------- scene control ---------------- */
+function cleanup(){
+  for (const a of [...arts]) a.remove();
+  pads.clear();
+  for (const c of [...temps]) dismiss(c);
+  for (const l of Object.values(L)){
+    l.reset();
+    l.stations.forEach(s => s.g.classList.remove('active','watched','target'));
+  }
+}
+async function playScene(n, ph = 'before', {install = false} = {}){
+  n = Math.max(FIRST, Math.min(LAST, n));
+  const sameScene = n === cur && cam;
+  token++; cur = n; phase = ph; speed = 1; override = null;
+  cleanup();
+  const S = SCENES[n];
+  levels = baseline(n);
+  if (ph === 'after' && S.target && !install) levels[S.target.key] = 1;
+  applyLevels();
+  for (const [id, l] of Object.entries(L)){ l.g.classList.toggle('on', S.loops.includes(id)); l.g.classList.toggle('old', !S.hot.has(id)); }
+  for (const [id, r] of Object.entries(RT)){ r.group.classList.toggle('on', S.routes.includes(id)); r.group.classList.toggle('old', !S.hot.has(id)); }
+  camTarget = bounds(n); if (!cam){ cam = {...camTarget}; applyCam(); }
+  setHud();
+  try {
+    await wait(sameScene ? 500 : 1100);
+    if (install) await installBeat(S.target);
+    let first = true;
+    for (;;){
+      await S.run(first);
+      if (first) afterFirstRun();
+      first = false;
+      await wait(1800);
+    }
+  } catch (e) { if (e !== CANCEL) console.error(e); }
+}
+function improve(){ const S = SCENES[cur]; if (S.target && phase === 'before') playScene(cur, 'after', {install:true}); }
+function advance(){
+  const S = SCENES[cur];
+  if (S.target && phase === 'before') improve();
+  else if (cur < LAST) playScene(cur + 1);
+}
+function back(){
+  const S = SCENES[cur];
+  if (S.target && phase === 'after') playScene(cur, 'before');
+  else if (cur > FIRST) playScene(cur - 1, SCENES[cur - 1].target ? 'after' : 'before');
+}
+function toggleFF(){ ff = !ff; $('ff').classList.toggle('on', ff); }
+function toggleZoom(){
+  zoom = zoom === 'focus' ? 'whole' : 'focus';
+  $('zoom').textContent = zoom === 'focus' ? '🔍 Zoom: new parts' : '🔍 Zoom: whole factory';
+  camTarget = bounds(cur);
+}
+addEventListener('keydown', e => {
+  if (['ArrowRight',' ','PageDown','Enter'].includes(e.key)) { e.preventDefault(); advance(); }
+  else if (['ArrowLeft','PageUp'].includes(e.key) || (e.key === 'Backspace' && !EMBED)) { e.preventDefault(); back(); }
+  else if (e.key === 'u' || e.key === 'U') improve();
+  else if (e.key === 'r' || e.key === 'R') playScene(cur);
+  else if (e.key === 'f' || e.key === 'F') toggleFF();
+  else if (e.key === 'z' || e.key === 'Z') toggleZoom();
+  else if (e.key === 'Home') playScene(FIRST);
+  else if (/^[1-7]$/.test(e.key) && !ONLY) playScene(+e.key);
+});
+if (!EMBED) svg.addEventListener('click', advance);
+const btn = (id, fn) => $(id).onclick = e => { e.stopPropagation(); fn(); };
+btn('next', advance); btn('prev', back); btn('replay', () => playScene(cur)); btn('improve', improve); btn('ff', toggleFF); btn('zoom', toggleZoom);
+
+/* ---------------- full screen: one button that toggles, plus a reminder that Esc exits ---------------- */
+const fsElement = () => document.fullscreenElement || document.webkitFullscreenElement;
+function toggleFullscreen(){
+  // Browsers can refuse (no user gesture, or a host frame without allow="fullscreen"); stay put if so.
+  const p = fsElement()
+    ? (document.exitFullscreen || document.webkitExitFullscreen).call(document)
+    : (root.requestFullscreen || root.webkitRequestFullscreen).call(root);
+  if (p && p.catch) p.catch(() => {});
+}
+function onFullscreenChange(){
+  const on = !!fsElement();
+  $('fs').textContent = on ? '✕ Exit full screen' : '⛶ Full screen';
+  $('fs').classList.toggle('on', on);
+  if (on) flashHint('Press <b>Esc</b> or <b>✕</b> to exit full screen', 4000);
+}
+if (document.fullscreenEnabled || document.webkitFullscreenEnabled){
+  $('fs').hidden = false;
+  btn('fs', toggleFullscreen);
+  document.addEventListener('fullscreenchange', onFullscreenChange);
+  document.addEventListener('webkitfullscreenchange', onFullscreenChange);
+}
+
+playScene(START);
+})();
+</script>
+</body>
+</html>
