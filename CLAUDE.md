@@ -7,7 +7,7 @@ Factory Engineering is a documentation site built with **Astro + Starlight** and
 - **Package manager:** Yarn
 - **Language:** TypeScript (strict mode)
 - **Deployment:** Azure Static Web Apps (primary), Netlify (alternative)
-- **Localization:** English (root) and French (`fr`)
+- **Localization:** English (root) only. French (`fr`) translation files exist but the locale is disabled in `src/config/locals.json` until the content is translated.
 
 ## Commands
 
@@ -110,6 +110,6 @@ All site configuration lives in `src/config/` as JSON files:
 4. **Theming changes** go in `src/config/theme.json`, not hardcoded in CSS.
 5. **No ESLint/Prettier configured** -- follow existing code style (2-space indent, no trailing semicolons in Astro frontmatter, semicolons in TS files).
 6. **Factory definitions** use JSON with supporting markdown in a same-named directory.
-7. **i18n:** Add French translations in parallel (`fr/` subdirectories or `menu.fr.json`).
+7. **i18n:** French is disabled. Do not add French pages unless re-enabling the `fr` locale in `src/config/locals.json`.
 8. **Do not modify** generated files in `.astro/` or `dist/`.
 9. Use the available Claude Code skills (in `.claude/skills/`) for specialized tasks like creating skills, working with Astro components, or writing documentation.
