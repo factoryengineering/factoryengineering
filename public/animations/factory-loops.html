@@ -135,7 +135,13 @@ setTheme(params.get('theme'));
 addEventListener('message', e => { if (e.data && e.data.type === 'factory-loops:theme') setTheme(e.data.theme); });
 const EMBED = params.has('embed'), ONLY = params.has('only');
 root.classList.toggle('embed', EMBED); root.classList.toggle('only', ONLY);
-const START = +(params.get('scene') || (location.hash.match(/^#scene-([1-7])$/) || [0, 1])[1]) || 1;
+// Only whole scenes 1–7 are valid; anything else (0, -1, 2.5, "abc") falls back to the hash, then scene 1.
+function startScene(){
+  const q = params.get('scene'), h = location.hash.match(/^#scene-([1-7])$/);
+  if (q && /^[1-7]$/.test(q)) return +q;
+  return h ? +h[1] : 1;
+}
+const START = startScene();
 const svg = $('stage');
 const layerRoutes = $('layerRoutes'), layerLoops = $('layerLoops'), layerTemp = $('layerTemp'), layerArt = $('layerArt');
 function el(tag, attrs = {}, parent){ const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; }
