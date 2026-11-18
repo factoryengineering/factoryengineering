@@ -15,7 +15,7 @@ A comprehensive skill for managing content in the Factory Engineering static web
 The Factory Engineering site is built with Astro and Starlight, featuring a custom content structure organized into three main collections:
 
 - **Articles**: Educational content about factory engineering concepts
-- **Examples**: Ready-to-use factory configurations
+- **Examples**: Example repositories with their factories checked in
 - **Skills**: Documentation for reusable AI skills and tools
 - **Docs**: General documentation and landing pages
 
@@ -55,7 +55,7 @@ draft: false
 
 ### Examples Collection
 
-Examples demonstrate ready-to-use factory configurations for common scenarios.
+Examples are real repositories that show factory engineering in practice. Each entry links to a repository you clone and explore.
 
 **Location**: `src/content/examples/`
 
@@ -136,7 +136,7 @@ description: "Page description"
 **Special Pages**:
 - `index.mdx`: Home page (uses splash template)
 - `articles.md`: Articles landing page
-- `examples.md`: Examples landing page
+- `examples.mdx`: Examples landing page (renders the examples collection)
 - `skills.md`: Skills landing page
 - `404.md`: Not found page
 
@@ -149,7 +149,7 @@ src/content/
 ├── articles/           # Educational articles
 │   ├── 01-*.md
 │   └── 02-*.md
-├── examples/           # Factory configurations
+├── examples/           # Example repository entries
 │   ├── 01-*.md
 │   └── 02-*.md
 ├── skills/             # Skill documentation
@@ -158,7 +158,7 @@ src/content/
 ├── docs/               # General docs & landing pages
 │   ├── index.mdx
 │   ├── articles.md
-│   ├── examples.md
+│   ├── examples.mdx
 │   └── skills.md
 ├── i18n/               # Internationalization
 └── sections/           # Page sections (CTA, etc.)
@@ -230,7 +230,7 @@ git commit -m "Add workflow patterns article"
 
 ### Updating Landing Pages
 
-Landing pages (`articles.md`, `examples.md`, `skills.md`) should be updated when:
+Landing pages (`articles.md`, `examples.mdx`, `skills.md`) should be updated when:
 - New categories are added
 - Featured content changes
 - Navigation structure changes
