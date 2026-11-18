@@ -5,16 +5,6 @@ description: Workshop resources for Build Your Own Software Factory — reposito
 
 Welcome to the **Build Your Own Software Factory** workshop. Everything you need for the session is linked below.
 
-## Factory Engineering skills
-
-[github.com/factoryengineering/skills](https://github.com/factoryengineering/skills)
-
-The night-shift skills that let a scheduled agent work a queue of labelled issues while nobody is watching. Install them into your project:
-
-```bash
-npx openskills install factoryengineering/skills
-```
-
 ## Demo application
 
 [github.com/factoryengineering/demo](https://github.com/factoryengineering/demo)
@@ -33,6 +23,16 @@ A TypeScript framework that ablates a skill one line at a time and measures, acr
 
 ```bash
 git clone https://github.com/factoryengineering/eval.git
+```
+
+## Factory Engineering skills
+
+[github.com/factoryengineering/skills](https://github.com/factoryengineering/skills)
+
+The night-shift skills that let a scheduled agent work a queue of labelled issues while nobody is watching. Install them into your project:
+
+```bash
+npx openskills install factoryengineering/skills
 ```
 
 ## Michael L. Perry's skills
