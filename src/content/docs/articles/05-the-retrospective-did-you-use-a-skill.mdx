@@ -8,6 +8,7 @@ draft: false
 ---
 
 import ChatAnim from '~/components/user-components/ChatAnim.astro';
+import FactoryLoops from '~/components/user-components/FactoryLoops.astro';
 
 *Build Your Software Factory — Article 3 of 20*
 
@@ -99,6 +100,10 @@ Two observations, two concrete edits. No "improve grouping coverage" tickets. Ev
 ## Re-test in a clean room
 
 Close everything. Open a fresh session. Give the assistant a new repository task that exercises grouping and a navigation property — ideally one you have not seen before. Watch it name the skill when you ask what it loaded. Watch the output follow the new rule.
+
+This is the retrospective loop. Today you run it by hand. As your factory grows, the retrospective watches every station, finds where rework happened, and upgrades the skills that caused it.
+
+<FactoryLoops scene={7} only caption="The retrospective upgrades Explore, Plan, and Code on its own." />
 
 You are now one full loop into the cycle:
 

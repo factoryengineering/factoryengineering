@@ -1,0 +1,110 @@
+---
+interface Props {
+  scene?: number;
+  only?: boolean;
+  title?: string;
+  caption?: string;
+}
+
+const { scene = 1, only = false, title = "Software factory loops animation", caption } = Astro.props;
+
+const base = "/animations/factory-loops.html";
+const query = new URLSearchParams({ embed: "", scene: String(scene) });
+if (only) query.set("only", "");
+const src = `${base}?${query.toString().replace(/=(&|$)/g, "$1")}`;
+const fullSrc = `${base}#scene-${scene}`;
+---
+
+<factory-loops class="factory-loops not-content">
+  <div class="factory-loops-frame">
+    <iframe data-src={src} title={title} loading="lazy" allow="fullscreen"></iframe>
+  </div>
+  <div class="factory-loops-bar">
+    {caption && <span class="factory-loops-caption">{caption}</span>}
+    <span class="factory-loops-actions">
+      <a href={fullSrc} target="_blank" rel="noopener">Open in new tab</a>
+    </span>
+  </div>
+</factory-loops>
+
+<script>
+  class FactoryLoops extends HTMLElement {
+    private observer?: MutationObserver;
+
+    connectedCallback() {
+      const frame = this.querySelector("iframe");
+      if (!frame) return;
+
+      // Match the site's theme, now and whenever the theme switch changes it.
+      const sendTheme = () =>
+        frame.contentWindow?.postMessage(
+          { type: "factory-loops:theme", theme: document.documentElement.dataset.theme || "dark" },
+          location.origin
+        );
+      // Set the source here so the first paint already uses the site's theme.
+      const url = new URL(frame.dataset.src || "", location.href);
+      url.searchParams.set("theme", document.documentElement.dataset.theme || "dark");
+      frame.addEventListener("load", sendTheme);
+      frame.src = url.toString();
+      this.observer = new MutationObserver(sendTheme);
+      this.observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+    }
+
+    disconnectedCallback() {
+      this.observer?.disconnect();
+    }
+  }
+
+  if (!customElements.get("factory-loops")) customElements.define("factory-loops", FactoryLoops);
+</script>
+
+<style>
+  .factory-loops {
+    display: block;
+    clear: both;
+    margin: 1.5rem 0 2rem;
+  }
+  .factory-loops-frame {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    min-height: 360px;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--sl-color-bg);
+  }
+  .factory-loops-frame iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+  .factory-loops-bar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem 1rem;
+    margin-top: 0.5rem;
+    font-size: var(--sl-text-sm);
+    color: var(--sl-color-gray-3);
+  }
+  .factory-loops-actions {
+    display: flex;
+    gap: 1rem;
+    margin-left: auto;
+  }
+  .factory-loops-actions a {
+    font: inherit;
+    color: var(--sl-color-accent-high);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  @media (max-width: 600px) {
+    .factory-loops-frame {
+      aspect-ratio: auto;
+      height: 480px;
+    }
+  }
+</style>
