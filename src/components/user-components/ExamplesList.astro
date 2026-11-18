@@ -1,0 +1,31 @@
+---
+import { getCollection } from "astro:content";
+import { marked } from "marked";
+
+const entries = (await getCollection("examples")).sort((a, b) =>
+  a.id.localeCompare(b.id)
+);
+
+const inline = (text: string) => marked.parseInline(text) as string;
+---
+
+{
+  entries.map(({ data }) => (
+    <section class="example-repo">
+      <h3>
+        <a href={data.githubUrl}>factoryengineering/{data.title}</a>
+      </h3>
+      <p set:html={inline(data.description)} />
+      {data.demonstrates && (
+        <>
+          <p><strong>What it demonstrates:</strong></p>
+          <ul>
+            {data.demonstrates.map((item) => (
+              <li set:html={inline(item)} />
+            ))}
+          </ul>
+        </>
+      )}
+    </section>
+  ))
+}
